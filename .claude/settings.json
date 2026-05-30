@@ -1,0 +1,98 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/secret-scanner.py",
+            "statusMessage": "Scanning for secrets..."
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/env-file-protection.py",
+            "statusMessage": "Checking env file rules..."
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/tdd-enforcer.py",
+            "statusMessage": "Checking TDD compliance..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/env-file-protection.py",
+            "statusMessage": "Checking git safety..."
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/branch-taxonomy.py",
+            "statusMessage": "Validating branch name..."
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/commit-message.py",
+            "statusMessage": "Validating commit message..."
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/commit-gate.py",
+            "statusMessage": "Running commit gate (tests + credo)..."
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/migration-gate.py",
+            "statusMessage": "Checking pending migrations..."
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/trivy-scanner.py",
+            "statusMessage": "Running Trivy security scan..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/elixir-test-runner.py",
+            "statusMessage": "Running Elixir tests..."
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/elixir-credo.py",
+            "statusMessage": "Running credo..."
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/elixir-dialyzer.py",
+            "statusMessage": "Running dialyzer on core modules..."
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/swift-format.py",
+            "statusMessage": "Formatting Swift..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/llm-mock-enforcer.py",
+            "statusMessage": "Checking LLM mock compliance..."
+          }
+        ]
+      }
+    ]
+  }
+}
