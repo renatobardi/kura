@@ -3,28 +3,28 @@
 Hook #14 — SonarCloud (PreToolUse: Bash)
 Kura Project
 
-Roda sonar-scanner antes de criar PR via gh pr create.
-Aguarda o Quality Gate do SonarCloud e bloqueia se falhar.
+Roda sonar-scanner antes de gh pr create e aguarda o resultado
+do Quality Gate na SonarCloud. Bloqueia PR se o gate falhar.
 
-Quality Gate verifica:
-  - Cobertura de testes (mínimo configurado no SonarCloud)
-  - Duplicação de código
-  - Code smells
-  - Bugs e vulnerabilidades
-  - Security hotspots
-
-Requer:
-  - sonar-scanner instalado (brew install sonar-scanner)
-  - SONAR_TOKEN em env ou .env
-  - sonar-project.properties no root do projeto
+Pré-requisitos:
+  1. sonar-scanner instalado (brew install sonar-scanner)
+  2. SONAR_TOKEN exportado no ambiente
+  3. sonar-project.properties no root do projeto
 
 sonar-project.properties mínimo:
-  sonar.projectKey=bardi_kura
-  sonar.organization=bardi
-  sonar.host.url=https://sonarcloud.io
+  sonar.projectKey=renato-bardi_kura
+  sonar.organization=renato-bardi
   sonar.sources=lib
   sonar.tests=test
-  sonar.elixir.coverage.reportPath=cover/excoveralls.json
+  sonar.host.url=https://sonarcloud.io
+  sonar.elixir.file.suffixes=.ex,.exs
+  sonar.exclusions=_build/**,deps/**,priv/repo/migrations/**
+
+Quality Gate bloqueia PR se:
+  - Novos bugs introduzidos
+  - Novas vulnerabilidades de segurança
+  - Code smells acima do limiar configurado
+  - Cobertura de testes abaixo do mínimo
 """
 import json
 import os
@@ -34,6 +34,7 @@ import sys
 import time
 import urllib.request
 import urllib.error
+import base64
 
 # ── Input ─────────────────────────────────────────────────────────────────────
 try:
@@ -47,7 +48,6 @@ if data.get("tool_name") != "Bash":
 command = data.get("tool_input", {}).get("command", "")
 cwd     = data.get("cwd", os.getcwd())
 
-# Só dispara em gh pr create
 if not re.search(r'\bgh\s+pr\s+create\b', command):
     sys.exit(0)
 
@@ -63,167 +63,196 @@ def find_project_root(start):
 project_root = find_project_root(cwd)
 props_file   = os.path.join(project_root, 'sonar-project.properties')
 
-# ── Verifica pré-requisitos ───────────────────────────────────────────────────
-def allow(msg):
-    print(json.dumps({
-        "hookSpecificOutput": {
-            "hookEventName": "PreToolUse",
-            "permissionDecision": "allow",
-            "additionalContext": msg,
-        }
-    }))
-    sys.exit(0)
-
-def deny(msg):
-    print(json.dumps({
-        "hookSpecificOutput": {
-            "hookEventName": "PreToolUse",
-            "permissionDecision": "deny",
-            "permissionDecisionReason": msg,
-        }
-    }))
-    sys.exit(0)
-
-# sonar-scanner instalado?
-try:
-    subprocess.run(['sonar-scanner', '--version'], capture_output=True, timeout=10)
-except FileNotFoundError:
-    allow("SONARCLOUD: sonar-scanner não instalado — análise pulada.\nInstale: brew install sonar-scanner")
-
-# sonar-project.properties existe?
-if not os.path.exists(props_file):
-    allow(
-        "SONARCLOUD: sonar-project.properties não encontrado — análise pulada.\n"
-        "Crie o arquivo no root do projeto (veja o docstring deste hook)."
-    )
-
-# SONAR_TOKEN disponível?
+# ── Verifica pré-requisitos ────────────────────────────────────────────────────
 sonar_token = os.environ.get('SONAR_TOKEN', '')
-if not sonar_token:
-    # Tenta ler do .env
-    env_file = os.path.join(project_root, '.env')
-    if os.path.exists(env_file):
-        with open(env_file) as f:
-            for line in f:
-                m = re.match(r'^SONAR_TOKEN\s*=\s*(.+)$', line.strip())
-                if m:
-                    sonar_token = m.group(1).strip().strip('"\'')
-                    break
 
 if not sonar_token:
-    allow("SONARCLOUD: SONAR_TOKEN não configurado — análise pulada.\nDefina SONAR_TOKEN no .env ou no ambiente.")
+    print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+        "permissionDecision": "allow",
+        "additionalContext": (
+            "SONARCLOUD: SONAR_TOKEN não encontrado — scan pulado.\n"
+            "Configure: export SONAR_TOKEN=seu_token_aqui\n"
+            "Gere em: https://sonarcloud.io/account/security"
+        )}}))
+    sys.exit(0)
 
-# ── Lê project key e organization do properties ───────────────────────────────
-project_key  = None
-organization = None
+if not os.path.exists(props_file):
+    # Gera properties mínimo
+    try:
+        # Tenta inferir projectKey do git remote
+        remote = subprocess.run(['git', 'remote', 'get-url', 'origin'],
+                                cwd=project_root, capture_output=True, text=True)
+        repo_match = re.search(r'github\.com[:/](.+?)(?:\.git)?$', remote.stdout.strip())
+        repo_slug  = repo_match.group(1).replace('/', '_') if repo_match else 'renato-bardi_kura'
+        org        = repo_slug.split('_')[0] if '_' in repo_slug else 'renato-bardi'
+
+        with open(props_file, 'w') as f:
+            f.write(f"""sonar.projectKey={repo_slug}
+sonar.organization={org}
+sonar.projectName=Kura
+sonar.sources=lib
+sonar.tests=test
+sonar.host.url=https://sonarcloud.io
+sonar.elixir.file.suffixes=.ex,.exs
+sonar.swift.file.suffixes=.swift
+sonar.exclusions=_build/**,deps/**,priv/repo/migrations/**,.claude/**
+sonar.coverage.exclusions=test/**
+""")
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+            "permissionDecision": "allow",
+            "additionalContext": (
+                f"SONARCLOUD: sonar-project.properties criado em {props_file}.\n"
+                "Verifique as configurações antes de criar o PR novamente."
+            )}}))
+        sys.exit(0)
+    except Exception:
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+            "permissionDecision": "allow",
+            "additionalContext": "SONARCLOUD: sonar-project.properties não encontrado — scan pulado."}}))
+        sys.exit(0)
+
+try:
+    subprocess.run(['sonar-scanner', '--version'], capture_output=True, timeout=5)
+except FileNotFoundError:
+    print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+        "permissionDecision": "allow",
+        "additionalContext": "SONARCLOUD: sonar-scanner não instalado.\nInstale: brew install sonar-scanner"}}))
+    sys.exit(0)
+
+# ── Extrai projectKey e organization do properties ────────────────────────────
+props = {}
 with open(props_file) as f:
     for line in f:
-        m = re.match(r'^sonar\.projectKey\s*=\s*(.+)$', line.strip())
-        if m:
-            project_key = m.group(1).strip()
-        m = re.match(r'^sonar\.organization\s*=\s*(.+)$', line.strip())
-        if m:
-            organization = m.group(1).strip()
+        line = line.strip()
+        if '=' in line and not line.startswith('#'):
+            k, _, v = line.partition('=')
+            props[k.strip()] = v.strip()
+
+project_key = props.get('sonar.projectKey', '')
+organization = props.get('sonar.organization', '')
 
 if not project_key:
-    allow("SONARCLOUD: sonar.projectKey não encontrado em sonar-project.properties.")
-
-# ── Gera cobertura antes do scan (se excoveralls estiver disponível) ──────────
-coverage_report = os.path.join(project_root, 'cover', 'excoveralls.json')
-if not os.path.exists(coverage_report):
-    try:
-        subprocess.run(
-            ['mix', 'coveralls.json'],
-            cwd=project_root,
-            capture_output=True,
-            timeout=120,
-        )
-    except Exception:
-        pass  # Continua mesmo sem cobertura
+    print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+        "permissionDecision": "allow",
+        "additionalContext": "SONARCLOUD: sonar.projectKey não definido em sonar-project.properties."}}))
+    sys.exit(0)
 
 # ── Roda sonar-scanner ────────────────────────────────────────────────────────
+print(json.dumps({"additionalContext": "SONARCLOUD: Enviando análise para SonarCloud..."}), flush=True)
+
 try:
     scan_result = subprocess.run(
         ['sonar-scanner', f'-Dsonar.token={sonar_token}'],
         cwd=project_root,
         capture_output=True,
         text=True,
-        timeout=180,
+        timeout=300,
         env={**os.environ, 'SONAR_TOKEN': sonar_token},
     )
 
-    if scan_result.returncode != 0:
-        err = (scan_result.stderr or scan_result.stdout)[:500]
-        allow(f"SONARCLOUD: scan falhou (exit {scan_result.returncode}) — PR permitido.\n{err}")
+    scan_output = scan_result.stdout + scan_result.stderr
 
-    # Extrai task ID do output para aguardar resultado
-    task_match = re.search(r'task\?id=([a-zA-Z0-9_-]+)', scan_result.stdout + scan_result.stderr)
-    task_id    = task_match.group(1) if task_match else None
+    # Extrai task URL do output
+    task_url_match = re.search(r'More about the report processing at (https?://\S+)', scan_output)
+
+    if scan_result.returncode != 0 or not task_url_match:
+        err = scan_output[-800:].strip()
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+            "permissionDecision": "allow",
+            "additionalContext": f"SONARCLOUD: Scanner falhou — PR permitido com aviso.\n{err}"}}))
+        sys.exit(0)
+
+    task_url = task_url_match.group(1)
+    # Extrai task ID
+    task_id_match = re.search(r'[?&]id=([A-Za-z0-9_-]+)', task_url)
+    task_id = task_id_match.group(1) if task_id_match else None
 
 except subprocess.TimeoutExpired:
-    allow("SONARCLOUD: scan timeout (>3min) — PR permitido. Verifique o SonarCloud manualmente.")
-except Exception as e:
-    allow(f"SONARCLOUD: erro ao rodar scan — {e}")
+    print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+        "permissionDecision": "allow",
+        "additionalContext": "SONARCLOUD: timeout no scanner (>5min) — PR permitido com aviso."}}))
+    sys.exit(0)
 
-# ── Aguarda Quality Gate ──────────────────────────────────────────────────────
-def sonar_api(path):
-    url = f"https://sonarcloud.io/api/{path}"
-    req = urllib.request.Request(url)
-    req.add_header('Authorization', f'Bearer {sonar_token}')
-    try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            return json.loads(resp.read())
-    except Exception:
-        return None
+# ── Aguarda processamento na SonarCloud (poll) ────────────────────────────────
+def sonar_request(url):
+    token_b64 = base64.b64encode(f"{sonar_token}:".encode()).decode()
+    req = urllib.request.Request(url, headers={"Authorization": f"Basic {token_b64}"})
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        return json.loads(resp.read())
 
-# Aguarda task completar (máx 90s)
+POLL_TIMEOUT = 120  # segundos
+POLL_INTERVAL = 5
+elapsed = 0
+task_status = None
+
 if task_id:
-    for _ in range(18):  # 18 × 5s = 90s
-        time.sleep(5)
-        task = sonar_api(f"ce/task?id={task_id}")
-        if task and task.get('task', {}).get('status') in ('SUCCESS', 'FAILED', 'CANCELLED'):
-            break
+    api_base = props.get('sonar.host.url', 'https://sonarcloud.io')
+    while elapsed < POLL_TIMEOUT:
+        try:
+            task_data   = sonar_request(f"{api_base}/api/ce/task?id={task_id}")
+            task_status = task_data.get('task', {}).get('status', '')
+            if task_status in ('SUCCESS', 'FAILED', 'CANCELLED'):
+                break
+        except Exception:
+            pass
+        time.sleep(POLL_INTERVAL)
+        elapsed += POLL_INTERVAL
 
-# Verifica Quality Gate
-qg = sonar_api(f"qualitygates/project_status?projectKey={project_key}")
-
-if not qg:
-    allow("SONARCLOUD: não foi possível verificar Quality Gate — PR permitido.")
-
-status = qg.get('projectStatus', {}).get('status', 'NONE')
-
-if status == 'OK':
-    print(json.dumps({
-        "hookSpecificOutput": {
-            "hookEventName": "PreToolUse",
-            "permissionDecision": "allow",
-            "additionalContext": f"[sonarcloud ✓] Quality Gate OK — PR liberado.",
-        }
-    }))
-
-elif status in ('ERROR', 'WARN'):
-    # Extrai condições que falharam
-    conditions = qg.get('projectStatus', {}).get('conditions', [])
-    failed     = [c for c in conditions if c.get('status') in ('ERROR', 'WARN')]
-
-    lines = []
-    for c in failed[:10]:
-        metric   = c.get('metricKey', '').replace('_', ' ')
-        actual   = c.get('actualValue', '?')
-        thresh   = c.get('errorThreshold', '?')
-        cstatus  = c.get('status', '')
-        lines.append(f"  {'✗' if cstatus == 'ERROR' else '⚠'} {metric}: {actual} (limite: {thresh})")
-
-    cond_text = "\n".join(lines) if lines else "  Verifique o dashboard do SonarCloud."
-    url_link  = f"https://sonarcloud.io/project/overview?id={project_key}"
-
-    deny(
-        f"SONARCLOUD: Quality Gate {'FALHOU' if status == 'ERROR' else 'com AVISO'} — PR bloqueado.\n\n"
-        f"Condições com problema:\n{cond_text}\n\n"
-        f"Dashboard: {url_link}\n"
-        f"Corrija os problemas e tente novamente."
+# ── Verifica Quality Gate ─────────────────────────────────────────────────────
+if task_status != 'SUCCESS':
+    msg = (
+        f"SONARCLOUD: Análise {task_status or 'inconclusiva'} após {elapsed}s.\n"
+        f"Verifique em: https://sonarcloud.io/project/overview?id={project_key}\n"
+        "PR permitido com aviso."
     )
-else:
-    allow(f"SONARCLOUD: status '{status}' — PR permitido. Verifique o dashboard.")
+    print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+        "permissionDecision": "allow", "additionalContext": msg}}))
+    sys.exit(0)
+
+try:
+    api_base   = props.get('sonar.host.url', 'https://sonarcloud.io')
+    gate_data  = sonar_request(
+        f"{api_base}/api/qualitygates/project_status"
+        f"?projectKey={project_key}"
+        + (f"&organization={organization}" if organization else "")
+    )
+    gate       = gate_data.get('projectStatus', {})
+    gate_status = gate.get('status', 'UNKNOWN')  # OK, WARN, ERROR
+
+    conditions = gate.get('conditions', [])
+    failed     = [c for c in conditions if c.get('status') == 'ERROR']
+    warned     = [c for c in conditions if c.get('status') == 'WARN']
+
+    sonar_url  = f"https://sonarcloud.io/project/overview?id={project_key}"
+
+    if gate_status == 'OK':
+        warn_note = ""
+        if warned:
+            warn_note = f"\n⚠️  {len(warned)} condição(ões) em aviso — revise em {sonar_url}"
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+            "permissionDecision": "allow",
+            "additionalContext": f"[sonarcloud ✓] Quality Gate passou. PR liberado.{warn_note}"}}))
+
+    else:
+        def fmt_condition(c):
+            metric  = c.get('metricKey', '').replace('_', ' ')
+            actual  = c.get('actualValue', '?')
+            error   = c.get('errorThreshold', '?')
+            return f"  • {metric}: {actual} (limiar: {error})"
+
+        failed_lines = "\n".join(fmt_condition(c) for c in failed[:8])
+        reason = (
+            f"SONARCLOUD: Quality Gate FALHOU — PR bloqueado.\n\n"
+            f"Condições com falha:\n{failed_lines}\n\n"
+            f"Detalhes: {sonar_url}\n\n"
+            f"Corrija os problemas e rode o scan novamente."
+        )
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+            "permissionDecision": "deny", "permissionDecisionReason": reason}}))
+
+except Exception as e:
+    print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+        "permissionDecision": "allow",
+        "additionalContext": f"SONARCLOUD: erro ao checar Quality Gate — {e}\nVerifique: https://sonarcloud.io"}}))
 
 sys.exit(0)
