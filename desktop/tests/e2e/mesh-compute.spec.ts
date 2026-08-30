@@ -99,7 +99,7 @@ test("a consuming client can switch to sharing its saved local model", async ({
   // client with one serve start (never a stop command).
   const localModel = "hf://demo/local-small-model:Q4_K_M";
   await page.addInitScript((model) => {
-    window.localStorage.setItem("buzz.mesh-compute.share.model.v1", model);
+    window.localStorage.setItem("kura.mesh-compute.share.model.v1", model);
   }, localModel);
   await installMockBridge(page);
   await page.goto("/");

@@ -524,7 +524,7 @@ test("thread gallery includes only currently rendered media", async ({
 test("preview-first galleries retain Markdown image actions", async ({
   page,
 }) => {
-  const previewUrl = "https://github.com/block/buzz/pull/6705";
+  const previewUrl = "https://github.com/block/kura/pull/6705";
   await installMockBridge(page, {
     uploadDescriptors: [
       {
@@ -546,7 +546,7 @@ test("preview-first galleries retain Markdown image actions", async ({
     }),
   );
   await page.addInitScript(() => {
-    localStorage.setItem("buzz.appearance.linkPreviewStyle", "rich");
+    localStorage.setItem("kura.appearance.linkPreviewStyle", "rich");
   });
   await page.goto("/");
   await page.getByTestId("channel-general").click();
@@ -718,7 +718,7 @@ test("hidden spoiler images are excluded from gallery navigation until revealed"
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
 
-  const spoiler = row.locator(".buzz-spoiler[data-spoiler]").first();
+  const spoiler = row.locator(".kura-spoiler[data-spoiler]").first();
   await expect(spoiler).toHaveAttribute("data-revealed", "false");
   await spoiler.click();
   await expect(spoiler).toHaveAttribute("data-revealed", "true");

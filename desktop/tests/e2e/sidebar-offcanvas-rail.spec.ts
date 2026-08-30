@@ -4,7 +4,7 @@ import { installMockBridge } from "../helpers/bridge";
 import { waitForAnimations } from "../helpers/animations";
 
 const SHOTS = "test-results/sidebar-offcanvas-rail";
-const THEME_STORAGE_KEY = "buzz-theme";
+const THEME_STORAGE_KEY = "kura-theme";
 const RELAY_URL = "ws://localhost:3000";
 
 const COMMUNITY_A = {
@@ -31,8 +31,8 @@ async function setup(page: Page, theme: string) {
   await installMockBridge(page, undefined, { skipCommunitySeed: true });
   await page.addInitScript(
     ({ list, active }) => {
-      window.localStorage.setItem("buzz-communities", JSON.stringify(list));
-      window.localStorage.setItem("buzz-active-community-id", active);
+      window.localStorage.setItem("kura-communities", JSON.stringify(list));
+      window.localStorage.setItem("kura-active-community-id", active);
     },
     { list: [COMMUNITY_A, COMMUNITY_B], active: COMMUNITY_A.id },
   );
@@ -48,7 +48,7 @@ async function setup(page: Page, theme: string) {
  * fragments on the transparent Kura chrome. The collapsed sidebar must be
  * invisible and non-interactive, leaving the rail clean in every theme.
  */
-for (const theme of ["buzz", "buzz-dark", "vesper"]) {
+for (const theme of ["kura", "kura-dark", "vesper"]) {
   test(`collapsed sidebar leaves the community rail clean — ${theme}`, async ({
     page,
   }) => {

@@ -4,11 +4,11 @@ import { installMockBridge } from "../helpers/bridge";
 import { FEATURE_OVERRIDES_STORAGE_KEY } from "../helpers/features";
 
 const RELAY_URL = "ws://localhost:3000";
-const THEME_STORAGE_KEY = "buzz-theme";
+const THEME_STORAGE_KEY = "kura-theme";
 const OWNER_PUBKEY = "deadbeef".repeat(8);
 
 function snapshotKey(relayUrl: string) {
-  return `buzz-channels.v1:${relayUrl}:${OWNER_PUBKEY.toLowerCase()}`;
+  return `kura-channels.v1:${relayUrl}:${OWNER_PUBKEY.toLowerCase()}`;
 }
 
 const COMMUNITY_A = {
@@ -29,8 +29,8 @@ async function expectContentSurfaceHorizontalGutters(
   expectedLeftGutter = 1,
 ) {
   const [mainInsetBox, contentBox] = await Promise.all([
-    page.locator("[data-buzz-glass-inset]").boundingBox(),
-    page.locator("[data-buzz-content-surface]").first().boundingBox(),
+    page.locator("[data-kura-glass-inset]").boundingBox(),
+    page.locator("[data-kura-content-surface]").first().boundingBox(),
   ]);
   expect(mainInsetBox).not.toBeNull();
   expect(contentBox).not.toBeNull();
@@ -50,8 +50,8 @@ async function seedCommunities(
 ) {
   await page.addInitScript(
     ({ list, active }) => {
-      window.localStorage.setItem("buzz-communities", JSON.stringify(list));
-      window.localStorage.setItem("buzz-active-community-id", active);
+      window.localStorage.setItem("kura-communities", JSON.stringify(list));
+      window.localStorage.setItem("kura-active-community-id", active);
     },
     { list: communities, active: activeId },
   );
@@ -187,7 +187,7 @@ test.describe("community rail", () => {
     await expect
       .poll(() =>
         page.evaluate(() =>
-          window.localStorage.getItem("buzz-active-community-id"),
+          window.localStorage.getItem("kura-active-community-id"),
         ),
       )
       .toBe(COMMUNITY_B.id);
@@ -470,7 +470,7 @@ test.describe("community rail", () => {
     await expect
       .poll(() =>
         page.evaluate(() =>
-          window.localStorage.getItem("buzz-active-community-id"),
+          window.localStorage.getItem("kura-active-community-id"),
         ),
       )
       .toBe(COMMUNITY_B.id);
@@ -508,7 +508,7 @@ test.describe("community rail", () => {
 
     const input = page.getByTestId("message-input");
     const previewUrl =
-      "https://github.com/block/buzz/pull/5697?community=reset";
+      "https://github.com/block/kura/pull/5697?community=reset";
     await input.fill("@SlowBot");
     await expect(page.getByTestId("mention-autocomplete")).toBeVisible();
     await input.press("Enter");
@@ -529,7 +529,7 @@ test.describe("community rail", () => {
     await expect
       .poll(() =>
         page.evaluate(() =>
-          window.localStorage.getItem("buzz-active-community-id"),
+          window.localStorage.getItem("kura-active-community-id"),
         ),
       )
       .toBe(COMMUNITY_B.id);
@@ -567,7 +567,7 @@ test.describe("community rail", () => {
     await page.getByTestId("channel-general").click();
 
     const input = page.getByTestId("message-input");
-    await input.fill("https://github.com/block/buzz/pull/5697?media=reset");
+    await input.fill("https://github.com/block/kura/pull/5697?media=reset");
     await page.getByTestId("send-message").click();
     await expect
       .poll(() =>
@@ -584,7 +584,7 @@ test.describe("community rail", () => {
     await expect
       .poll(() =>
         page.evaluate(() =>
-          window.localStorage.getItem("buzz-active-community-id"),
+          window.localStorage.getItem("kura-active-community-id"),
         ),
       )
       .toBe(COMMUNITY_B.id);
@@ -626,7 +626,7 @@ test.describe("community rail", () => {
     await page.getByTestId("channel-general").click();
 
     const input = page.getByTestId("message-input");
-    await input.fill("https://github.com/block/buzz/pull/5697?native=reset");
+    await input.fill("https://github.com/block/kura/pull/5697?native=reset");
     await page.getByTestId("send-message").click();
     await expect
       .poll(() =>
@@ -717,7 +717,7 @@ test.describe("community rail", () => {
           throw new Error("missing general channel snapshot");
         window.localStorage.setItem(targetSnapshotKey, source);
         window.localStorage.setItem(
-          "buzz-community-destinations",
+          "kura-community-destinations",
           JSON.stringify({
             [communityId]: {
               kind: "channel",
@@ -764,7 +764,7 @@ test.describe("community rail", () => {
     await seedCommunities(page, [COMMUNITY_A, COMMUNITY_B], COMMUNITY_A.id);
     await page.addInitScript((communityId) => {
       window.localStorage.setItem(
-        "buzz-community-destinations",
+        "kura-community-destinations",
         JSON.stringify({
           [communityId]: { kind: "channel", channelId: "missing-channel" },
         }),
@@ -802,7 +802,7 @@ test.describe("community rail", () => {
       .poll(() =>
         page.evaluate((communityId) => {
           const raw = window.localStorage.getItem(
-            "buzz-community-destinations",
+            "kura-community-destinations",
           );
           if (!raw) return null;
           return JSON.parse(raw)[communityId];
@@ -818,7 +818,7 @@ test.describe("community rail", () => {
     await seedCommunities(page, [COMMUNITY_A, COMMUNITY_B], COMMUNITY_A.id);
     await page.addInitScript((communityId) => {
       window.localStorage.setItem(
-        "buzz-community-destinations",
+        "kura-community-destinations",
         JSON.stringify({
           [communityId]: { kind: "channel", channelId: "general" },
         }),
@@ -961,7 +961,7 @@ test.describe("community rail", () => {
       .poll(() =>
         page.evaluate((communityId) => {
           const raw = window.localStorage.getItem(
-            "buzz-community-destinations",
+            "kura-community-destinations",
           );
           return raw ? JSON.parse(raw)[communityId] : null;
         }, COMMUNITY_B.id),
@@ -1011,7 +1011,7 @@ test.describe("community rail", () => {
       .poll(() =>
         page.evaluate((communityId) => {
           const raw = window.localStorage.getItem(
-            "buzz-community-destinations",
+            "kura-community-destinations",
           );
           return raw ? JSON.parse(raw)[communityId] : null;
         }, COMMUNITY_B.id),
@@ -1037,7 +1037,7 @@ test.describe("community rail", () => {
       .poll(() =>
         page.evaluate((communityId) => {
           const raw = window.localStorage.getItem(
-            "buzz-community-destinations",
+            "kura-community-destinations",
           );
           return raw ? JSON.parse(raw)[communityId] : null;
         }, COMMUNITY_B.id),
@@ -1052,7 +1052,7 @@ test.describe("community rail", () => {
     await seedCommunities(page, [COMMUNITY_A, COMMUNITY_B], COMMUNITY_A.id);
     await page.addInitScript((communityId) => {
       window.localStorage.setItem(
-        "buzz-community-destinations",
+        "kura-community-destinations",
         JSON.stringify({
           [communityId]: { kind: "channel", channelId: "general" },
         }),
@@ -1088,7 +1088,7 @@ test.describe("community rail", () => {
     await expect
       .poll(() =>
         page.evaluate(() =>
-          window.localStorage.getItem("buzz-active-community-id"),
+          window.localStorage.getItem("kura-active-community-id"),
         ),
       )
       .toBe(COMMUNITY_B.id);
@@ -1163,13 +1163,13 @@ test.describe("community rail", () => {
     await expect(page.getByTestId("community-choice-join")).toBeVisible();
     await expect
       .poll(() =>
-        page.evaluate(() => window.localStorage.getItem("buzz-communities")),
+        page.evaluate(() => window.localStorage.getItem("kura-communities")),
       )
       .toBeNull();
     await expect
       .poll(() =>
         page.evaluate(() =>
-          window.localStorage.getItem("buzz-community-discovery-after-leave"),
+          window.localStorage.getItem("kura-community-discovery-after-leave"),
         ),
       )
       .toBe("1");
@@ -1187,7 +1187,7 @@ test.describe("community rail", () => {
     await expect
       .poll(() =>
         relaunchPage.evaluate(() =>
-          window.localStorage.getItem("buzz-communities"),
+          window.localStorage.getItem("kura-communities"),
         ),
       )
       .toBeNull();
@@ -1259,7 +1259,7 @@ test.describe("community rail", () => {
 
   test("hides the rail with a single community", async ({ page }) => {
     await page.addInitScript((themeStorageKey) => {
-      window.localStorage.setItem(themeStorageKey, "buzz-dark");
+      window.localStorage.setItem(themeStorageKey, "kura-dark");
     }, THEME_STORAGE_KEY);
     await installMockBridge(page, undefined, { skipCommunitySeed: true });
     await seedCommunities(page, [COMMUNITY_A], COMMUNITY_A.id);
@@ -1281,7 +1281,7 @@ test.describe("community rail", () => {
       "8px",
     );
     const sidebarBackground = await page
-      .locator("[data-buzz-glass-inset]")
+      .locator("[data-kura-glass-inset]")
       .evaluate((element) => getComputedStyle(element).backgroundColor);
     await expect(page.locator("[data-collapsed-content-gutter]")).toHaveCSS(
       "background-color",
@@ -1345,10 +1345,10 @@ test.describe("community rail", () => {
     const railBox = await page.getByTestId("community-rail").boundingBox();
     const searchBox = await page.getByTestId("open-search").boundingBox();
     const appSurfaceBox = await page
-      .locator(".buzz-huddle-app-surface")
+      .locator(".kura-huddle-app-surface")
       .boundingBox();
     const contentBox = await page
-      .locator("[data-buzz-content-surface]")
+      .locator("[data-kura-content-surface]")
       .first()
       .boundingBox();
     expect(buttonBox).not.toBeNull();
@@ -1400,11 +1400,11 @@ test.describe("community rail", () => {
     // Seed only if not already set so the persisted order survives page.reload().
     await page.addInitScript(
       ({ list, active }) => {
-        if (!window.localStorage.getItem("buzz-communities")) {
-          window.localStorage.setItem("buzz-communities", JSON.stringify(list));
+        if (!window.localStorage.getItem("kura-communities")) {
+          window.localStorage.setItem("kura-communities", JSON.stringify(list));
         }
-        if (!window.localStorage.getItem("buzz-active-community-id")) {
-          window.localStorage.setItem("buzz-active-community-id", active);
+        if (!window.localStorage.getItem("kura-active-community-id")) {
+          window.localStorage.setItem("kura-active-community-id", active);
         }
       },
       { list: [COMMUNITY_A, COMMUNITY_B], active: COMMUNITY_A.id },
@@ -1437,7 +1437,7 @@ test.describe("community rail", () => {
     await expect
       .poll(() =>
         page.evaluate(() => {
-          const raw = window.localStorage.getItem("buzz-communities");
+          const raw = window.localStorage.getItem("kura-communities");
           if (!raw) return null;
           const list = JSON.parse(raw) as Array<{ id: string }>;
           return list.map((c) => c.id);
@@ -1461,7 +1461,7 @@ test.describe("community rail", () => {
 
     // Storage must still be [B, A] after reload.
     const storedOrder = await page.evaluate(() => {
-      const raw = window.localStorage.getItem("buzz-communities");
+      const raw = window.localStorage.getItem("kura-communities");
       if (!raw) return null;
       const list = JSON.parse(raw) as Array<{ id: string }>;
       return list.map((c) => c.id);
@@ -1528,7 +1528,7 @@ test.describe("community rail", () => {
     await expect
       .poll(() =>
         page.evaluate(() => {
-          const raw = window.localStorage.getItem("buzz-communities");
+          const raw = window.localStorage.getItem("kura-communities");
           if (!raw) return null;
           const list = JSON.parse(raw) as Array<{ id: string }>;
           return list.map((c) => c.id);

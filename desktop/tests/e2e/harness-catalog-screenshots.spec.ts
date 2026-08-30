@@ -12,16 +12,16 @@ const SHOTS = "test-results/byoh-after";
  */
 const CATALOG = [
   {
-    id: "buzz-agent",
+    id: "kura-agent",
     label: "Kura Agent",
     avatar_url: "",
     availability: "available",
-    command: "buzz-agent",
-    binary_path: "/usr/local/bin/buzz-agent",
+    command: "kura-agent",
+    binary_path: "/usr/local/bin/kura-agent",
     default_args: [],
-    mcp_command: "buzz-dev-mcp",
+    mcp_command: "kura-dev-mcp",
     install_hint: "",
-    install_instructions_url: "https://github.com/block/buzz",
+    install_instructions_url: "https://github.com/block/kura",
     can_auto_install: false,
     underlying_cli_path: null,
     node_required: false,

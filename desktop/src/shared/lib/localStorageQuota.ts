@@ -8,16 +8,16 @@
  */
 
 const PURE_CACHE_KEY_PREFIXES = [
-  "buzz-channel-messages.v1:",
-  "buzz-channels.v1:",
-  "buzz-observed-unread.v1:",
-  "buzz-projects.v1:",
-  "buzz-sidebar-skeleton-shape.v1:",
-  "buzz-timeline-skeleton-shape.v1:",
-  "buzz-user-labels.v1:",
+  "kura-channel-messages.v1:",
+  "kura-channels.v1:",
+  "kura-observed-unread.v1:",
+  "kura-projects.v1:",
+  "kura-sidebar-skeleton-shape.v1:",
+  "kura-timeline-skeleton-shape.v1:",
+  "kura-user-labels.v1:",
 ];
 
-const QUOTA_RECOVERY_MARKER_KEY = "buzz-local-storage-quota-recovery.v1";
+const QUOTA_RECOVERY_MARKER_KEY = "kura-local-storage-quota-recovery.v1";
 
 // Keep disposable snapshots below 2 MiB, leaving roughly 3 MiB of WebKit's
 // observed ~5 MiB origin quota for identities, communities, preferences, and

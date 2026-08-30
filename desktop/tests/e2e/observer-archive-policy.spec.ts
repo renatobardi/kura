@@ -75,7 +75,7 @@ test.describe("observer archive policy — Settings toggle", () => {
         window.localStorage.setItem(storageKey, "0");
       },
       {
-        storageKey: `buzz:observer-archive-default-seeded:${MOCK_PUBKEY}`,
+        storageKey: `kura:observer-archive-default-seeded:${MOCK_PUBKEY}`,
       },
     );
 

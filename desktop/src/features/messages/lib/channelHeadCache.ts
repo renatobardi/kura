@@ -19,7 +19,7 @@ const cacheScopes = new WeakMap<QueryClient, ChannelHeadScope>();
 export function isChannelHeadCacheEnabled(): boolean {
   if (typeof window === "undefined") return false;
   if (import.meta.env?.VITE_KURA_CHANNEL_HEAD_CACHE === "off") return false;
-  return window.localStorage.getItem("buzz-channel-head-cache") !== "off";
+  return window.localStorage.getItem("kura-channel-head-cache") !== "off";
 }
 export function channelHeadCacheScope(
   queryClient: QueryClient,

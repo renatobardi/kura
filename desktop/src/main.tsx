@@ -29,7 +29,7 @@ type E2eWindow = Window & {
 
 const E2E_DEFAULT_PUBKEY = "deadbeef".repeat(8);
 const E2E_COMMUNITY_ID = "e2e-default-community";
-const ONBOARDING_COMPLETION_STORAGE_KEY_PREFIX = "buzz-onboarding-complete.v1:";
+const ONBOARDING_COMPLETION_STORAGE_KEY_PREFIX = "kura-onboarding-complete.v1:";
 const DEV_STATE_RESET_PARAM = "resetDevState";
 
 function resetDevWebviewStateFromUrl() {
@@ -42,7 +42,7 @@ function resetDevWebviewStateFromUrl() {
     return;
   }
 
-  // WebKit groups every Buzz binary under one disk directory, but storage is
+  // WebKit groups every Kura binary under one disk directory, but storage is
   // isolated by origin. Clearing here resets only this dev server's origin;
   // deleting the shared WebKit directory would also destroy installed-app state.
   window.localStorage.clear();
@@ -70,8 +70,8 @@ function configureDevE2eBridgeFromUrl() {
     name: "E2E Test",
     relayUrl: "ws://localhost:3000",
   };
-  window.localStorage.setItem("buzz-communities", JSON.stringify([community]));
-  window.localStorage.setItem("buzz-active-community-id", E2E_COMMUNITY_ID);
+  window.localStorage.setItem("kura-communities", JSON.stringify([community]));
+  window.localStorage.setItem("kura-active-community-id", E2E_COMMUNITY_ID);
   window.localStorage.setItem(
     `${ONBOARDING_COMPLETION_STORAGE_KEY_PREFIX}${E2E_DEFAULT_PUBKEY}`,
     "true",
@@ -81,14 +81,14 @@ function configureDevE2eBridgeFromUrl() {
 function renderApp() {
   ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
-      {/* block/buzz#5078 — catch any uncaught render error so a WebKit
+      {/* block/kura#5078 — catch any uncaught render error so a WebKit
           SecurityError from localStorage can't blank the whole window. */}
       <RootErrorBoundary>
         <CommunitiesProvider>
           <CommunityOnboardingProvider
             enabled={huddleWindowChannelId() === null}
           >
-            <ThemeProvider defaultTheme="buzz">
+            <ThemeProvider defaultTheme="kura">
               <TooltipProvider>
                 <EmojiBurstProvider>
                   <PoofBurstProvider>

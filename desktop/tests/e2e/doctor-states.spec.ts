@@ -30,18 +30,18 @@ const GOOSE_AVAILABLE = {
   auth_status: { status: "not_applicable" },
 };
 
-/** buzz-agent is always available and has no auth step. */
+/** kura-agent is always available and has no auth step. */
 const KURA_AGENT_AVAILABLE = {
-  id: "buzz-agent",
+  id: "kura-agent",
   label: "Kura Agent",
   avatar_url: "",
   availability: "available",
-  command: "buzz-agent",
-  binary_path: "/usr/local/bin/buzz-agent",
+  command: "kura-agent",
+  binary_path: "/usr/local/bin/kura-agent",
   default_args: [],
-  mcp_command: "buzz-dev-mcp",
+  mcp_command: "kura-dev-mcp",
   install_hint: "",
-  install_instructions_url: "https://github.com/block/buzz",
+  install_instructions_url: "https://github.com/block/kura",
   can_auto_install: false,
   underlying_cli_path: null,
   node_required: false,
@@ -142,18 +142,18 @@ test.describe("Doctor panel state screenshots", () => {
           rows.map((row) => row.getAttribute("data-testid")),
         ),
     ).toEqual([
-      "doctor-runtime-buzz-agent",
+      "doctor-runtime-kura-agent",
       "doctor-runtime-goose",
       "doctor-runtime-claude",
       "doctor-runtime-codex",
     ]);
-    for (const runtimeId of ["goose", "claude", "codex", "buzz-agent"]) {
+    for (const runtimeId of ["goose", "claude", "codex", "kura-agent"]) {
       await expect(
         page.getByTestId(`doctor-runtime-logo-${runtimeId}`),
       ).toBeVisible();
     }
     const rowHeights = await Promise.all(
-      ["goose", "claude", "codex", "buzz-agent"].map((runtimeId) =>
+      ["goose", "claude", "codex", "kura-agent"].map((runtimeId) =>
         page
           .getByTestId(`doctor-runtime-${runtimeId}`)
           .evaluate((element) =>
@@ -186,7 +186,7 @@ test.describe("Doctor panel state screenshots", () => {
         .locator("..")
         .locator(".."),
     ).toHaveCSS("align-items", "flex-end");
-    for (const runtimeId of ["goose", "claude", "buzz-agent"]) {
+    for (const runtimeId of ["goose", "claude", "kura-agent"]) {
       await expect(
         page.getByTestId(`doctor-runtime-menu-${runtimeId}`),
       ).toHaveCount(0);
@@ -1006,7 +1006,7 @@ test.describe("Doctor panel state screenshots", () => {
             exit_code: 1,
           },
         ],
-        log_path: "/tmp/buzz-install-codex.log",
+        log_path: "/tmp/kura-install-codex.log",
       },
     });
 
@@ -1043,7 +1043,7 @@ test.describe("Doctor panel state screenshots", () => {
 
     // The failure points at the log holding bounded output for every attempt.
     await expect(installError).toContainText("npm ERR! code E404");
-    await expect(installError).toContainText("/tmp/buzz-install-codex.log");
+    await expect(installError).toContainText("/tmp/kura-install-codex.log");
 
     await row.scrollIntoViewIfNeeded();
     await waitForAnimations(page);

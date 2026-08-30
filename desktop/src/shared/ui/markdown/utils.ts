@@ -144,8 +144,8 @@ export function imageReserveStyle(args: {
   if (hiddenSpoilerMediaSize) {
     const ratio = `${hiddenSpoilerMediaSize.width} / ${hiddenSpoilerMediaSize.height}`;
     return {
-      "--buzz-spoiler-media-aspect-ratio": ratio,
-      "--buzz-spoiler-media-width": `${hiddenSpoilerMediaSize.width}px`,
+      "--kura-spoiler-media-aspect-ratio": ratio,
+      "--kura-spoiler-media-width": `${hiddenSpoilerMediaSize.width}px`,
       aspectRatio: ratio,
       height: "auto",
       width: `${hiddenSpoilerMediaSize.width}px`,
@@ -162,14 +162,14 @@ export function imageReserveStyle(args: {
 
 export function isInsideHiddenSpoiler(element: Element): boolean {
   return (
-    element.closest('.buzz-spoiler[data-spoiler][data-revealed="false"]') !==
+    element.closest('.kura-spoiler[data-spoiler][data-revealed="false"]') !==
     null
   );
 }
 
 /**
  * `urlTransform` for `<ReactMarkdown>` that preserves `kura://` deep links
- * used by Buzz — both `kura://message?…` links and `kura://pr|issue|repo?…`
+ * used by Kura — both `kura://message?…` links and `kura://pr|issue|repo?…`
  * entity links. The default transform strips unknown schemes (returns `""`)
  * before the `a` component override can see them, which would break copy →
  * paste → click end-to-end.
@@ -181,7 +181,7 @@ export function isInsideHiddenSpoiler(element: Element): boolean {
  *   succeeds, keeping the sanitizer active against arbitrary `kura://` URIs.
  * - Everything else delegates to `defaultUrlTransform`.
  */
-export function buzzDeepLinkUrlTransform(value: string, key: string): string {
+export function kuraDeepLinkUrlTransform(value: string, key: string): string {
   if (key !== "href") return defaultUrlTransform(value);
   if (isMessageLink(value) || isChannelLink(value)) return value;
   if (parseEntityLink(value).ok) return value;
@@ -189,11 +189,11 @@ export function buzzDeepLinkUrlTransform(value: string, key: string): string {
 }
 
 /**
- * @deprecated Preserved for external callers; use `buzzDeepLinkUrlTransform`
+ * @deprecated Preserved for external callers; use `kuraDeepLinkUrlTransform`
  * which also handles `kura://pr|issue|repo` entity links.
  */
 export function messageLinkUrlTransform(value: string, key: string): string {
-  return buzzDeepLinkUrlTransform(value, key);
+  return kuraDeepLinkUrlTransform(value, key);
 }
 
 export function getReactNodeText(node: React.ReactNode): string {

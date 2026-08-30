@@ -12,7 +12,7 @@ import {
 import type { AgentPersona } from "@/shared/api/types";
 import type { AcpRuntimeCatalogEntry } from "@/shared/api/types";
 import {
-  BuzzAgentModelTuningFields,
+  KuraAgentModelTuningFields,
   NumericTuningFields,
 } from "./kuraAgentModelTuningFields";
 import {
@@ -69,7 +69,7 @@ export function EditAgentAdvancedFields({
   inheritedEnvVars: Record<string, string>;
   inheritHarness: boolean;
   linkedPersona: AgentPersona | null;
-  /** Active LLM model — forwarded to BuzzAgentModelTuningFields for effort filtering. */
+  /** Active LLM model — forwarded to KuraAgentModelTuningFields for effort filtering. */
   model?: string;
   /**
    * The actual/prospective runtime id used to decide whether to show the
@@ -78,7 +78,7 @@ export function EditAgentAdvancedFields({
    */
   modelTuningRuntimeId: string;
   parallelism: string;
-  /** Active LLM provider id — forwarded to BuzzAgentModelTuningFields for effort filtering. */
+  /** Active LLM provider id — forwarded to KuraAgentModelTuningFields for effort filtering. */
   provider?: string;
   requiredEnvKeys: readonly string[];
   /**
@@ -119,7 +119,7 @@ export function EditAgentAdvancedFields({
   );
 
   // Build the effective hidden-key list: caller's secrets + effort key (when
-  // rendered by BuzzAgentModelTuningFields) + numeric keys via structuredEnvKeys.
+  // rendered by KuraAgentModelTuningFields) + numeric keys via structuredEnvKeys.
   const effectiveHiddenKeys = React.useMemo(
     () => [
       ...hiddenEnvKeys,
@@ -360,7 +360,7 @@ export function EditAgentAdvancedFields({
 
       {/* Effort-tuning knob — only shown for kura-agent. */}
       {isKuraAgentRuntime(modelTuningRuntimeId) ? (
-        <BuzzAgentModelTuningFields
+        <KuraAgentModelTuningFields
           envVars={envVars}
           inheritedEnvVars={inheritedEnvVars}
           model={model}

@@ -531,7 +531,7 @@ test("shows cached profile labels while relay profiles revalidate", {
   await page.addInitScript(
     ({ alicePubkey }) => {
       window.localStorage.setItem(
-        "buzz-user-labels.v1:ws://localhost:3000",
+        "kura-user-labels.v1:ws://localhost:3000",
         JSON.stringify({
           version: 1,
           updatedAt: Date.now(),
@@ -617,7 +617,7 @@ test("start a new direct message from the sidebar", async ({ page }) => {
     selectedCharlieBox.y + selectedCharlieBox.height / 2,
   );
   await page.mouse.down();
-  await expect(page.locator(".buzz-poof-burst")).toHaveCount(1);
+  await expect(page.locator(".kura-poof-burst")).toHaveCount(1);
   await page.mouse.up();
   await expect(selectedCharlie).not.toBeVisible();
   await page.getByTestId("new-dm-search").fill("charlie");
@@ -3494,7 +3494,7 @@ test("Inbox All never lists drafts and unread-only hides reminders", async ({
     },
     {
       draftStorageKey: draftKey,
-      draftStoreKey: `buzz-drafts.v2:ws://localhost:3000:${MOCK_IDENTITY_PUBKEY}`,
+      draftStoreKey: `kura-drafts.v2:ws://localhost:3000:${MOCK_IDENTITY_PUBKEY}`,
     },
   );
   await page.goto("/");

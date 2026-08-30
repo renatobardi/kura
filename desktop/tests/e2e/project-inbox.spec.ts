@@ -11,7 +11,7 @@ test("Kura Git pull request renders and stays actionable in Inbox", async ({
 }) => {
   await page.addInitScript(() => {
     window.localStorage.setItem(
-      "buzz-feature-overrides-v1",
+      "kura-feature-overrides-v1",
       JSON.stringify({ projects: true }),
     );
   });

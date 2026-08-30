@@ -275,18 +275,18 @@ const LINK_PREVIEW_SAMPLE_BASE: Omit<ResolvedLinkPreview, "imageDataUrl"> = {
  * are read from the live stylesheet and baked in per render — if the Kura
  * gradient ever changes in `theme.css`, this preview follows automatically.
  */
-function buzzGradientSampleImage(isDark: boolean): string {
+function kuraGradientSampleImage(isDark: boolean): string {
   const styles = globalThis.document
     ? getComputedStyle(document.documentElement)
     : null;
   const readToken = (token: string, fallback: string): string =>
     styles?.getPropertyValue(token).trim() || fallback;
   const top = isDark
-    ? readToken("--buzz-gradient-dark-top", "#1f1d1a")
-    : readToken("--buzz-gradient-light-top", "#f7f4ee");
+    ? readToken("--kura-gradient-dark-top", "#1f1d1a")
+    : readToken("--kura-gradient-light-top", "#f7f4ee");
   const bottom = isDark
-    ? readToken("--buzz-gradient-dark-bottom", "#151412")
-    : readToken("--buzz-gradient-light-bottom", "#ece7dc");
+    ? readToken("--kura-gradient-dark-bottom", "#151412")
+    : readToken("--kura-gradient-light-bottom", "#ece7dc");
   const shapeToken = isDark ? "--foreground" : "--background";
   const shapeFallback = isDark ? "0 0% 98%" : "0 0% 100%";
   const shape = `hsl(${readToken(shapeToken, shapeFallback)})`;
@@ -308,7 +308,7 @@ function LinkPreviewSample({ style }: { style: LinkPreviewStyle }) {
   const preview = React.useMemo<ResolvedLinkPreview>(
     () => ({
       ...LINK_PREVIEW_SAMPLE_BASE,
-      imageDataUrl: buzzGradientSampleImage(isDark),
+      imageDataUrl: kuraGradientSampleImage(isDark),
     }),
     [isDark],
   );
@@ -507,11 +507,11 @@ function ThreadLayoutDiagram({ mode }: { mode: ThreadViewMode }) {
   // Inline SVG resolves CSS variables, so the frame gradient references the
   // Kura gradient tokens directly and follows theme.css automatically.
   const gradientTop = isDark
-    ? "var(--buzz-gradient-dark-top, #1f1d1a)"
-    : "var(--buzz-gradient-light-top, #f7f4ee)";
+    ? "var(--kura-gradient-dark-top, #1f1d1a)"
+    : "var(--kura-gradient-light-top, #f7f4ee)";
   const gradientBottom = isDark
-    ? "var(--buzz-gradient-dark-bottom, #151412)"
-    : "var(--buzz-gradient-light-bottom, #ece7dc)";
+    ? "var(--kura-gradient-dark-bottom, #151412)"
+    : "var(--kura-gradient-light-bottom, #ece7dc)";
   const channelSurface = "hsl(var(--muted))";
   const threadSurface = "hsl(var(--background))";
   const channelOpacity = isDark ? 0.88 : 0.78;

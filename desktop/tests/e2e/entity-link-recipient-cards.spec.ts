@@ -126,7 +126,7 @@ test("agent-style Kura links stay chip-only with metadata tooltips", async ({
     .last();
   await expect(row).toBeVisible();
 
-  await expect(row.locator('[data-link-preview^="buzz-"]')).toHaveCount(0);
+  await expect(row.locator('[data-link-preview^="kura-"]')).toHaveCount(0);
   const externalCard = row.locator('[data-link-preview="generic-link"]');
   await expect(externalCard).toBeVisible();
   await expect(externalCard).toContainText("External preview survives");
@@ -148,12 +148,12 @@ test("agent-style Kura links stay chip-only with metadata tooltips", async ({
   await prChip.hover();
   const prTooltip = page.getByRole("tooltip");
   const prContext = prTooltip.locator(
-    '[data-buzz-tooltip-metadata-content=""]',
+    '[data-kura-tooltip-metadata-content=""]',
   );
   await expect(prContext).toHaveText(PR_SUBJECT);
   await expect(prContext).toHaveClass(/line-clamp-3/);
   await expect(prContext).toHaveCSS("overflow-wrap", "anywhere");
-  const prFooter = prTooltip.locator('[data-buzz-tooltip-metadata-type=""]');
+  const prFooter = prTooltip.locator('[data-kura-tooltip-metadata-type=""]');
   await expect(prFooter).toHaveText("Pull request · relay-tools");
   await expect(prFooter).toHaveCSS("overflow-wrap", "anywhere");
   await expect(prFooter).toHaveCSS("white-space", "normal");
@@ -174,7 +174,7 @@ test("agent-style Kura links stay chip-only with metadata tooltips", async ({
   expect(tooltipSemanticColors.actual).toEqual(tooltipSemanticColors.expected);
   await expect(prChip).toHaveText("relay-tools");
 
-  const issueChip = row.locator('[data-buzz-link-kind="issue"]');
+  const issueChip = row.locator('[data-kura-link-kind="issue"]');
   // The issue chip is the repository name alone — resolved metadata never
   // reaches the inline label, so it neither absorbs the title nor falls back
   // to the event hash.
@@ -190,7 +190,7 @@ test("agent-style Kura links stay chip-only with metadata tooltips", async ({
   await issueChip.hover();
   const issueTooltip = page.getByRole("tooltip");
   const issueContext = issueTooltip.locator(
-    '[data-buzz-tooltip-metadata-content=""]',
+    '[data-kura-tooltip-metadata-content=""]',
   );
   await expect(issueContext).toHaveText(ISSUE_SUBJECT);
   await expect(issueContext).toHaveClass(/line-clamp-3/);
@@ -204,7 +204,7 @@ test("agent-style Kura links stay chip-only with metadata tooltips", async ({
     )
     .toBe(true);
   await expect(
-    issueTooltip.locator('[data-buzz-tooltip-metadata-type=""]'),
+    issueTooltip.locator('[data-kura-tooltip-metadata-type=""]'),
   ).toHaveText("Issue · relay-tools");
 
   const labeledIssue = row
@@ -215,7 +215,7 @@ test("agent-style Kura links stay chip-only with metadata tooltips", async ({
   await expect(
     page
       .getByRole("tooltip")
-      .locator('[data-buzz-tooltip-metadata-content=""]'),
+      .locator('[data-kura-tooltip-metadata-content=""]'),
   ).toHaveText(ISSUE_SUBJECT);
 
   // Repository metadata remains available from its inline chip.
@@ -226,10 +226,10 @@ test("agent-style Kura links stay chip-only with metadata tooltips", async ({
   await repoChip.hover();
   const repoTooltip = page.getByRole("tooltip");
   await expect(
-    repoTooltip.locator('[data-buzz-tooltip-metadata-content=""]'),
+    repoTooltip.locator('[data-kura-tooltip-metadata-content=""]'),
   ).toContainText("Operator tooling and admin CLI for relay deployments.");
   await expect(
-    repoTooltip.locator('[data-buzz-tooltip-metadata-type=""]'),
+    repoTooltip.locator('[data-kura-tooltip-metadata-type=""]'),
   ).toHaveText("Repository");
 
   const labeledClone = row
@@ -242,7 +242,7 @@ test("agent-style Kura links stay chip-only with metadata tooltips", async ({
   await labeledClone.hover();
   const cloneTooltip = page.getByRole("tooltip");
   await expect(
-    cloneTooltip.locator('[data-buzz-tooltip-metadata-content=""]'),
+    cloneTooltip.locator('[data-kura-tooltip-metadata-content=""]'),
   ).toContainText("Operator tooling and admin CLI for relay deployments.");
   await labeledClone.click();
   await expect(page.locator("[data-project-detail-screen]")).toBeVisible();
@@ -251,7 +251,7 @@ test("agent-style Kura links stay chip-only with metadata tooltips", async ({
   const missingRepoChip = row.getByRole("button", {
     name: "Open repository missing-repo",
   });
-  await expect(missingRepoChip).not.toHaveClass(/buzz-link-unavailable/);
+  await expect(missingRepoChip).not.toHaveClass(/kura-link-unavailable/);
   const missingRepoColors = await missingRepoChip.evaluate((element) => {
     const styles = getComputedStyle(element);
     const probe = document.createElement("span");
@@ -272,10 +272,10 @@ test("agent-style Kura links stay chip-only with metadata tooltips", async ({
   await missingRepoChip.hover();
   const missingRepoTooltip = page.getByRole("tooltip");
   await expect(
-    missingRepoTooltip.locator('[data-buzz-tooltip-metadata-content=""]'),
+    missingRepoTooltip.locator('[data-kura-tooltip-metadata-content=""]'),
   ).toHaveCount(0);
   const missingRepoFooter = missingRepoTooltip.locator(
-    '[data-buzz-tooltip-metadata-type=""]',
+    '[data-kura-tooltip-metadata-type=""]',
   );
   await expect(missingRepoFooter).toHaveText("Repository");
   await expect(missingRepoFooter).toHaveClass(/text-secondary-foreground\/80/);
@@ -342,7 +342,7 @@ test("issue chip width is metadata-independent while the title loads", async ({
 
   const tooltipContent = page
     .getByRole("tooltip")
-    .locator('[data-buzz-tooltip-metadata-content=""]');
+    .locator('[data-kura-tooltip-metadata-content=""]');
   const widths = new Set<number>();
   const tooltipSamples: string[] = [];
   await expect
@@ -398,7 +398,7 @@ test("entity tooltip uses project context while relay metadata is delayed", asyn
   await expect(
     page
       .getByRole("tooltip")
-      .locator('[data-buzz-tooltip-metadata-content=""]'),
+      .locator('[data-kura-tooltip-metadata-content=""]'),
   ).toHaveText("buzz · The complete Kura community platform.");
 });
 
@@ -425,7 +425,7 @@ test("desktop composer and sent message keep Kura entities chip-only", async ({
   await page.getByTestId("send-message").click();
 
   const row = page.getByTestId("message-row").last();
-  await expect(row.locator('[data-link-preview^="buzz-"]')).toHaveCount(0);
+  await expect(row.locator('[data-link-preview^="kura-"]')).toHaveCount(0);
   const repoChip = row.getByRole("button", {
     name: "Open repository relay-tools",
   });
@@ -434,7 +434,7 @@ test("desktop composer and sent message keep Kura entities chip-only", async ({
   await expect(
     page
       .getByRole("tooltip")
-      .locator('[data-buzz-tooltip-metadata-content=""]'),
+      .locator('[data-kura-tooltip-metadata-content=""]'),
   ).toContainText("Operator tooling and admin CLI for relay deployments.");
 
   await waitForAnimations(page);
@@ -496,7 +496,7 @@ test("composer classifies a same-relay clone URL as a repository chip, not a car
   await expect(
     page
       .getByRole("tooltip")
-      .locator('[data-buzz-tooltip-metadata-content=""]'),
+      .locator('[data-kura-tooltip-metadata-content=""]'),
   ).toContainText("Relay, desktop, and mobile clients");
 
   // The chip navigates in-app, proving the clone URL resolved onto the
@@ -660,8 +660,8 @@ test("deleted top-level message links identify deletion and fall back to channel
   page,
 }) => {
   await page.addInitScript(() => {
-    window.localStorage.setItem("buzz-theme", "buzz-dark");
-    window.localStorage.setItem("buzz-accent-color", "#c0a2f1");
+    window.localStorage.setItem("kura-theme", "kura-dark");
+    window.localStorage.setItem("kura-accent-color", "#c0a2f1");
   });
   const missingMessageId = "d".repeat(64);
   const channelId = "9dae0116-799b-5071-a0a8-fdd30a91a35d";
@@ -684,11 +684,11 @@ test("deleted top-level message links identify deletion and fall back to channel
     "data-message-link-state",
     "deleted",
   );
-  await expect(deletedLink).toHaveClass(/buzz-link-deleted/);
-  await expect(deletedLink).not.toHaveClass(/buzz-link-unavailable/);
+  await expect(deletedLink).toHaveClass(/kura-link-deleted/);
+  await expect(deletedLink).not.toHaveClass(/kura-link-unavailable/);
   const unavailableColors = await linkMessage.evaluate((message) => {
     const probe = document.createElement("span");
-    probe.className = "mention-chip buzz-link-unavailable";
+    probe.className = "mention-chip kura-link-unavailable";
     message.querySelector(".message-markdown")?.append(probe);
     const styles = getComputedStyle(probe);
     const colors = {

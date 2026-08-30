@@ -712,7 +712,7 @@ test("thread autocomplete keeps multiple long names readable in a narrow panel",
   });
   await page.setViewportSize({ width: 900, height: 640 });
   await page.addInitScript(() => {
-    window.sessionStorage.setItem("buzz.desktop.thread-panel-width", "300");
+    window.sessionStorage.setItem("kura.desktop.thread-panel-width", "300");
   });
   await page.goto("/");
   await page.getByTestId("channel-general").click();
@@ -965,7 +965,7 @@ test("selecting a person mention inserts @Name into input", async ({
   page,
 }) => {
   await page.addInitScript(() => {
-    window.localStorage.setItem("buzz-theme", "buzz-dark");
+    window.localStorage.setItem("kura-theme", "kura-dark");
   });
   await page.goto("/");
   await page.getByTestId("channel-general").click();

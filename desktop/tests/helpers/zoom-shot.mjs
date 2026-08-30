@@ -27,7 +27,7 @@ mkdirSync(resolve(a.outdir), { recursive: true });
 
 const BASE = `http://127.0.0.1:${a.port}`;
 const DEFAULT_MOCK_PUBKEY = "deadbeef".repeat(8);
-const ONBOARDING_PREFIX = "buzz-onboarding-complete.v1:";
+const ONBOARDING_PREFIX = "kura-onboarding-complete.v1:";
 const TEST_PUBKEYS = [
   DEFAULT_MOCK_PUBKEY,
   "e5ebc6cdb579be112e336cc319b5989b4bb6af11786ea90dbe52b5f08d741b34",
@@ -48,8 +48,8 @@ await page.addInitScript(() => {
     relayUrl: "ws://localhost:3000",
     addedAt: new Date().toISOString(),
   };
-  window.localStorage.setItem("buzz-communities", JSON.stringify([ws]));
-  window.localStorage.setItem("buzz-active-community-id", id);
+  window.localStorage.setItem("kura-communities", JSON.stringify([ws]));
+  window.localStorage.setItem("kura-active-community-id", id);
 });
 await page.addInitScript(
   ({ prefix, pubkeys }) => {

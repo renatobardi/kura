@@ -5,7 +5,7 @@ import { getPublicKey } from "nostr-tools/pure";
 import { installRelayBridge } from "../helpers/bridge";
 
 /**
- * SCROLL-BACK latency profile for one channel (#buzz-bugs) against a LIVE
+ * SCROLL-BACK latency profile for one channel (#kura-bugs) against a LIVE
  * relay, post-PR #1500 read-model.
  *
  * Mechanics under test (source: useLoadOlderOnScroll.ts, pageOlderMessages.ts,
@@ -28,19 +28,19 @@ import { installRelayBridge } from "../helpers/bridge";
  *   KURA_E2E_RELAY_URL=http://127.0.0.1:13000 \
  *   KURA_COMMUNITY_HOST=sprout-oss.stage.blox.sqprod.co \
  *   KURA_PERF_NSEC=nsec1... \
- *   npx playwright test --config=playwright.perf.config.ts scrollback-buzzbugs.perf.ts
+ *   npx playwright test --config=playwright.perf.config.ts scrollback-kurabugs.perf.ts
  */
 
 const RELAY_HTTP =
   process.env.KURA_E2E_RELAY_URL ?? "https://sprout-oss.stage.blox.sqprod.co";
 const NSEC = process.env.KURA_PERF_NSEC ?? "";
 const COMMUNITY_HOST = process.env.KURA_COMMUNITY_HOST ?? "";
-const TARGET_CHANNEL = process.env.KURA_PERF_CHANNEL ?? "buzz-bugs";
+const TARGET_CHANNEL = process.env.KURA_PERF_CHANNEL ?? "kura-bugs";
 const PAGES = Number(process.env.KURA_PERF_PAGES ?? 10);
 
-const IDENTITY_OVERRIDE_KEY = "buzz:e2e-identity-override.v1";
-const ONBOARDING_PREFIX = "buzz-onboarding-complete.v1:";
-const WELCOME_PREFIX = "buzz-welcome-channel-ensured.v2:";
+const IDENTITY_OVERRIDE_KEY = "kura:e2e-identity-override.v1";
+const ONBOARDING_PREFIX = "kura-onboarding-complete.v1:";
+const WELCOME_PREFIX = "kura-welcome-channel-ensured.v2:";
 
 const REAL_CHROME_UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36";

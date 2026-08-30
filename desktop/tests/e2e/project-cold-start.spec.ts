@@ -7,7 +7,7 @@ const PROJECT_HOME_CHANNEL_ID = "cf63feec-21bb-5bf0-a2f8-0e4c3de8ec73";
 async function enableProjectsFeature(page: import("@playwright/test").Page) {
   await page.addInitScript(() => {
     window.localStorage.setItem(
-      "buzz-feature-overrides-v1",
+      "kura-feature-overrides-v1",
       JSON.stringify({ projects: true }),
     );
   });
@@ -20,7 +20,7 @@ async function waitForProjectSnapshot(
     .poll(() =>
       page.evaluate(() =>
         Object.keys(window.localStorage).some((key) =>
-          key.startsWith("buzz-projects.v1:"),
+          key.startsWith("kura-projects.v1:"),
         ),
       ),
     )
@@ -114,7 +114,7 @@ test("stale non-matching snapshot uses the scoped project-home lookup", async ({
 
   await page.evaluate(() => {
     const key = Object.keys(window.localStorage).find((candidate) =>
-      candidate.startsWith("buzz-projects.v1:"),
+      candidate.startsWith("kura-projects.v1:"),
     );
     if (!key) throw new Error("Project snapshot was not persisted.");
     const snapshot = JSON.parse(window.localStorage.getItem(key) ?? "{}");
@@ -143,7 +143,7 @@ test("stale non-matching snapshot uses the scoped project-home lookup", async ({
   await expect(page.getByTestId("project-home-context-panel")).toBeVisible();
   const usedScopedLookup = await page.evaluate((channelId) => {
     return window.__KURA_E2E_PROJECT_QUERY_FILTERS__?.some((filter) =>
-      filter["#buzz-channel"]?.includes(channelId),
+      filter["#kura-channel"]?.includes(channelId),
     );
   }, PROJECT_HOME_CHANNEL_ID);
   expect(usedScopedLookup).toBe(true);

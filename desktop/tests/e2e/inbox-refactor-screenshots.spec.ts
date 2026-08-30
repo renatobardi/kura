@@ -23,9 +23,9 @@ const DM_CHANNEL_ID = "f48efb06-0c93-5025-aac9-2e646bb6bfa8";
 
 // Mock bridge default pubkey — must match DEFAULT_MOCK_PUBKEY in bridge.ts.
 const MOCK_PUBKEY = "deadbeef".repeat(8);
-const DRAFT_STORE_KEY = `buzz-drafts.v1:${MOCK_PUBKEY}`;
-const FONT_SIZE_STORAGE_KEY = "buzz.appearance.fontSize";
-const CONVERSATION_DENSITY_STORAGE_KEY = "buzz.appearance.conversationDensity";
+const DRAFT_STORE_KEY = `kura-drafts.v1:${MOCK_PUBKEY}`;
+const FONT_SIZE_STORAGE_KEY = "kura.appearance.fontSize";
+const CONVERSATION_DENSITY_STORAGE_KEY = "kura.appearance.conversationDensity";
 
 // Fixed timestamps so draft ordering renders deterministically.
 const DRAFT_CREATED_AT_1 = "2026-07-01T10:00:00.000Z";
@@ -122,14 +122,14 @@ type MockFeedWindow = Window & {
 async function patchCommunityPubkey(page: import("@playwright/test").Page) {
   await page.addInitScript(
     ({ pubkey }) => {
-      const raw = window.localStorage.getItem("buzz-communities");
+      const raw = window.localStorage.getItem("kura-communities");
       const communities = raw
         ? (JSON.parse(raw) as Array<Record<string, unknown>>)
         : [];
       if (communities[0]) {
         communities[0].pubkey = pubkey;
         window.localStorage.setItem(
-          "buzz-communities",
+          "kura-communities",
           JSON.stringify(communities),
         );
       }

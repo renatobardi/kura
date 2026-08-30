@@ -3,13 +3,13 @@ import { expect, test, type Page } from "@playwright/test";
 import { waitForAnimations } from "../helpers/animations";
 import { installMockBridge } from "../helpers/bridge";
 
-const SHOTS = "test-results/buzz-theme";
-const THEME_STORAGE_KEY = "buzz-theme";
-const GLASS_BACKGROUND_STORAGE_KEY = "buzz-glass-background";
-const GLASS_OPACITY_STORAGE_KEY = "buzz-glass-opacity";
-const PROMINENT_ACTIVE_TAB_STORAGE_KEY = "buzz-prominent-active-tab";
-const CONVERSATION_DENSITY_STORAGE_KEY = "buzz.appearance.conversationDensity";
-const FONT_SIZE_STORAGE_KEY = "buzz.appearance.fontSize";
+const SHOTS = "test-results/kura-theme";
+const THEME_STORAGE_KEY = "kura-theme";
+const GLASS_BACKGROUND_STORAGE_KEY = "kura-glass-background";
+const GLASS_OPACITY_STORAGE_KEY = "kura-glass-opacity";
+const PROMINENT_ACTIVE_TAB_STORAGE_KEY = "kura-prominent-active-tab";
+const CONVERSATION_DENSITY_STORAGE_KEY = "kura.appearance.conversationDensity";
+const FONT_SIZE_STORAGE_KEY = "kura.appearance.fontSize";
 const MOCK_PUBKEY = "deadbeef".repeat(8);
 const GENERAL_CHANNEL_ID = "9a1657ac-f7aa-5db0-b632-d8bbeb6dfb50";
 
@@ -31,7 +31,7 @@ async function seedIconChannelSection(page: Page) {
   await page.addInitScript(
     ({ channelId, pubkey }) => {
       window.localStorage.setItem(
-        `buzz-channel-sections.v1:${pubkey}`,
+        `kura-channel-sections.v1:${pubkey}`,
         JSON.stringify({
           version: 1,
           sections: [
@@ -57,7 +57,7 @@ async function openChannel(page: Page) {
   await expect(page.getByTestId("app-sidebar")).toBeVisible();
 }
 
-async function expectBuzzSidebarPalette(page: Page, mode: "light" | "dark") {
+async function expectKuraSidebarPalette(page: Page, mode: "light" | "dark") {
   const mutedColor =
     mode === "light" ? "rgba(0, 0, 0, 0.4)" : "rgba(255, 255, 255, 0.4)";
   const searchSurface =
@@ -70,7 +70,7 @@ async function expectBuzzSidebarPalette(page: Page, mode: "light" | "dark") {
     mode === "light" ? "rgba(0, 0, 0, 0.5)" : "rgba(255, 255, 255, 0.5)";
   const search = page.getByTestId("open-search");
   const pinnedHeader = page.getByTestId("sidebar-pinned-header");
-  const sidebarScroller = page.locator(".buzz-sidebar-scrollbar");
+  const sidebarScroller = page.locator(".kura-sidebar-scrollbar");
   const scrollContent = page.getByTestId("sidebar-scroll-content");
   const primaryMenu = page.getByTestId("sidebar-primary-menu");
   const sectionLabel = page
@@ -142,7 +142,7 @@ async function expectBuzzSidebarPalette(page: Page, mode: "light" | "dark") {
     const rowRightSpacing = scrollContentBox.right - (rowBox.x + rowBox.width);
     expect(Math.abs(rowLeftSpacing - rowRightSpacing)).toBeLessThanOrEqual(0.5);
   }
-  await expect(page.locator("[data-buzz-sidebar-secondary]").first()).toHaveCSS(
+  await expect(page.locator("[data-kura-sidebar-secondary]").first()).toHaveCSS(
     "color",
     mutedColor,
   );
@@ -240,12 +240,12 @@ async function expectIconlessSectionTitleAligned(
   expect(Math.abs(titleBox.x - firstRowIconX)).toBeLessThanOrEqual(0.5);
 }
 
-async function expectBuzzContentShadow(page: Page, mode: "light" | "dark") {
+async function expectKuraContentShadow(page: Page, mode: "light" | "dark") {
   const effects = await page.evaluate(() => {
-    const shell = document.querySelector(".buzz-huddle-shell");
-    const content = document.querySelector("[data-buzz-content-surface]");
+    const shell = document.querySelector(".kura-huddle-shell");
+    const content = document.querySelector("[data-kura-content-surface]");
     const shadowViewport = document.querySelector(
-      "[data-buzz-shadow-viewport]",
+      "[data-kura-shadow-viewport]",
     );
     return {
       appStroke: shell ? getComputedStyle(shell, "::before").boxShadow : "",
@@ -268,15 +268,15 @@ async function expectBuzzContentShadow(page: Page, mode: "light" | "dark") {
   }
 }
 
-async function expectBuzzGradientPaint(
+async function expectKuraGradientPaint(
   page: Page,
   mode: "light" | "dark",
 ): Promise<string> {
   const paint = await page.evaluate(() => {
     const root = document.documentElement;
-    const appSurface = document.querySelector(".buzz-huddle-app-surface");
-    const lightLayer = document.querySelector('[data-buzz-gradient="light"]');
-    const darkLayer = document.querySelector('[data-buzz-gradient="dark"]');
+    const appSurface = document.querySelector(".kura-huddle-app-surface");
+    const lightLayer = document.querySelector('[data-kura-gradient="light"]');
+    const darkLayer = document.querySelector('[data-kura-gradient="dark"]');
     const sidebarRoot = document.querySelector(
       '[data-testid="app-sidebar"], [data-testid="settings-sidebar"]',
     );
@@ -287,7 +287,7 @@ async function expectBuzzGradientPaint(
     const darkStyles = darkLayer ? getComputedStyle(darkLayer) : null;
     return {
       isDark: root.classList.contains("dark"),
-      theme: root.getAttribute("data-buzz-theme"),
+      theme: root.getAttribute("data-kura-theme"),
       surfaceImage: appStyles?.backgroundImage ?? "",
       lightImage: lightStyles?.backgroundImage ?? "",
       lightOpacity: lightStyles?.opacity ?? "",
@@ -299,7 +299,7 @@ async function expectBuzzGradientPaint(
     };
   });
 
-  expect(paint.theme).toBe(mode === "light" ? "buzz" : "buzz-dark");
+  expect(paint.theme).toBe(mode === "light" ? "kura" : "kura-dark");
   expect(paint.isDark).toBe(mode === "dark");
   expect(paint.surfaceImage).toBe("none");
   expect(paint.lightImage).not.toBe("");
@@ -313,7 +313,7 @@ async function expectBuzzGradientPaint(
   return mode === "light" ? paint.lightImage : paint.darkImage;
 }
 
-async function expectBuzzSettingsPalette(page: Page, mode: "light" | "dark") {
+async function expectKuraSettingsPalette(page: Page, mode: "light" | "dark") {
   const mutedColor =
     mode === "light" ? "rgba(0, 0, 0, 0.4)" : "rgba(255, 255, 255, 0.4)";
   const sidebar = page.getByTestId("settings-sidebar");
@@ -327,7 +327,7 @@ async function expectBuzzSettingsPalette(page: Page, mode: "light" | "dark") {
     mutedColor,
   );
 
-  await expectBuzzGradientPaint(page, mode);
+  await expectKuraGradientPaint(page, mode);
 
   const version = page.getByTestId("settings-version");
   if ((await version.count()) > 0) {
@@ -335,12 +335,12 @@ async function expectBuzzSettingsPalette(page: Page, mode: "light" | "dark") {
   }
 }
 
-async function expectAppliedBuzzTheme(
+async function expectAppliedKuraTheme(
   page: Page,
-  themeName: "buzz" | "buzz-dark",
-  storedTheme: "buzz" | "buzz-dark" = themeName,
+  themeName: "kura" | "kura-dark",
+  storedTheme: "kura" | "kura-dark" = themeName,
 ) {
-  const isDark = themeName === "buzz-dark";
+  const isDark = themeName === "kura-dark";
   await expect
     .poll(() =>
       page.evaluate((storageKey) => {
@@ -349,10 +349,10 @@ async function expectAppliedBuzzTheme(
         return {
           storedTheme: window.localStorage.getItem(storageKey),
           isDark: root.classList.contains("dark"),
-          buzzTheme: root.getAttribute("data-buzz-theme"),
-          gradientTop: styles.getPropertyValue("--buzz-gradient-top").trim(),
+          kuraTheme: root.getAttribute("data-kura-theme"),
+          gradientTop: styles.getPropertyValue("--kura-gradient-top").trim(),
           gradientBottom: styles
-            .getPropertyValue("--buzz-gradient-bottom")
+            .getPropertyValue("--kura-gradient-bottom")
             .trim(),
         };
       }, THEME_STORAGE_KEY),
@@ -360,7 +360,7 @@ async function expectAppliedBuzzTheme(
     .toEqual({
       storedTheme,
       isDark,
-      buzzTheme: themeName,
+      kuraTheme: themeName,
       gradientTop: isDark ? "#1f1d1a" : "#f7f4ee",
       gradientBottom: isDark ? "#151412" : "#ece7dc",
     });
@@ -385,44 +385,44 @@ async function emitNativeThemeChange(page: Page, theme: "light" | "dark") {
   }, theme);
 }
 
-test("buzz light sidebar gradient", async ({ page }) => {
-  await seedTheme(page, "buzz");
+test("kura light sidebar gradient", async ({ page }) => {
+  await seedTheme(page, "kura");
   await installMockBridge(page);
   await openChannel(page);
-  await expectBuzzGradientPaint(page, "light");
-  await expectBuzzSidebarPalette(page, "light");
-  await expectBuzzContentShadow(page, "light");
+  await expectKuraGradientPaint(page, "light");
+  await expectKuraSidebarPalette(page, "light");
+  await expectKuraContentShadow(page, "light");
   await expectIconlessSectionTitleAligned(page, "stream-list");
   await expectIconlessSectionTitleAligned(page, "dm-list");
   await waitForAnimations(page);
   await page
     .getByTestId("app-sidebar")
-    .screenshot({ path: `${SHOTS}/01-buzz-light-sidebar.png` });
+    .screenshot({ path: `${SHOTS}/01-kura-light-sidebar.png` });
 });
 
-test("buzz dark sidebar gradient", async ({ page }) => {
-  await seedTheme(page, "buzz-dark");
+test("kura dark sidebar gradient", async ({ page }) => {
+  await seedTheme(page, "kura-dark");
   await installMockBridge(page);
   await openChannel(page);
-  await expectBuzzGradientPaint(page, "dark");
-  await expectBuzzSidebarPalette(page, "dark");
-  await expectBuzzContentShadow(page, "dark");
+  await expectKuraGradientPaint(page, "dark");
+  await expectKuraSidebarPalette(page, "dark");
+  await expectKuraContentShadow(page, "dark");
   await expectIconlessSectionTitleAligned(page, "stream-list");
   await expectIconlessSectionTitleAligned(page, "dm-list");
-  await expect(page.locator("[data-buzz-content-surface]")).toHaveCSS(
+  await expect(page.locator("[data-kura-content-surface]")).toHaveCSS(
     "background-color",
     "rgb(22, 21, 19)",
   );
   await waitForAnimations(page);
   await page
     .getByTestId("app-sidebar")
-    .screenshot({ path: `${SHOTS}/02-buzz-dark-sidebar.png` });
+    .screenshot({ path: `${SHOTS}/02-kura-dark-sidebar.png` });
 });
 
 test("custom section icon and name align with channel columns", async ({
   page,
 }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await seedIconChannelSection(page);
   await installMockBridge(page);
   await openChannel(page);
@@ -545,7 +545,7 @@ test("appearance groups theme and preferences into labeled rows", async ({
   await themeStyleTrigger.click();
   await expect(themeStyleTrigger).toHaveAttribute("aria-expanded", "true");
   await expect(themeStyleOptions).toBeVisible();
-  await themeCard.getByTestId("theme-option-buzz").click();
+  await themeCard.getByTestId("theme-option-kura").click();
   await expect(themeStyleTrigger).toHaveAttribute("aria-expanded", "true");
   await expect(themeStyleOptions).toBeVisible();
   await expect(
@@ -644,7 +644,7 @@ test("appearance groups theme and preferences into labeled rows", async ({
 test("app font size and conversation density apply independently", async ({
   page,
 }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await installMockBridge(page);
   await openAppearance(page, "light");
 
@@ -677,7 +677,7 @@ test("app font size and conversation density apply independently", async ({
     .getByTestId("font-size-row")
     .locator("[data-settings-subcopy]");
   // The conversation tokens are rem-relative `calc(...)` expressions (the
-  // type tokens ride on `--buzz-type-rem`, which itself derives from the
+  // type tokens ride on `--kura-type-rem`, which itself derives from the
   // root rem so Cmd +/- zooms everything together). Reading the raw custom
   // property strings off <html> would just return unresolved calc text, so
   // resolve each token to px through a probe element instead: assign the
@@ -686,7 +686,7 @@ test("app font size and conversation density apply independently", async ({
   // fractional precision instead of snapping to layout units.
   const readScale = () =>
     root.evaluate((element) => {
-      const PROBE_ID = "buzz-e2e-conversation-scale-probe";
+      const PROBE_ID = "kura-e2e-conversation-scale-probe";
       const tokens = {
         authorLineHeight: "--conversation-author-line-height",
         bodyGap: "--conversation-body-gap",
@@ -1164,28 +1164,28 @@ test("app font size and conversation density apply independently", async ({
 });
 
 test("appearance picker — system tab (Kura follows OS)", async ({ page }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await installMockBridge(page);
   const panel = await openAppearance(page, "system");
   await panel.screenshot({ path: `${SHOTS}/03-picker-system.png` });
 });
 
 test("appearance picker — light tab (Kura)", async ({ page }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await installMockBridge(page);
   const panel = await openAppearance(page, "light");
   await panel.screenshot({ path: `${SHOTS}/04-picker-light.png` });
 });
 
 test("appearance picker — dark tab (Kura Dark)", async ({ page }) => {
-  await seedTheme(page, "buzz-dark");
+  await seedTheme(page, "kura-dark");
   await installMockBridge(page);
   const panel = await openAppearance(page, "dark");
   await panel.screenshot({ path: `${SHOTS}/05-picker-dark.png` });
 });
 
 test("settings nav uses Kura active pill + hover (light)", async ({ page }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await page.getByTestId("open-settings").click();
@@ -1208,7 +1208,7 @@ test("settings nav uses Kura active pill + hover (light)", async ({ page }) => {
     throw new Error("Settings nav label geometry is missing");
   }
   expect(Math.abs(selectedLabelBox.width - unselectedLabelBox.width)).toBe(0);
-  await expectBuzzSettingsPalette(page, "light");
+  await expectKuraSettingsPalette(page, "light");
   const activeRow = page.getByTestId("settings-nav-appearance");
   await expect(activeRow).toHaveAttribute("data-active", "true");
   await waitForAnimations(page);
@@ -1216,7 +1216,7 @@ test("settings nav uses Kura active pill + hover (light)", async ({ page }) => {
 });
 
 test("settings nav uses Kura active pill + hover (dark)", async ({ page }) => {
-  await seedTheme(page, "buzz-dark");
+  await seedTheme(page, "kura-dark");
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await page.getByTestId("open-settings").click();
@@ -1224,7 +1224,7 @@ test("settings nav uses Kura active pill + hover (dark)", async ({ page }) => {
   const sidebar = page.getByTestId("settings-sidebar");
   await expect(sidebar).toBeVisible({ timeout: 10_000 });
   await page.getByTestId("settings-nav-appearance").click();
-  await expectBuzzSettingsPalette(page, "dark");
+  await expectKuraSettingsPalette(page, "dark");
   await expect(page.getByTestId("settings-content-surface")).toHaveCSS(
     "background-color",
     "rgb(22, 21, 19)",
@@ -1239,7 +1239,7 @@ test("settings nav uses Kura active pill + hover (dark)", async ({ page }) => {
 test("prominent active tab is opt-in and switches selection surfaces", async ({
   page,
 }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await installMockBridge(page);
   await openAppearance(page, "light");
 
@@ -1299,7 +1299,7 @@ test("prominent active tab is opt-in and switches selection surfaces", async ({
 test("prominent channel and direct-message rows share one flat active state", async ({
   page,
 }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await page.addInitScript(
     ({ key }) => window.localStorage.setItem(key, "true"),
     { key: PROMINENT_ACTIVE_TAB_STORAGE_KEY },
@@ -1340,13 +1340,13 @@ for (const { activeSurface, hoverSurface, mode, theme } of [
     activeSurface: "rgba(0, 0, 0, 0.07)",
     hoverSurface: "rgba(0, 0, 0, 0.04)",
     mode: "light" as const,
-    theme: "buzz",
+    theme: "kura",
   },
   {
     activeSurface: "rgba(255, 255, 255, 0.16)",
     hoverSurface: "rgba(255, 255, 255, 0.04)",
     mode: "dark" as const,
-    theme: "buzz-dark",
+    theme: "kura-dark",
   },
 ]) {
   test(`non-prominent ${theme} selection matches production`, async ({
@@ -1445,7 +1445,7 @@ for (const { mode, theme } of [
 test("settings content uses the same inset surface as the main app", async ({
   page,
 }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
   const searchBox = await page.getByTestId("open-search").boundingBox();
@@ -1525,7 +1525,7 @@ test("settings content uses the same inset surface as the main app", async ({
 });
 
 test("appearance hides accent picker under Kura", async ({ page }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await installMockBridge(page);
   const panel = await openAppearance(page, "light");
   // The accent picker is hidden while a Kura theme is active. Its neutral
@@ -1535,7 +1535,7 @@ test("appearance hides accent picker under Kura", async ({ page }) => {
 });
 
 test("glass background keeps the content panel solid", async ({ page }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await page.addInitScript(() => {
     (window as typeof window & { isTauri?: boolean }).isTauri = true;
     Object.defineProperty(navigator, "platform", {
@@ -1561,7 +1561,7 @@ test("glass background keeps the content panel solid", async ({ page }) => {
     .toBeNull();
   await expect(opacitySlider).toHaveCount(0);
   await expect(root).not.toHaveAttribute("data-glass-background", "");
-  await expect(page.locator(".buzz-theme-gradient-underlay")).not.toHaveCSS(
+  await expect(page.locator(".kura-theme-gradient-underlay")).not.toHaveCSS(
     "background-image",
     "none",
   );
@@ -1569,7 +1569,7 @@ test("glass background keeps the content panel solid", async ({ page }) => {
   await toggle.click();
   await expect(toggle).toBeChecked();
   await expect(opacitySlider).toBeVisible();
-  await expect(opacitySlider).toHaveClass(/buzz-avatar-framing-slider/);
+  await expect(opacitySlider).toHaveClass(/kura-avatar-framing-slider/);
   await expect(opacitySlider).toHaveAttribute("aria-valuenow", "65");
   await expect(opacitySlider).toHaveCSS("height", "32px");
   const matchingRadiusControls = [
@@ -1590,23 +1590,23 @@ test("glass background keeps the content panel solid", async ({ page }) => {
   }
   await expect(page.getByTestId("glass-opacity-value")).toHaveCount(0);
   await expect(
-    opacitySlider.locator(".buzz-avatar-framing-slider-handle"),
+    opacitySlider.locator(".kura-avatar-framing-slider-handle"),
   ).toHaveCSS("opacity", "1");
   await expect(root).toHaveAttribute("data-glass-background", "");
-  const buzzSettingOrder = await page
+  const kuraSettingOrder = await page
     .getByTestId("appearance-theme-card")
     .locator(
       '[data-testid="appearance-color-mode-row"], [data-testid="theme-style-row"], [data-testid="glass-background-row"], [data-testid="glass-opacity-row"], [data-testid="prominent-active-tab-row"]',
     )
     .evaluateAll((rows) => rows.map((row) => row.getAttribute("data-testid")));
-  expect(buzzSettingOrder).toEqual([
+  expect(kuraSettingOrder).toEqual([
     "appearance-color-mode-row",
     "theme-style-row",
     "glass-background-row",
     "glass-opacity-row",
     "prominent-active-tab-row",
   ]);
-  await expect(page.locator(".buzz-theme-gradient-underlay")).toHaveCSS(
+  await expect(page.locator(".kura-theme-gradient-underlay")).toHaveCSS(
     "background-image",
     "none",
   );
@@ -1669,7 +1669,7 @@ test("glass background keeps the content panel solid", async ({ page }) => {
 });
 
 test("glass background is unavailable on Linux", async ({ page }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await page.addInitScript((storageKey) => {
     window.localStorage.setItem(storageKey, "true");
     (window as typeof window & { isTauri?: boolean }).isTauri = true;
@@ -1726,12 +1726,12 @@ test("non-Kura glass preserves the selected theme sidebar tint", async ({
   await openAppearance(page, "light");
 
   const root = page.locator("html");
-  await expect(root).not.toHaveAttribute("data-buzz-sidebar", "");
+  await expect(root).not.toHaveAttribute("data-kura-sidebar", "");
   await page.getByTestId("glass-background-toggle").click();
   await expect(root).toHaveAttribute("data-glass-background", "");
 
   const tint = await page
-    .locator(".buzz-theme-gradient-layer")
+    .locator(".kura-theme-gradient-layer")
     .evaluate((element) => {
       const rootStyles = getComputedStyle(document.documentElement);
       const sidebar = rootStyles
@@ -1771,13 +1771,13 @@ test("accent picker reveals/hides when toggling Kura", async ({ page }) => {
   await installMockBridge(page);
   await openAppearance(page, "light");
   await expect(page.getByTestId("accent-color-neutral")).toBeVisible();
-  const nonBuzzSettingOrder = await page
+  const nonKuraSettingOrder = await page
     .getByTestId("appearance-theme-card")
     .locator(
       '[data-testid="appearance-color-mode-row"], [data-testid="theme-style-row"], [data-testid="accent-color-options"], [data-testid="glass-background-row"], [data-testid="prominent-active-tab-row"]',
     )
     .evaluateAll((rows) => rows.map((row) => row.getAttribute("data-testid")));
-  expect(nonBuzzSettingOrder).toEqual([
+  expect(nonKuraSettingOrder).toEqual([
     "appearance-color-mode-row",
     "theme-style-row",
     "accent-color-options",
@@ -1786,7 +1786,7 @@ test("accent picker reveals/hides when toggling Kura", async ({ page }) => {
 
   // Switch to Kura — picker should leave (allow the exit animation to settle).
   await page.getByTestId("theme-style-trigger").click();
-  await page.getByTestId("theme-option-buzz").click();
+  await page.getByTestId("theme-option-kura").click();
   await expect(page.getByTestId("theme-style-trigger")).toHaveAttribute(
     "aria-expanded",
     "true",
@@ -1838,31 +1838,31 @@ test("accent picker reveals/hides when toggling Kura", async ({ page }) => {
 test("Kura light and dark modes apply live without a reload", async ({
   page,
 }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await installMockBridge(page);
   await openAppearance(page, "light");
-  await expectAppliedBuzzTheme(page, "buzz");
-  const lightGradient = await expectBuzzGradientPaint(page, "light");
+  await expectAppliedKuraTheme(page, "kura");
+  const lightGradient = await expectKuraGradientPaint(page, "light");
 
   await page.getByTestId("appearance-mode-dark").click();
-  await expectAppliedBuzzTheme(page, "buzz-dark");
-  const darkGradient = await expectBuzzGradientPaint(page, "dark");
+  await expectAppliedKuraTheme(page, "kura-dark");
+  const darkGradient = await expectKuraGradientPaint(page, "dark");
   expect(darkGradient).not.toBe(lightGradient);
 
   await page.getByTestId("appearance-mode-light").click();
-  await expectAppliedBuzzTheme(page, "buzz");
-  await expectBuzzGradientPaint(page, "light");
+  await expectAppliedKuraTheme(page, "kura");
+  await expectKuraGradientPaint(page, "light");
 
   // Exercise the overlap that previously let a slower, stale theme load win.
   await page.getByTestId("appearance-mode-dark").click();
   await page.getByTestId("appearance-mode-light").click();
-  await expectAppliedBuzzTheme(page, "buzz");
+  await expectAppliedKuraTheme(page, "kura");
 });
 
 test("Kura follows native system theme changes without a reload", async ({
   page,
 }) => {
-  await seedTheme(page, "buzz");
+  await seedTheme(page, "kura");
   await page.addInitScript(() => {
     (window as typeof window & { isTauri?: boolean }).isTauri = true;
   });
@@ -1870,10 +1870,10 @@ test("Kura follows native system theme changes without a reload", async ({
   await openAppearance(page, "system");
 
   await emitNativeThemeChange(page, "dark");
-  await expectAppliedBuzzTheme(page, "buzz-dark", "buzz");
-  await expectBuzzGradientPaint(page, "dark");
+  await expectAppliedKuraTheme(page, "kura-dark", "kura");
+  await expectKuraGradientPaint(page, "dark");
 
   await emitNativeThemeChange(page, "light");
-  await expectAppliedBuzzTheme(page, "buzz", "buzz");
-  await expectBuzzGradientPaint(page, "light");
+  await expectAppliedKuraTheme(page, "kura", "kura");
+  await expectKuraGradientPaint(page, "light");
 });

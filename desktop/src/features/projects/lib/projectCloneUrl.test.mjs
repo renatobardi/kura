@@ -68,13 +68,13 @@ test("effectiveCloneUrls returns empty when no default can be derived", () => {
 
 test("projectRepoHost recognizes a canonical repository on the relay", () => {
   assert.deepEqual(projectRepoHost(`${ORIGIN}/git/${OWNER}/buzz`, ORIGIN), {
-    kind: "buzz",
+    kind: "kura",
   });
 });
 
 test("projectRepoHost identifies an external repository by host", () => {
   assert.deepEqual(
-    projectRepoHost("https://github.com/block/buzz.git", ORIGIN),
+    projectRepoHost("https://github.com/block/kura.git", ORIGIN),
     { kind: "external", host: "github.com" },
   );
 });
@@ -102,7 +102,7 @@ test("projectRepoHostForProject recognizes an implicit relay repository", () => 
       { cloneUrls: [], dtag: "buzz", owner: OWNER },
       ORIGIN,
     ),
-    { kind: "buzz" },
+    { kind: "kura" },
   );
 });
 
@@ -110,13 +110,13 @@ test("repositoryDisplayPath renders an external repo as host/path without .git",
   assert.equal(
     repositoryDisplayPath(
       {
-        cloneUrls: ["https://github.com/block/buzz.git"],
+        cloneUrls: ["https://github.com/block/kura.git"],
         dtag: "buzz",
         owner: OWNER,
       },
       ORIGIN,
     ),
-    "github.com/block/buzz",
+    "github.com/block/kura",
   );
 });
 

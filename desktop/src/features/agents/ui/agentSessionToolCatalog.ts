@@ -11,7 +11,7 @@ import {
   XCircle,
 } from "lucide-react";
 
-import type { BuzzToolInfo, ToolStatus } from "./agentSessionTypes";
+import type { KuraToolInfo, ToolStatus } from "./agentSessionTypes";
 
 export function normalizeToolStatus(status: string): ToolStatus {
   const normalized = status.toLowerCase();
@@ -136,7 +136,7 @@ const KURA_TOOL_TITLE_ALIASES: Array<[RegExp, string]> = [
   [/\bremoving reaction\b/, "remove_reaction"],
 ];
 
-export function getBuzzToolInfo(title: string): BuzzToolInfo | null {
+export function getKuraToolInfo(title: string): KuraToolInfo | null {
   const name = normalizeToolName(title);
   const isRead = KURA_READ_TOOLS.has(name);
   const isWrite = KURA_WRITE_TOOLS.has(name);
@@ -206,10 +206,10 @@ export function getBuzzToolInfo(title: string): BuzzToolInfo | null {
 }
 
 export function normalizeToolName(title: string): string {
-  const knownName = findBuzzToolName(title, true);
+  const knownName = findKuraToolName(title, true);
   if (knownName) return knownName;
 
-  const normalized = normalizeToolNameText(title).replace(/^buzz_/, "");
+  const normalized = normalizeToolNameText(title).replace(/^kura_/, "");
   return normalized.match(/[a-z][a-z0-9_]+/)?.[0] ?? normalized;
 }
 
@@ -222,8 +222,8 @@ export function normalizeToolNameText(value: string): string {
     .replace(/^_+|_+$/g, "");
 }
 
-export function findBuzzToolName(value: string, includeShortNames: boolean) {
-  const alias = findBuzzToolAlias(value);
+export function findKuraToolName(value: string, includeShortNames: boolean) {
+  const alias = findKuraToolAlias(value);
   if (alias) return alias;
 
   const normalized = normalizeToolNameText(value);
@@ -235,7 +235,7 @@ export function findBuzzToolName(value: string, includeShortNames: boolean) {
   );
 }
 
-function findBuzzToolAlias(value: string) {
+function findKuraToolAlias(value: string) {
   const normalizedPhrase = value
     .trim()
     .toLowerCase()

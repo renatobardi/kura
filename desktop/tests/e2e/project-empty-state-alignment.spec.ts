@@ -8,7 +8,7 @@ const ALIGNMENT_TOLERANCE_PX = 2;
 async function enableProjectsFeature(page: import("@playwright/test").Page) {
   await page.addInitScript(() => {
     window.localStorage.setItem(
-      "buzz-feature-overrides-v1",
+      "kura-feature-overrides-v1",
       JSON.stringify({ projects: true }),
     );
   });

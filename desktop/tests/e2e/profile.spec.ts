@@ -434,8 +434,8 @@ test("keeps the saved profile description after a community round trip", async (
     },
   ];
   await page.addInitScript((seed) => {
-    window.localStorage.setItem("buzz-communities", JSON.stringify(seed));
-    window.localStorage.setItem("buzz-active-community-id", seed[0].id);
+    window.localStorage.setItem("kura-communities", JSON.stringify(seed));
+    window.localStorage.setItem("kura-active-community-id", seed[0].id);
   }, communities);
   await page.goto("/");
 
@@ -599,7 +599,7 @@ test("nests the avatar edit button in a clipped notch", async ({ page }) => {
   // keeps the root accent-driven token, so the shared-token comparison below
   // only holds outside the Kura theme.
   await page.addInitScript(() => {
-    window.localStorage.setItem("buzz-theme", "github-light");
+    window.localStorage.setItem("kura-theme", "github-light");
   });
   await page.goto("/");
 
@@ -780,7 +780,7 @@ test("uploads local profile avatar files before saving", async ({ page }) => {
   await expect(page.getByTestId("profile-avatar-url")).toHaveValue("");
 
   const pastedAvatarUrl = await page.evaluate(
-    () => new URL("/buzz.svg", window.location.href).href,
+    () => new URL("/kura.svg", window.location.href).href,
   );
   await page.getByTestId("profile-avatar-url").click();
   await page.keyboard.insertText(pastedAvatarUrl);
@@ -827,7 +827,7 @@ test("renders emoji avatars with a static background layer", async ({
     "background-color",
     "rgb(255, 231, 92)",
   );
-  await expect(avatarPreview).not.toHaveClass(/buzz-avatar-squish/);
+  await expect(avatarPreview).not.toHaveClass(/kura-avatar-squish/);
   await expect(page.getByTestId("profile-avatar-preview-emoji")).toHaveText(
     "😀",
   );
@@ -1318,7 +1318,7 @@ test("renders agent profile ingress subviews from the Playwright mock bridge", a
       return {
         heroHeight: Number.parseFloat(
           getComputedStyle(layout).getPropertyValue(
-            "--buzz-profile-sticky-hero-height",
+            "--kura-profile-sticky-hero-height",
           ),
         ),
         tabsTop: tabs ? Number.parseFloat(getComputedStyle(tabs).top) : 0,
@@ -2456,7 +2456,7 @@ test("opens settings with the keyboard shortcut and updates theme", async ({
 
   // Theme name persists in localStorage
   await expect
-    .poll(() => page.evaluate(() => localStorage.getItem("buzz-theme")))
+    .poll(() => page.evaluate(() => localStorage.getItem("kura-theme")))
     .toBe("github-light");
 
   // Switch to Dark mode tab to reveal dark themes
@@ -2472,7 +2472,7 @@ test("opens settings with the keyboard shortcut and updates theme", async ({
     .toBe(true);
 
   await expect
-    .poll(() => page.evaluate(() => localStorage.getItem("buzz-theme")))
+    .poll(() => page.evaluate(() => localStorage.getItem("kura-theme")))
     .toBe("dracula");
 
   // Close settings with keyboard shortcut
@@ -2490,7 +2490,7 @@ test("supports webview zoom keyboard shortcuts", async ({ page }) => {
   const getTextScaleState = () =>
     page.evaluate(() => ({
       rootFontSize: getComputedStyle(document.documentElement).fontSize,
-      storedScale: localStorage.getItem("buzz:text-scale"),
+      storedScale: localStorage.getItem("kura:text-scale"),
       webviewZoom: (window as Window & { __KURA_E2E_WEBVIEW_ZOOM__?: number })
         .__KURA_E2E_WEBVIEW_ZOOM__,
     }));
@@ -2585,7 +2585,7 @@ test("storage clear resets composed font size and keyboard zoom across windows",
   const readTypographyState = () =>
     page.evaluate(() => {
       const probe = document.createElement("span");
-      probe.style.fontSize = "var(--buzz-type-rem)";
+      probe.style.fontSize = "var(--kura-type-rem)";
       document.documentElement.appendChild(probe);
       const typeRemPx =
         Math.round(Number.parseFloat(getComputedStyle(probe).fontSize) * 100) /
@@ -2595,7 +2595,7 @@ test("storage clear resets composed font size and keyboard zoom across windows",
         fontSize: document.documentElement.dataset.fontSize,
         rootFontSize: getComputedStyle(document.documentElement).fontSize,
         typeRemPx,
-        textScale: localStorage.getItem("buzz:text-scale"),
+        textScale: localStorage.getItem("kura:text-scale"),
       };
     });
 

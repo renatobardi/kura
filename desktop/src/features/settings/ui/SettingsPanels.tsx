@@ -34,7 +34,7 @@ import { LocalArchiveSettingsCard } from "@/features/local-archive/ui/LocalArchi
 import { cn } from "@/shared/lib/cn";
 import { useCommunities } from "@/features/communities/useCommunities";
 import { Badge } from "@/shared/ui/badge";
-import { isBuzzTheme, useTheme } from "@/shared/theme/ThemeProvider";
+import { isKuraTheme, useTheme } from "@/shared/theme/ThemeProvider";
 import {
   LIGHT_THEMES,
   SYNTAX_THEMES,
@@ -237,8 +237,8 @@ export const settingsSections: SettingsSectionDescriptor[] = [
 ];
 
 function formatThemeLabel(name: string): string {
-  if (name === "buzz") return "Kura";
-  if (name === "buzz-dark") return "Kura Dark";
+  if (name === "kura") return "Kura";
+  if (name === "kura-dark") return "Kura Dark";
   return name
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -442,8 +442,8 @@ function ThemeSettingsCard() {
   // Kura themes pin a neutral accent (GitHub black in light, white in dark),
   // so the accent picker is hidden while a Kura theme is active. `themeName` is
   // the effective theme, so this also covers System mode resolving to Kura.
-  const buzzThemeSelected = isBuzzTheme(themeName);
-  const accentPickerHidden = buzzThemeSelected;
+  const kuraThemeSelected = isKuraTheme(themeName);
+  const accentPickerHidden = kuraThemeSelected;
   const shouldReduceMotion = useReducedMotion();
 
   const previewVarsByTheme = useThemePreviewVars();
@@ -785,7 +785,7 @@ function ThemeSettingsCard() {
           )}
 
           <GlassBackgroundSetting />
-          {buzzThemeSelected ? <ProminentActiveTabSetting /> : null}
+          {kuraThemeSelected ? <ProminentActiveTabSetting /> : null}
         </SettingsOptionGroup>
 
         <SettingsOptionGroup

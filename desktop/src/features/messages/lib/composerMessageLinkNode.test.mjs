@@ -24,12 +24,12 @@ const CHANNEL_HREF = `kura://channel/${CHANNEL_ID}`;
 const CHANNEL_MESSAGE_ID = "a".repeat(64);
 const CHANNEL_MESSAGE_HREF = `kura://channel/${CHANNEL_ID}/${CHANNEL_MESSAGE_ID}`;
 const OWNER = "a".repeat(64);
-const REPO_HREF = `kura://repo?owner=${OWNER}&d=buzz-world`;
-const PROJECT_HREF = `kura://project?owner=${OWNER}&d=buzz-world`;
+const REPO_HREF = `kura://repo?owner=${OWNER}&d=kura-world`;
+const PROJECT_HREF = `kura://project?owner=${OWNER}&d=kura-world`;
 const ISSUE_ID = "b".repeat(64);
-const ISSUE_HREF = `kura://issue?id=${ISSUE_ID}&owner=${OWNER}&d=buzz-world`;
+const ISSUE_HREF = `kura://issue?id=${ISSUE_ID}&owner=${OWNER}&d=kura-world`;
 const PR_ID = "c".repeat(64);
-const PR_HREF = `kura://pr?id=${PR_ID}&owner=${OWNER}&d=buzz-world`;
+const PR_HREF = `kura://pr?id=${PR_ID}&owner=${OWNER}&d=kura-world`;
 
 test("resolves a composer preview and canonicalizes the underlying href", () => {
   assert.deepEqual(
@@ -529,7 +529,7 @@ test("real markdown-it parsing materializes a restored message link", () => {
   });
 
   const html = md.renderInline(`See ${HREF}.`);
-  assert.match(html, /See <span data-composer-buzz-link=""/);
+  assert.match(html, /See <span data-composer-kura-link=""/);
   assert.match(html, /data-channel-name="general"/);
   assert.match(html, /data-href="kura:\/\/message\?channel=.*&amp;id=/);
 });
@@ -542,9 +542,9 @@ test("real markdown-it parsing materializes mixed Kura permalink chips", () => {
   });
 
   const html = md.renderInline(`${HREF} ${CHANNEL_HREF} ${REPO_HREF}`);
-  assert.equal((html.match(/data-composer-buzz-link=""/g) ?? []).length, 3);
+  assert.equal((html.match(/data-composer-kura-link=""/g) ?? []).length, 3);
   assert.match(html, /data-href="kura:\/\/channel\/9a1657ac/);
-  assert.match(html, /data-href="kura:\/\/repo\?owner=a{64}&amp;d=buzz-world/);
+  assert.match(html, /data-href="kura:\/\/repo\?owner=a{64}&amp;d=kura-world/);
 });
 
 test("real markdown-it parsing preserves underscores in restored entity links", () => {
@@ -556,7 +556,7 @@ test("real markdown-it parsing preserves underscores in restored entity links", 
 
   const html = md.renderInline(href);
 
-  assert.equal((html.match(/data-composer-buzz-link=""/g) ?? []).length, 1);
+  assert.equal((html.match(/data-composer-kura-link=""/g) ?? []).length, 1);
   assert.match(html, /data-href="kura:\/\/repo\?owner=a{64}&amp;d=my_repo"/);
   assert.doesNotMatch(html, /<\/span>_repo/);
 });
@@ -619,7 +619,7 @@ test("composer node uses the sent-message chip presentation", () => {
   assert.match(rendered[1].class, /mention-chip/);
   assert.match(rendered[1].class, /inline-chip-with-icon/);
   assert.match(rendered[1].class, /inline-chip-icon-message/);
-  assert.equal(rendered[1]["data-buzz-link"], "");
+  assert.equal(rendered[1]["data-kura-link"], "");
   // Channel label only — no event hash, so the chip does not change width when
   // the draft is sent and the rendered chip resolves its metadata.
   assert.match(rendered[1].class, /wrapping-inline-chip/);
@@ -680,34 +680,34 @@ test("composer node renders channel and entity chip presentations", () => {
   assert.equal(renderedChipLabel(channel), "general");
 
   const repo = render(REPO_HREF);
-  assert.equal(repo[1]["data-buzz-link-kind"], "repo");
+  assert.equal(repo[1]["data-kura-link-kind"], "repo");
   assert.match(repo[1].class, /inline-chip-icon-repo/);
-  assert.equal(renderedChipLabel(repo), "buzz-world");
+  assert.equal(renderedChipLabel(repo), "kura-world");
 
   const project = render(PROJECT_HREF);
-  assert.equal(project[1]["data-buzz-link-kind"], "project");
+  assert.equal(project[1]["data-kura-link-kind"], "project");
   assert.match(project[1].class, /inline-chip-icon-project/);
-  assert.equal(renderedChipLabel(project), "buzz-world");
+  assert.equal(renderedChipLabel(project), "kura-world");
 
   const issue = render(ISSUE_HREF);
-  assert.equal(issue[1]["data-buzz-link-kind"], "issue");
+  assert.equal(issue[1]["data-kura-link-kind"], "issue");
   assert.match(issue[1].class, /inline-chip-icon-issue/);
   // Repository name only — the rendered chip never widens into the issue
   // title, so the composer must not widen into the event hash either.
-  assert.equal(renderedChipLabel(issue), "buzz-world");
+  assert.equal(renderedChipLabel(issue), "kura-world");
 
   const pullRequest = render(PR_HREF);
-  assert.equal(pullRequest[1]["data-buzz-link-kind"], "pr");
+  assert.equal(pullRequest[1]["data-kura-link-kind"], "pr");
   assert.match(pullRequest[1].class, /inline-chip-icon-pr/);
-  assert.equal(renderedChipLabel(pullRequest), "buzz-world");
+  assert.equal(renderedChipLabel(pullRequest), "kura-world");
 });
 
 test("markdown rendering stores identity in attributes, not visible id text", () => {
   const { md } = captureMarkdownRule();
-  const render = md.renderer.rules.buzz_composer_message_link;
+  const render = md.renderer.rules.kura_composer_message_link;
   const html = render([{ meta: { channelName: "general", href: HREF } }], 0);
 
-  assert.match(html, /data-composer-buzz-link=""/);
+  assert.match(html, /data-composer-kura-link=""/);
   assert.match(html, /data-channel-name="general"/);
   assert.match(html, /data-href="kura:\/\/message\?channel=.*&amp;id=/);
   assert.doesNotMatch(html, />[^<]*root-event/);

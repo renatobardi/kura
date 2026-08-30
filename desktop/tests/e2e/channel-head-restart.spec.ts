@@ -35,7 +35,7 @@ test("restart paints a persisted head before the single authoritative refresh", 
   const persistedCache = await page.evaluate(() =>
     Object.fromEntries(
       Object.entries(window.localStorage).filter(([key]) =>
-        key.startsWith("buzz-e2e-channel-head:"),
+        key.startsWith("kura-e2e-channel-head:"),
       ),
     ),
   );

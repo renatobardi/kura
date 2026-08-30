@@ -76,7 +76,7 @@ export function DiffViewer({
   }
 
   return (
-    <div className={cn("buzz-diff-theme", className)}>
+    <div className={cn("kura-diff-theme", className)}>
       {searchPreview ? (
         <pre
           className="mb-3 whitespace-pre-wrap rounded-lg bg-muted/35 p-2 font-mono text-xs text-muted-foreground"
@@ -138,14 +138,14 @@ export function DiffViewer({
               {file.hunks.length > 0 ? (
                 <Diff
                   className={cn(
-                    "buzz-diff-table",
+                    "kura-diff-table",
                     viewType === "split" ? "min-w-[780px]" : "w-full",
                   )}
-                  codeClassName="buzz-diff-code"
+                  codeClassName="kura-diff-code"
                   diffType={diffType}
-                  gutterClassName="buzz-diff-gutter"
+                  gutterClassName="kura-diff-gutter"
                   hunks={file.hunks}
-                  lineClassName="buzz-diff-line"
+                  lineClassName="kura-diff-line"
                   viewType={viewType}
                 >
                   {(hunks) =>

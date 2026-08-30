@@ -21,7 +21,7 @@ import {
 // usePersonaModelDiscovery (keyed on provider), so the model dropdown updates
 // without saving. These tests guard the visibility predicate.
 
-test("editAgent_providerFieldVisible_forBuzzAgent", () => {
+test("editAgent_providerFieldVisible_forKuraAgent", () => {
   assert.equal(
     runtimeSupportsLlmProviderSelection("kura-agent"),
     true,
@@ -201,7 +201,7 @@ test("editAgent_modelFallback_selectNotDisabledLogic", () => {
 // Switching to kura-agent runtime (which supports LLM provider selection)
 // must make the provider field visible, enabling live discovery.
 
-test("editAgent_runtimeSwitch_toBuzzAgentEnablesProvider", () => {
+test("editAgent_runtimeSwitch_toKuraAgentEnablesProvider", () => {
   // Simulate: user switches from "claude" to "kura-agent"
   const previousRuntime = "claude";
   const nextRuntime = "kura-agent";
@@ -866,7 +866,7 @@ test("editAgent_inheritCheckboxRoundTrip_clearsStaleSavedProviderWhenRevertingTo
 // from agent.agentCommand in the catalog rather than using !inheritHarness as
 // a blanket not-provider-capable proxy.
 
-test("editAgent_inheritedBuzzAgentProvider_preservedOnNameOnlySave", () => {
+test("editAgent_inheritedKuraAgentProvider_preservedOnNameOnlySave", () => {
   // Inherited kura-agent persona with databricks_v2 snapshot.
   // User makes a name-only edit (never touches runtime or provider).
   // The catalog-arrival effect correctly derived selectedRuntimeId="kura-agent".
@@ -924,7 +924,7 @@ test("editAgent_inheritedBuzzAgentProvider_preservedOnNameOnlySave", () => {
   );
 });
 
-test("editAgent_inheritedBuzzAgentProvider_clearsWhenUserSwitchesToInheritedClaude", () => {
+test("editAgent_inheritedKuraAgentProvider_clearsWhenUserSwitchesToInheritedClaude", () => {
   // An agent inheriting kura-agent with databricks_v2, but the persona was
   // changed to Claude (agentCommand now resolves to Claude). On save, the
   // provider must be cleared (not preserved for a non-capable runtime).
@@ -1097,7 +1097,7 @@ test("editAgent_findingE_lockedRuntimeStillClears", () => {
   );
 });
 
-test("editAgent_findingE_capableBuzzAgentLoadedCatalog_preservedOnNoOpSave", () => {
+test("editAgent_findingE_capableKuraAgentLoadedCatalog_preservedOnNoOpSave", () => {
   // Confirm loaded-catalog inherited kura-agent still preserves provider.
   // This is Finding D's good path — must not regress with the tri-state change.
 
@@ -1485,7 +1485,7 @@ test("blockSave_nullField_allowed", () => {
 //   FALSE-BLOCK: kura-agent pin → inherit claude persona
 //     → must NOT be blocked (claude has no dialog-fixable credential requirement)
 
-test("blockSave_inheritTransition_claudePin_toBuzzAgentPersona_missingKey_blocked", () => {
+test("blockSave_inheritTransition_claudePin_toKuraAgentPersona_missingKey_blocked", () => {
   // Scenario: agent is currently pinned to claude (CLI-login, llmProviderFieldVisible=false
   // so providerForDiscovery="" in the component). The user checks "Inherit runtime
   // from persona" where the persona uses kura-agent/anthropic.

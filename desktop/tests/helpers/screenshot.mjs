@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 //
-// Standalone Playwright screenshot helper for the Buzz desktop app.
+// Standalone Playwright screenshot helper for the Kura desktop app.
 //
 // Launches headless Chromium with the E2E mock bridge pre-injected (same
 // setup as installMockBridge in bridge.ts), navigates to a route, optionally
@@ -81,7 +81,7 @@ function bail(msg) {
 
 const BASE_URL = "http://127.0.0.1:4173";
 const DEFAULT_MOCK_PUBKEY = "deadbeef".repeat(8);
-const ONBOARDING_PREFIX = "buzz-onboarding-complete.v1:";
+const ONBOARDING_PREFIX = "kura-onboarding-complete.v1:";
 
 const TEST_PUBKEYS = [
   DEFAULT_MOCK_PUBKEY,
@@ -115,8 +115,8 @@ await page.addInitScript(() => {
     relayUrl: "ws://localhost:3000",
     addedAt: new Date().toISOString(),
   };
-  window.localStorage.setItem("buzz-communities", JSON.stringify([community]));
-  window.localStorage.setItem("buzz-active-community-id", communityId);
+  window.localStorage.setItem("kura-communities", JSON.stringify([community]));
+  window.localStorage.setItem("kura-active-community-id", communityId);
 });
 
 // Seed onboarding completion for all known identities

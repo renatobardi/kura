@@ -4,17 +4,17 @@ export function GradientLayer() {
   return (
     <div
       aria-hidden="true"
-      className="buzz-theme-gradient-layer pointer-events-none absolute inset-0 -z-10"
-      data-buzz-gradient-layer
+      className="kura-theme-gradient-layer pointer-events-none absolute inset-0 -z-10"
+      data-kura-gradient-layer
     >
-      <div className="buzz-theme-gradient-underlay absolute inset-0" />
+      <div className="kura-theme-gradient-underlay absolute inset-0" />
       <div
-        className="buzz-theme-gradient-layer-light absolute inset-0 opacity-0"
-        data-buzz-gradient="light"
+        className="kura-theme-gradient-layer-light absolute inset-0 opacity-0"
+        data-kura-gradient="light"
       />
       <div
-        className="buzz-theme-gradient-layer-dark absolute inset-0 opacity-0"
-        data-buzz-gradient="dark"
+        className="kura-theme-gradient-layer-dark absolute inset-0 opacity-0"
+        data-kura-gradient="dark"
       />
     </div>
   );
@@ -37,13 +37,13 @@ export function ContentSurface({
           ? "relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden bg-background"
           : "relative z-10 mb-2 ml-px mr-2 mt-px flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl bg-background shadow-content-edge"
       }
-      data-buzz-content-surface
-      data-buzz-content-unframed={unframed ? true : undefined}
+      data-kura-content-surface
+      data-kura-content-unframed={unframed ? true : undefined}
     >
-      <div className="buzz-content-primary flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="kura-content-primary flex min-h-0 flex-1 flex-col overflow-hidden">
         {children}
       </div>
-      <div className="buzz-terminal-dock-host" data-terminal-dock>
+      <div className="kura-terminal-dock-host" data-terminal-dock>
         {terminal}
       </div>
     </div>

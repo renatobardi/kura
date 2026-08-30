@@ -19,7 +19,7 @@ import {
   TooltipTrigger,
 } from "@/shared/ui/tooltip";
 
-import { BuzzInlineLink, BuzzLinkChip } from "./BuzzLinkChip";
+import { KuraInlineLink, KuraLinkChip } from "./KuraLinkChip";
 import { MessageLinkPill } from "./MessageLinkPill";
 import { useMarkdownRuntime } from "./runtimeContext";
 import { useInlineTooltipPosition } from "./useInlineTooltipPosition";
@@ -75,7 +75,7 @@ function ChannelMetadataTooltip({
           {description ? (
             <span
               className="line-clamp-2 [overflow-wrap:anywhere] whitespace-normal"
-              data-buzz-tooltip-metadata-content=""
+              data-kura-tooltip-metadata-content=""
             >
               {description}
             </span>
@@ -85,7 +85,7 @@ function ChannelMetadataTooltip({
               "line-clamp-2 max-w-full [overflow-wrap:anywhere] whitespace-normal text-2xs text-secondary-foreground/80",
               description && "mt-1",
             )}
-            data-buzz-tooltip-metadata-type=""
+            data-kura-tooltip-metadata-type=""
           >
             {channelTooltipFooter(channel)}
           </span>
@@ -121,7 +121,7 @@ function ChannelPermalinkChipContents({
 }) {
   return (
     <ChannelMetadataTooltip channel={channel}>
-      <BuzzLinkChip
+      <KuraLinkChip
         data-channel-deep-link={dataChannelDeepLink}
         href={href}
         icon="channel"
@@ -134,7 +134,7 @@ function ChannelPermalinkChipContents({
         wrapping
       >
         {label}
-      </BuzzLinkChip>
+      </KuraLinkChip>
     </ChannelMetadataTooltip>
   );
 }
@@ -179,13 +179,13 @@ function ResolvedAuthoredDeepLink({
   const label = getReactNodeText(children);
   if (!openable) {
     return (
-      <span className="font-medium text-current" data-buzz-link={href}>
+      <span className="font-medium text-current" data-kura-link={href}>
         {children}
       </span>
     );
   }
   return (
-    <BuzzInlineLink
+    <KuraInlineLink
       href={href}
       title={href}
       aria-label={`${messageLink ? "Open message" : "Open channel"}: ${label}`}
@@ -195,7 +195,7 @@ function ResolvedAuthoredDeepLink({
       }
     >
       {children}
-    </BuzzInlineLink>
+    </KuraInlineLink>
   );
 }
 
@@ -232,7 +232,7 @@ export function AuthoredDeepLinkAnchor({
   const knownChannel = channels?.find((c) => c.id === channelId);
   if (knownChannel) {
     return (
-      <BuzzInlineLink
+      <KuraInlineLink
         href={href}
         title={href}
         aria-label={`${messageLink ? "Open message" : "Open channel"}: ${label}`}
@@ -240,12 +240,12 @@ export function AuthoredDeepLinkAnchor({
         onOpenLink={openLink}
       >
         {children}
-      </BuzzInlineLink>
+      </KuraInlineLink>
     );
   }
   if (!resolveChannelReferences) {
     return (
-      <span className="font-medium text-current" data-buzz-link={href}>
+      <span className="font-medium text-current" data-kura-link={href}>
         {children}
       </span>
     );
@@ -408,7 +408,7 @@ function ChannelReferenceChip({
 }: ChannelReferenceChipProps) {
   return (
     <ChannelMetadataTooltip channel={channel}>
-      <BuzzLinkChip
+      <KuraLinkChip
         data-channel-link=""
         href={channel ? buildChannelLink(channel.id) : undefined}
         icon="channel"
@@ -422,7 +422,7 @@ function ChannelReferenceChip({
         wrapping
       >
         {channelName}
-      </BuzzLinkChip>
+      </KuraLinkChip>
     </ChannelMetadataTooltip>
   );
 }

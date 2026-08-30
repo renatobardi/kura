@@ -585,7 +585,7 @@ test("provider id matching is case-insensitive", () => {
 // ---------------------------------------------------------------------------
 
 // Tests below verify the validValues membership check that the auto-clear
-// useEffect in BuzzAgentModelTuningFields and AgentDefaultsSettingsCard
+// useEffect in KuraAgentModelTuningFields and AgentDefaultsSettingsCard
 // use to decide whether to reset the current effort to Inherit.
 
 test("effort max is invalid for OpenAI (should trigger auto-clear)", () => {

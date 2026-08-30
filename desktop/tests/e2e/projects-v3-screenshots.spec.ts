@@ -50,7 +50,7 @@ async function expectProjectContextGroups(
   await expect(panel.getByTestId("project-repository-people")).toHaveCount(0);
 }
 
-async function openBuzzProject(page: import("@playwright/test").Page) {
+async function openKuraProject(page: import("@playwright/test").Page) {
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await page.getByTestId("open-projects-view").click();
   await page.getByTestId("projects-section-projects").click();
@@ -85,7 +85,7 @@ test("repository-only relays keep the Repositories section available", async ({
 
 test("projects activity overview screenshot", async ({ page }) => {
   await page.addInitScript(() => {
-    window.localStorage.setItem("buzz-theme", "light");
+    window.localStorage.setItem("kura-theme", "light");
   });
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -201,7 +201,7 @@ test("restricted repositories keep event work visible and offer access help", as
     projectAccessChannelId: "11111111-1111-4111-8111-111111111111",
     projectRepoSnapshotError: "remote: repository not found",
   });
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   const unavailableState = page
     .getByTestId("project-repository-unavailable")
@@ -257,9 +257,9 @@ test("repository pages show a centered Kura loader while fetching", async ({
   page,
 }) => {
   await installMockBridge(page, { projectRepoSnapshotDelayMs: 750 });
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
-  const loader = page.getByTestId("buzz-loading-state");
+  const loader = page.getByTestId("kura-loading-state");
   await expect(loader).toBeVisible();
   await expect(
     loader.getByRole("img", { name: "Loading repository" }),
@@ -278,7 +278,7 @@ test("repository pages show a centered Kura loader while fetching", async ({
 // plus, issue detail with inline copy link + avatar timeline, PR detail).
 test("projects v3 workspace screenshot states", async ({ page }) => {
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
   const initialProjectBreadcrumb = page.getByRole("navigation", {
     name: "Project breadcrumb",
   });
@@ -495,7 +495,7 @@ test("projects v3 workspace screenshot states", async ({ page }) => {
   const projectPanelLayout = page.getByTestId("project-panel-layout");
   const projectContentPod = page.getByTestId("project-content-pod");
   const appContentSurface = page
-    .locator("[data-buzz-content-surface]")
+    .locator("[data-kura-content-surface]")
     .filter({ has: projectPanelLayout })
     .first();
   await expect(projectPanelLayout).toHaveAttribute("data-detached", "true");
@@ -1207,7 +1207,7 @@ test("projects v3 workspace screenshot states", async ({ page }) => {
 
 test("projects v3 work-item list metadata", async ({ page }) => {
   await page.addInitScript(() => {
-    window.localStorage.setItem("buzz.projects.viewMode", "list");
+    window.localStorage.setItem("kura.projects.viewMode", "list");
   });
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });

@@ -4,7 +4,7 @@ import { TEST_IDENTITIES, installMockBridge } from "../helpers/bridge";
 
 const MOCK_PUBKEY = "deadbeef".repeat(8);
 const ENGINEERING_CHANNEL_ID = "1c7e1c02-87bb-5e88-b2da-5a7a9432d0c9";
-const MUTE_STORAGE_KEY = `buzz-channel-mutes.v1:${MOCK_PUBKEY}`;
+const MUTE_STORAGE_KEY = `kura-channel-mutes.v1:${MOCK_PUBKEY}`;
 
 function seedMuteState(
   page: import("@playwright/test").Page,
@@ -90,7 +90,7 @@ test.describe("channel muting", () => {
 
   test("02b — muted channels recede further in dark mode", async ({ page }) => {
     await page.addInitScript(() => {
-      window.localStorage.setItem("buzz-theme", "buzz-dark");
+      window.localStorage.setItem("kura-theme", "kura-dark");
     });
     await seedMuteState(page, ENGINEERING_CHANNEL_ID);
     await installMockBridge(page);

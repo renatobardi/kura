@@ -17,7 +17,7 @@ import {
   useDismissMediaContextMenu,
 } from "./MediaContextMenu";
 
-function useBuzzLinkContextMenu({
+function useKuraLinkContextMenu({
   href,
   interactive,
   onOpenLink,
@@ -43,7 +43,7 @@ function useBuzzLinkContextMenu({
   const contextMenu =
     position && href ? (
       <MediaContextMenu
-        dataAttributes={["data-buzz-link-context-menu"]}
+        dataAttributes={["data-kura-link-context-menu"]}
         items={[
           {
             label: "Open link",
@@ -105,7 +105,7 @@ function wrappingChipContent(
   );
 }
 
-export function BuzzLinkChip({
+export function KuraLinkChip({
   children,
   className,
   href,
@@ -121,7 +121,7 @@ export function BuzzLinkChip({
   onOpenLink: () => void;
   wrapping?: boolean;
 }) {
-  const { contextMenu, onContextMenuCapture } = useBuzzLinkContextMenu({
+  const { contextMenu, onContextMenuCapture } = useKuraLinkContextMenu({
     href,
     interactive,
     onOpenLink,
@@ -153,7 +153,7 @@ export function BuzzLinkChip({
     return (
       <InlineChip
         {...props}
-        data-buzz-link=""
+        data-kura-link=""
         className={chipClassName}
         icon={Icon}
       >
@@ -166,7 +166,7 @@ export function BuzzLinkChip({
     <>
       <InlineChip
         {...props}
-        data-buzz-link=""
+        data-kura-link=""
         className={chipClassName}
         icon={Icon}
         interactive
@@ -183,7 +183,7 @@ export function BuzzLinkChip({
   );
 }
 
-export function BuzzInlineLink({
+export function KuraInlineLink({
   children,
   href,
   interactive,
@@ -196,7 +196,7 @@ export function BuzzInlineLink({
 }) {
   const contextMenuHref =
     href ?? (typeof props.title === "string" ? props.title : undefined);
-  const { contextMenu, onContextMenuCapture } = useBuzzLinkContextMenu({
+  const { contextMenu, onContextMenuCapture } = useKuraLinkContextMenu({
     href: contextMenuHref,
     interactive,
     onOpenLink,

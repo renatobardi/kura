@@ -1060,7 +1060,7 @@ type MockSubscription = {
 
 type MockFilter = {
   "#a"?: string[];
-  "#buzz-channel"?: string[];
+  "#kura-channel"?: string[];
   "#d"?: string[];
   "#e"?: string[];
   "#h"?: string[];
@@ -1090,7 +1090,7 @@ function createMockRelayMembershipEvent(): RelayEvent {
 /**
  * Per-user custom emoji sets (kind:30030) the mock WS serves for
  * `listCustomEmoji` REQs. The community palette is the client-side UNION of
- * every member's own set (d=`buzz:custom-emoji`). We serve TWO member-authored
+ * every member's own set (d=`kura:custom-emoji`). We serve TWO member-authored
  * sets from distinct pubkeys so the e2e exercises the union/collapse path, not
  * a single relay-owned set. `:buzz:` is the stable shortcode exercised by
  * custom-emoji.spec.ts (claimed by BOTH members with different URLs, so the
@@ -1121,7 +1121,7 @@ function createMockCustomEmojiSetEvents(): RelayEvent[] {
         ["emoji", "narf", "https://example.com/e2e/narf.png"],
         // member B claims :buzz: with a DIFFERENT url — unionCustomEmoji must
         // collapse it to one deterministic winner, never expose two URLs.
-        ["emoji", "buzz", "https://example.com/e2e/buzz-b.png"],
+        ["emoji", "buzz", "https://example.com/e2e/kura-b.png"],
         ["emoji", "bufo_joy", "https://example.com/e2e/bufo-joy.png"],
       ],
       "b".repeat(64),
@@ -1507,7 +1507,7 @@ const CHANNEL_WINDOW_AUX_DELETION_KINDS = new Set([
 
 // Fake media-proxy port the mock answers for `get_media_proxy_port`, so
 // `rewriteRelayUrl()` produces a real `http://127.0.0.1:<port>/media/...` src
-// in e2e (instead of the `buzz-media://` fallback). The reaction guard
+// in e2e (instead of the `kura-media://` fallback). The reaction guard
 // asserts against this exact port.
 const MOCK_MEDIA_PROXY_PORT = 54321;
 let mockMediaProxyPort = MOCK_MEDIA_PROXY_PORT;
@@ -1531,7 +1531,7 @@ const REACTION_TARGET_CONTENT = "React to me with a custom emoji";
 // id so it is a valid reaction target and never collides with the regular
 // REACTION_TARGET_EVENT_ID.
 const SYSTEM_REACTION_TARGET_EVENT_ID = "e".repeat(64);
-const E2E_IDENTITY_OVERRIDE_STORAGE_KEY = "buzz:e2e-identity-override.v1";
+const E2E_IDENTITY_OVERRIDE_STORAGE_KEY = "kura:e2e-identity-override.v1";
 /** Stands in for `tauri.conf.json`'s version, which no mock IPC call can read. */
 const MOCK_APP_VERSION = "0.0.0-e2e";
 const DEFAULT_MOCK_IDENTITY = {
@@ -1902,7 +1902,7 @@ function buildMockConfigSurface(pubkey: string): {
     normalized: {
       model: {
         value: "gpt-4o",
-        origin: "buzzExplicit",
+        origin: "kuraExplicit",
         overriddenValue: "gpt-4o-mini",
         overriddenOrigin: "configFile",
         isRequired: false,
@@ -2227,7 +2227,7 @@ function buildMockConfigSurface(pubkey: string): {
   };
 
   // Mixed-provenance showcase — top-level rows carry different origins so the
-  // panel witnesses distinct provenance labels in one frame: "Set in Buzz",
+  // panel witnesses distinct provenance labels in one frame: "Set in Kura",
   // "Inherited from template", "From config file (...)" and
   // "From environment variable (...)".
   const multiOriginSurface = {
@@ -2237,7 +2237,7 @@ function buildMockConfigSurface(pubkey: string): {
     normalized: {
       model: {
         value: "gpt-4o",
-        origin: "buzzExplicit",
+        origin: "kuraExplicit",
         overriddenValue: null,
         overriddenOrigin: null,
         isRequired: false,
@@ -2289,7 +2289,7 @@ function buildMockConfigSurface(pubkey: string): {
   const kuraAgentSurface = {
     ...gooseSurface,
     runtimeId: "kura-agent",
-    runtimeLabel: "Buzz Agent",
+    runtimeLabel: "Kura Agent",
     advanced: [],
     extensions: [],
     sources: {
@@ -2354,7 +2354,7 @@ function buildSeededManagedAgent(seed: MockManagedAgentSeed): MockManagedAgent {
     // must mirror the wire shape, not omit the key.
     runtime: seed.runtime ?? null,
     relay_url: DEFAULT_RELAY_WS_URL,
-    acp_command: "buzz-acp",
+    acp_command: "kura-acp",
     agent_command: agentCommand,
     agent_args: agentArgs,
     mcp_command: "",
@@ -2386,7 +2386,7 @@ function buildSeededManagedAgent(seed: MockManagedAgentSeed): MockManagedAgent {
     respond_to_allowlist: seed.respondToAllowlist ?? [],
     private_key_nsec: `nsec1mock${seed.pubkey.slice(0, 20)}`,
     log_lines: [
-      `buzz-acp starting: relay=${DEFAULT_RELAY_WS_URL} agent_pubkey=${seed.pubkey} parallelism=1`,
+      `kura-acp starting: relay=${DEFAULT_RELAY_WS_URL} agent_pubkey=${seed.pubkey} parallelism=1`,
       "profile created; harness not started",
     ],
   };
@@ -2727,7 +2727,7 @@ const mockChannels: MockChannel[] = [
     name: "buzz",
     channel_type: "stream",
     visibility: "open",
-    description: "Project home for the Buzz community platform.",
+    description: "Project home for the Kura community platform.",
     topic: null,
     purpose: null,
     last_message_at: null,
@@ -3579,7 +3579,7 @@ type PersistedMockHuddle = {
   state: MockHuddleState;
 };
 
-const MOCK_HUDDLE_STORAGE_KEY = "buzz.e2e.mock-huddle.v1";
+const MOCK_HUDDLE_STORAGE_KEY = "kura.e2e.mock-huddle.v1";
 let mockHuddle: PersistedMockHuddle | null = null;
 
 function persistMockHuddle() {
@@ -4214,9 +4214,9 @@ function assertExpectedRelayScope(
   if (!expected) return;
   let active: string | null = null;
   try {
-    const activeId = window.localStorage.getItem("buzz-active-community-id");
+    const activeId = window.localStorage.getItem("kura-active-community-id");
     const communities = JSON.parse(
-      window.localStorage.getItem("buzz-communities") ?? "[]",
+      window.localStorage.getItem("kura-communities") ?? "[]",
     ) as { id: string; relayUrl: string }[];
     active =
       communities.find((community) => community.id === activeId)?.relayUrl ??
@@ -4404,7 +4404,7 @@ function isMockBroadcastReply(tags: string[][]): boolean {
 }
 
 /**
- * Mirror the relay's channel-window row set (buzz-db `thread.rs`, NIP-CW
+ * Mirror the relay's channel-window row set (kura-db `thread.rs`, NIP-CW
  * §Top-level Classification): an event is a timeline row iff its depth is 0
  * (no reply marker → `rootEventId === null`) OR its depth is 1 (its parent is
  * the thread root) AND it is broadcast. Depth ≥ 2 replies never surface on the
@@ -5906,7 +5906,7 @@ const MOCK_PROJECT_SEEDS = [
     dtag: "buzz",
     name: "buzz",
     description:
-      "Relay, desktop, and mobile clients for the Buzz community platform.",
+      "Relay, desktop, and mobile clients for the Kura community platform.",
     cloneUrl: `${DEFAULT_RELAY_HTTP_URL}/git/${MOCK_IDENTITY_PUBKEY}/buzz`,
     webUrl: null,
     owner: MOCK_IDENTITY_PUBKEY,
@@ -5972,7 +5972,7 @@ function mulberry32(seed: number) {
 }
 
 let mockProjectEventStore: RelayEvent[] | null = null;
-const MOCK_PROJECT_BRANCHES_KEY = "buzz-e2e-project-branches";
+const MOCK_PROJECT_BRANCHES_KEY = "kura-e2e-project-branches";
 
 function readMockProjectBranches(): Record<string, Record<string, string>> {
   try {
@@ -6031,7 +6031,7 @@ function buildMockProjectEvents(): RelayEvent[] {
           ["name", seed.name],
           ["description", seed.description],
           [
-            "buzz-channel",
+            "kura-channel",
             getConfig()?.mock?.projectAccessChannelId ??
               STARTER_PROJECT_HOME_CHANNEL_ID,
           ],
@@ -6125,11 +6125,11 @@ function buildMockProjectEvents(): RelayEvent[] {
           ["a", `${KIND_REPO_ANNOUNCEMENT}:${projectOwner}:buzz`],
           ["a", `${KIND_REPO_ANNOUNCEMENT}:${ALICE_PUBKEY}:relay-tools`],
           [
-            "buzz-channel",
+            "kura-channel",
             getConfig()?.mock?.projectAccessChannelId ??
               STARTER_PROJECT_HOME_CHANNEL_ID,
           ],
-          ["buzz-related-channel", "9dae0116-799b-5071-a0a8-fdd30a91a35d"],
+          ["kura-related-channel", "9dae0116-799b-5071-a0a8-fdd30a91a35d"],
         ],
         projectOwner,
         now,
@@ -8311,9 +8311,9 @@ async function handleDiscoverAcpRuntimes(
       command: "kura-agent",
       binary_path: "/usr/local/bin/kura-agent",
       default_args: [],
-      mcp_command: "buzz-dev-mcp",
+      mcp_command: "kura-dev-mcp",
       install_hint: "Ships with the Kura desktop app.",
-      install_instructions_url: "https://github.com/block/buzz",
+      install_instructions_url: "https://github.com/block/kura",
       can_auto_install: false,
       requires_external_cli: false,
       underlying_cli_path: null,
@@ -8538,10 +8538,10 @@ async function handleDiscoverManagedAgentPrereqs(
   return {
     acp: {
       command:
-        configuredPrereqs?.acp?.command ?? args.input?.acpCommand ?? "buzz-acp",
+        configuredPrereqs?.acp?.command ?? args.input?.acpCommand ?? "kura-acp",
       resolved_path:
         configuredPrereqs?.acp?.resolvedPath ??
-        "/Users/wesb/dev/buzz/target/debug/buzz-acp",
+        "/Users/wesb/dev/buzz/target/debug/kura-acp",
       available: configuredPrereqs?.acp?.available ?? true,
     },
     mcp: {
@@ -9329,7 +9329,7 @@ async function handleCreateManagedAgent(
     // Create never pins a harness id — the record inherits from the persona.
     runtime: null,
     relay_url: args.input.relayUrl ?? DEFAULT_RELAY_WS_URL,
-    acp_command: args.input.acpCommand ?? "buzz-acp",
+    acp_command: args.input.acpCommand ?? "kura-acp",
     agent_command: agentCommand,
     agent_args: agentArgs,
     mcp_command: args.input.mcpCommand ?? "",
@@ -9360,7 +9360,7 @@ async function handleCreateManagedAgent(
     respond_to_allowlist: [...mintRespondToAllowlist],
     private_key_nsec: `nsec1mock${pubkey.slice(0, 20)}`,
     log_lines: [
-      `buzz-acp starting: relay=${args.input.relayUrl ?? DEFAULT_RELAY_WS_URL} agent_pubkey=${pubkey} parallelism=${mintParallelism}`,
+      `kura-acp starting: relay=${args.input.relayUrl ?? DEFAULT_RELAY_WS_URL} agent_pubkey=${pubkey} parallelism=${mintParallelism}`,
       args.input.systemPrompt?.trim()
         ? `system prompt override configured (${args.input.systemPrompt.trim().length} chars)`
         : "system prompt override not set",
@@ -9497,7 +9497,7 @@ async function handleStartManagedAgent(
         mockMeshState.models.some((model) => model.id === modelId));
     if (!hasLiveTarget) {
       throw new Error(
-        "Buzz shared compute cannot start because no live member is serving this model.",
+        "Kura shared compute cannot start because no live member is serving this model.",
       );
     }
   }
@@ -9645,7 +9645,7 @@ async function handleUpdateManagedAgent(args: {
  * Mock-mode `search_messages` predicate, mirroring the relay's filter contract.
  *
  * `since`/`until` are NIP-01 bounds and both inclusive — the relay keeps events
- * where `since <= created_at <= until` (`crates/buzz-core/src/filter.rs`). The
+ * where `since <= created_at <= until` (`crates/kura-core/src/filter.rs`). The
  * `before:` operator's exclusivity is encoded upstream in
  * `parseSearchOperators`, which subtracts a second; the mock must not subtract
  * it a second time.
@@ -10269,7 +10269,7 @@ async function handleEditMessage(
     ...emojiTags,
     ...mentionPubkeys.map((pubkey) => ["p", pubkey]),
     ...(mentionTags ?? []),
-    ...(mentionTags ? [["buzz:mention-snapshot"]] : []),
+    ...(mentionTags ? [["kura:mention-snapshot"]] : []),
     ...(args.suppressLinkPreviews ? [["link-preview", "none"]] : []),
   ];
   const tags = [["h", args.channelId], ["e", args.eventId], ...extraTags];
@@ -10794,7 +10794,7 @@ function sendToMockSocket(args: {
         window.__KURA_E2E_DEFER_FULL_PROJECT_QUERIES__ &&
         !filter.authors &&
         !filter["#a"] &&
-        !filter["#buzz-channel"] &&
+        !filter["#kura-channel"] &&
         !filter["#d"] &&
         !filter["#e"] &&
         !filter.ids
@@ -11238,7 +11238,7 @@ export function maybeInstallE2eTauriMocks() {
   window.__KURA_E2E_PUSH_MOCK_FEED_ITEM__ = (item) => {
     const category = item.category === "mention" ? "mentions" : item.category;
     mockFeedOverrides[category].unshift(item);
-    window.dispatchEvent(new CustomEvent("buzz:e2e-home-feed-updated"));
+    window.dispatchEvent(new CustomEvent("kura:e2e-home-feed-updated"));
     return item;
   };
   window.__KURA_E2E_REPLACE_MOCK_FEED_ITEM__ = (oldId, item) => {
@@ -11254,7 +11254,7 @@ export function maybeInstallE2eTauriMocks() {
     }
     // Insert the replacement at the front of the correct bucket.
     mockFeedOverrides[category].unshift(item);
-    window.dispatchEvent(new CustomEvent("buzz:e2e-home-feed-updated"));
+    window.dispatchEvent(new CustomEvent("kura:e2e-home-feed-updated"));
     return item;
   };
   window.__KURA_E2E_MD_PARSE_COUNT__ = getMarkdownParseCount;
@@ -12087,7 +12087,7 @@ export function maybeInstallE2eTauriMocks() {
               name: "Gemma-4-E4B-it-Q4_K_M",
               size: "3.5GB",
               sizeGb: 3.5,
-              description: "Buzz-curated local agent model",
+              description: "Kura-curated local agent model",
               fit: "comfortable",
               installed: true,
               recommended: true,
@@ -12195,7 +12195,7 @@ export function maybeInstallE2eTauriMocks() {
       }
       case "save_ncryptsec_copy": {
         const paths = activeConfig?.mock?.backupSavePaths ?? [
-          "/tmp/buzz-identity.ncryptsec",
+          "/tmp/kura-identity.ncryptsec",
         ];
         const index = Math.min(backupSaveCallCount, paths.length - 1);
         backupSaveCallCount += 1;
@@ -12497,11 +12497,11 @@ export function maybeInstallE2eTauriMocks() {
                 "export function useProjectRepoSnapshotQuery(project) {\n  return useQuery({ queryKey: [project.id, 'repo-snapshot'] });\n}\n",
             },
             {
-              path: "crates/buzz-relay/src/api/git/transport.rs",
+              path: "crates/kura-relay/src/api/git/transport.rs",
               kind: "blob",
               size: 33120,
               preview_content:
-                "// Smart HTTP git transport\n// Handles upload-pack and receive-pack for Buzz git repos.\n",
+                "// Smart HTTP git transport\n// Handles upload-pack and receive-pack for Kura git repos.\n",
             },
           ],
         };
@@ -12521,7 +12521,7 @@ export function maybeInstallE2eTauriMocks() {
           commit_body: [
             "See the [project guide](https://example.com/project-guide).",
             "",
-            "![Architecture](/buzz.svg)",
+            "![Architecture](/kura.svg)",
             "",
             "![Demo](https://example.com/project-demo.mp4)",
           ].join("\n"),
@@ -13615,7 +13615,7 @@ export function maybeInstallE2eTauriMocks() {
           }
           if (mockMeshState.models.length === 0) {
             throw new Error(
-              "no Buzz shared compute serving members are available",
+              "no Kura shared compute serving members are available",
             );
           }
         }
@@ -14324,7 +14324,7 @@ export function maybeInstallE2eTauriMocks() {
           scope: { pubkey: string; relayUrl: string };
           limit: number;
         };
-        const key = `buzz-e2e-channel-head:${args.scope.pubkey.toLowerCase()}:${args.scope.relayUrl.toLowerCase().replace(/\/$/, "")}`;
+        const key = `kura-e2e-channel-head:${args.scope.pubkey.toLowerCase()}:${args.scope.relayUrl.toLowerCase().replace(/\/$/, "")}`;
         const entries = JSON.parse(
           window.localStorage.getItem(key) ?? "[]",
         ) as Array<{
@@ -14343,7 +14343,7 @@ export function maybeInstallE2eTauriMocks() {
           channelId: string;
           events: RelayEvent[];
         };
-        const key = `buzz-e2e-channel-head:${args.scope.pubkey.toLowerCase()}:${args.scope.relayUrl.toLowerCase().replace(/\/$/, "")}`;
+        const key = `kura-e2e-channel-head:${args.scope.pubkey.toLowerCase()}:${args.scope.relayUrl.toLowerCase().replace(/\/$/, "")}`;
         const entries = JSON.parse(
           window.localStorage.getItem(key) ?? "[]",
         ) as Array<{
@@ -14368,7 +14368,7 @@ export function maybeInstallE2eTauriMocks() {
       }
       case "channel_head_cache_clear": {
         const args = payload as { scope: { pubkey: string; relayUrl: string } };
-        const key = `buzz-e2e-channel-head:${args.scope.pubkey.toLowerCase()}:${args.scope.relayUrl.toLowerCase().replace(/\/$/, "")}`;
+        const key = `kura-e2e-channel-head:${args.scope.pubkey.toLowerCase()}:${args.scope.relayUrl.toLowerCase().replace(/\/$/, "")}`;
         window.localStorage.removeItem(key);
         return null;
       }

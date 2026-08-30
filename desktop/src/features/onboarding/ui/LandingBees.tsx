@@ -1,5 +1,5 @@
 // Static landing corner mark. The previous animated bee-swarm field has been
-// removed as part of the Buzz -> Kura rebrand; kept as a tiny named component
+// removed as part of the Kura -> Kura rebrand; kept as a tiny named component
 // so callers don't need to change.
 import { KuraMark } from "@/shared/ui/kura-logo/KuraMark";
 

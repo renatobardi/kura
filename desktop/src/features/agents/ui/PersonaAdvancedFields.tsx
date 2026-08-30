@@ -18,7 +18,7 @@ import {
   parallelismCapHint,
 } from "../lib/agentParallelism";
 import {
-  BuzzAgentModelTuningFields,
+  KuraAgentModelTuningFields,
   NumericTuningFields,
 } from "./kuraAgentModelTuningFields";
 import {
@@ -61,7 +61,7 @@ export function PersonaAdvancedFields({
   /** Env vars to display as inherited defaults in tuning-field placeholders.
    *  For templates, pass `globalConfig.env_vars` (the fallback layer). */
   inheritedEnvVars?: EnvVarsValue;
-  /** Active LLM model — forwarded to BuzzAgentModelTuningFields for effort filtering. */
+  /** Active LLM model — forwarded to KuraAgentModelTuningFields for effort filtering. */
   model?: string;
   /** Runtime id for the kura-agent effort-tuning knob visibility gate. */
   modelTuningRuntimeId?: string;
@@ -69,7 +69,7 @@ export function PersonaAdvancedFields({
   onBehaviorDraftChange: (value: PersonaBehaviorDraft) => void;
   onEnvVarsChange: (value: EnvVarsValue) => void;
   onNamePoolTextChange: (value: string) => void;
-  /** Active LLM provider id — forwarded to BuzzAgentModelTuningFields for effort filtering. */
+  /** Active LLM provider id — forwarded to KuraAgentModelTuningFields for effort filtering. */
   provider?: string;
   requiredEnvKeys?: readonly string[];
   fileSatisfiedEnvKeys?: readonly string[];
@@ -267,7 +267,7 @@ export function PersonaAdvancedFields({
 
       {/* Effort-tuning knob — only shown for kura-agent. */}
       {isKuraAgentRuntime(modelTuningRuntimeId) ? (
-        <BuzzAgentModelTuningFields
+        <KuraAgentModelTuningFields
           envVars={envVars}
           inheritedEnvVars={inheritedEnvVars}
           model={model}

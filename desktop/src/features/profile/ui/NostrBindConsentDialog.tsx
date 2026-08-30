@@ -34,9 +34,9 @@ const NOSTR_BIND_PREVIEW_PAYLOAD: NostrBindDeepLinkPayload = {
   challengeId: "550e8400-e29b-41d4-a716-446655440000",
   nonce: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi01234567",
   verificationCode: "123456",
-  audience: "buzz:nostr-identity",
+  audience: "kura:nostr-identity",
   action: "bind_nostr_identity",
-  protocol: "buzz-nostr-identity",
+  protocol: "kura-nostr-identity",
   version: "1",
   origin: "https://example.com",
   expiresAt: "2099-01-01T00:00:00Z",
@@ -114,7 +114,7 @@ async function copyToClipboard(text: string): Promise<boolean> {
 
 function appendCallbackStatus(callbackUrl: string): string {
   const url = new URL(callbackUrl);
-  url.searchParams.set("buzz_bind", "signed");
+  url.searchParams.set("kura_bind", "signed");
   return url.toString();
 }
 
@@ -645,7 +645,7 @@ export function NostrBindConsentDialog() {
         {payload ? (
           <DialogPrimitive.Content
             aria-describedby="nostr-bind-description"
-            className="buzz-onboarding-neutral-theme buzz-startup-shell fixed inset-0 z-50 flex overflow-y-auto bg-background px-4 py-12 text-foreground outline-hidden"
+            className="kura-onboarding-neutral-theme kura-startup-shell fixed inset-0 z-50 flex overflow-y-auto bg-background px-4 py-12 text-foreground outline-hidden"
             data-system-color-scheme={systemColorScheme}
             data-testid="nostr-bind-page"
           >

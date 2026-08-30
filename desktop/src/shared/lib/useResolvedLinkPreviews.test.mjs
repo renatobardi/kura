@@ -5,8 +5,8 @@ import { JSDOM } from "jsdom";
 
 import {
   __linkPreviewMetadataTest,
-  fetchBuzzEntityMetadata,
-  isBuzzEntityPreview,
+  fetchKuraEntityMetadata,
+  isKuraEntityPreview,
   resetLinkPreviewMetadataCache,
   resolveLinkPreview,
   withEntityFallbacks,
@@ -42,7 +42,7 @@ test("pending external metadata reserves the image treatment", () => {
 
 test("pending Kura entity metadata remains image-less", () => {
   const entityPreview = {
-    kind: "buzz-repository",
+    kind: "kura-repository",
     href: `kura://repo?owner=${"cd".repeat(32)}&d=buzz`,
     provider: "Kura",
     title: "buzz",
@@ -100,9 +100,9 @@ test("transient and rejected image fetches use the stable fallback treatment", (
 test("metadata cache keys deduplicate URL fragments", () => {
   assert.equal(
     __linkPreviewMetadataTest.metadataCacheKey(
-      "https://github.com/block/buzz/pull/3834#issuecomment-1",
+      "https://github.com/block/kura/pull/3834#issuecomment-1",
     ),
-    "https://github.com/block/buzz/pull/3834",
+    "https://github.com/block/kura/pull/3834",
   );
 });
 
@@ -203,7 +203,7 @@ test("metadata loader coalesces fragment variants and bounds concurrency", async
 
 test("withEntityFallbacks re-adds previews dropped by null metadata", () => {
   const entityPreview = {
-    kind: "buzz-pull-request",
+    kind: "kura-pull-request",
     href: `kura://pr?id=${"ab".repeat(32)}&owner=${"cd".repeat(32)}&d=buzz`,
     provider: "Kura",
     title: `buzz #${"ab".repeat(4)}`,
@@ -217,14 +217,14 @@ test("withEntityFallbacks re-adds previews dropped by null metadata", () => {
 
 test("withEntityFallbacks keeps resolved previews and preserves order", () => {
   const first = {
-    kind: "buzz-repository",
+    kind: "kura-repository",
     href: `kura://repo?owner=${"cd".repeat(32)}&d=buzz`,
     provider: "Kura",
     title: "buzz",
     typeLabel: "repo",
   };
   const second = {
-    kind: "buzz-issue",
+    kind: "kura-issue",
     href: `kura://issue?id=${"ef".repeat(32)}&owner=${"cd".repeat(32)}&d=buzz`,
     provider: "Kura",
     title: `buzz #${"ef".repeat(4)}`,
@@ -244,15 +244,15 @@ test("withEntityFallbacks keeps resolved previews and preserves order", () => {
 
 test("entity fallback eligibility is kind-scoped", () => {
   assert.equal(
-    isBuzzEntityPreview({
+    isKuraEntityPreview({
       ...preview,
-      kind: "buzz-repository",
+      kind: "kura-repository",
       href: `kura://repo?owner=${"cd".repeat(32)}&d=buzz`,
     }),
     true,
   );
   assert.equal(
-    isBuzzEntityPreview({ ...preview, href: "kura://future?id=example" }),
+    isKuraEntityPreview({ ...preview, href: "kura://future?id=example" }),
     false,
   );
 });
@@ -353,7 +353,7 @@ test("Kura PR metadata includes repository identity and trusted root context", a
       .sort((left, right) => right.created_at - left.created_at)
       .slice(0, filter.limit);
 
-  const result = await fetchBuzzEntityMetadata(
+  const result = await fetchKuraEntityMetadata(
     `kura://pr?id=${id}&owner=${owner}&d=buzz`,
     fetchEvents,
   );
@@ -395,7 +395,7 @@ test("Kura entity roots reject ambiguous repository tags", async () => {
         ["subject", "Misbound entity"],
       ],
     });
-    const result = await fetchBuzzEntityMetadata(
+    const result = await fetchKuraEntityMetadata(
       `kura://${type}?id=${id}&owner=${owner}&d=buzz`,
       async (filter) =>
         filter.kinds?.includes(30617)
@@ -410,7 +410,7 @@ test("Kura entity roots reject ambiguous repository tags", async () => {
 
 test("Kura repository metadata stays image-less and exposes default branch", async () => {
   const owner = "cd".repeat(32);
-  const result = await fetchBuzzEntityMetadata(
+  const result = await fetchKuraEntityMetadata(
     `kura://repo?owner=${owner}&d=relay-tools`,
     async () => [
       relayEvent({
@@ -438,7 +438,7 @@ test("Kura repository metadata stays image-less and exposes default branch", asy
 
 test("Kura project metadata resolves from the 30621 announcement", async () => {
   const owner = "cd".repeat(32);
-  const result = await fetchBuzzEntityMetadata(
+  const result = await fetchKuraEntityMetadata(
     `kura://project?owner=${owner}&d=pollinator`,
     async () => [
       relayEvent({
@@ -464,7 +464,7 @@ test("Kura project metadata resolves from the 30621 announcement", async () => {
 test("Kura project metadata declines a missing or invalid announcement", async () => {
   const owner = "cd".repeat(32);
   assert.equal(
-    await fetchBuzzEntityMetadata(
+    await fetchKuraEntityMetadata(
       `kura://project?owner=${owner}&d=pollinator`,
       async () => [],
     ),
@@ -472,7 +472,7 @@ test("Kura project metadata declines a missing or invalid announcement", async (
   );
   // Two `d` tags fail NIP-MP envelope validation.
   assert.equal(
-    await fetchBuzzEntityMetadata(
+    await fetchKuraEntityMetadata(
       `kura://project?owner=${owner}&d=pollinator`,
       async () => [
         relayEvent({

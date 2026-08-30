@@ -66,13 +66,13 @@ function RepositoryHostIcon({
 }) {
   const host = projectRepoHostForRepository(repository, useRelayOrigin());
   const label =
-    host.kind === "buzz"
+    host.kind === "kura"
       ? "Kura-hosted repository"
       : host.kind === "external"
         ? `Git data hosted on ${host.host}`
         : "Repository host";
   const mark =
-    host.kind === "buzz" ? (
+    host.kind === "kura" ? (
       <KuraMark className={compact ? "h-3.5 w-3.5" : "h-4.5 w-4.5"} />
     ) : host.kind === "external" && host.host === "github.com" ? (
       <GitHubMark className={compact ? "h-3.5 w-3.5" : "h-4.5 w-4.5"} />
@@ -128,7 +128,7 @@ function RepositoryIdentity({
   inlineBranch?: boolean;
 }) {
   // Where the git data lives beats repeating the (often identical) project
-  // name — "github.com/block/buzz" for external repos, "owner/repo" for
+  // name — "github.com/block/kura" for external repos, "owner/repo" for
   // Kura-hosted ones.
   const displayPath = repositoryDisplayPath(
     repository,

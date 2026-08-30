@@ -11,7 +11,7 @@ const READ_DELAY_MS = 600;
 const SNAPSHOT_FRAME_DELAY_MS = 3_000;
 
 function snapshotKey(relayUrl: string, ownerPubkey = OWNER_PUBKEY) {
-  return `buzz-channels.v1:${relayUrl}:${ownerPubkey.toLowerCase()}`;
+  return `kura-channels.v1:${relayUrl}:${ownerPubkey.toLowerCase()}`;
 }
 
 function makeSnapshotChannel(index: number, prefix = "snapshot") {
@@ -38,9 +38,9 @@ function makeSnapshotChannel(index: number, prefix = "snapshot") {
 const FULL_SNAPSHOT = Array.from({ length: 14 }, (_, index) =>
   makeSnapshotChannel(index),
 );
-const SNAPSHOT_DIAGNOSTIC_MARK = "buzz:sidebar:snapshot-diagnostic";
-const FULL_SIDEBAR_PAINT_MARK = "buzz:sidebar:full-list-painted";
-const BOOT_TO_FULL_SIDEBAR_MEASURE = "buzz:sidebar:boot-to-full-list-painted";
+const SNAPSHOT_DIAGNOSTIC_MARK = "kura:sidebar:snapshot-diagnostic";
+const FULL_SIDEBAR_PAINT_MARK = "kura:sidebar:full-list-painted";
+const BOOT_TO_FULL_SIDEBAR_MEASURE = "kura:sidebar:boot-to-full-list-painted";
 
 function snapshotIntegrity(
   ownerPubkey: string,
@@ -144,11 +144,11 @@ async function seedCommunities(page: Page, communityPubkey = OWNER_PUBKEY) {
         },
       ];
       window.localStorage.setItem(
-        "buzz-communities",
+        "kura-communities",
         JSON.stringify(communities),
       );
       window.localStorage.setItem(
-        "buzz-active-community-id",
+        "kura-active-community-id",
         communities[0].id,
       );
     },

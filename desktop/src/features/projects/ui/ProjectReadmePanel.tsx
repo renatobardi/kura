@@ -12,7 +12,7 @@ import { projectExternalRefUrl } from "@/features/projects/lib/projectExternalUr
 import type { ProjectRepoUnavailableReason } from "@/features/projects/lib/projectRepoAvailability";
 import { formatLastChangedAt } from "@/features/projects/lib/projectsViewHelpers";
 import { Button } from "@/shared/ui/button";
-import { BuzzLoadingState } from "@/shared/ui/BuzzLoadingState";
+import { KuraLoadingState } from "@/shared/ui/KuraLoadingState";
 import { Markdown, SyntaxHighlightedCode } from "@/shared/ui/markdown";
 import { baseName, languageForPath } from "./ProjectRepositoryPanel";
 import {
@@ -105,7 +105,7 @@ export function ReadmePanel({
   sourceControls,
   unavailableReason,
 }: {
-  /** `buzz-channel` binding of the repository, for access-restricted copy. */
+  /** `kura-channel` binding of the repository, for access-restricted copy. */
   accessChannelId?: string | null;
   file: ProjectRepoFile | null;
   fileContentSource?: RepositoryFileContentSource;
@@ -173,7 +173,7 @@ export function ReadmePanel({
     return (
       <section className="overflow-hidden">
         {header}
-        <BuzzLoadingState label="Loading repository" />
+        <KuraLoadingState label="Loading repository" />
       </section>
     );
   }
@@ -256,7 +256,7 @@ export function ReadmePanel({
     return (
       <section className="overflow-hidden">
         {header}
-        <BuzzLoadingState label="Loading README" />
+        <KuraLoadingState label="Loading README" />
       </section>
     );
   }

@@ -13,7 +13,7 @@ import { waitForAnimations } from "../helpers/animations";
 // same shortcode as `img[data-custom-emoji]` via remarkCustomEmoji.
 //
 // The `:buzz:` shortcode lives in a member-authored kind:30030 set
-// (d=`buzz:custom-emoji`) served by the mock bridge from two distinct
+// (d=`kura:custom-emoji`) served by the mock bridge from two distinct
 // pubkeys. `listCustomEmoji` reads every member's set over the relay WS and
 // unions them (deduped by shortcode+url) into the community palette — which is
 // live even in mock-bridge mode (the mock only intercepts Tauri commands), so
@@ -244,7 +244,7 @@ test("native emoji-only messages leave space below the author metadata", async (
 // `:react:` is a relay-hosted fixture emoji (URL on the relay origin matching
 // rewriteRelayUrl()'s /media/{64-hex}.{ext} pattern), and the mock bridge
 // answers get_media_proxy_port with port 54321 so the rewrite resolves to a
-// real 127.0.0.1 URL rather than the buzz-media:// fallback.
+// real 127.0.0.1 URL rather than the kura-media:// fallback.
 
 const REACTION_SHORTCODE = "react";
 const SELECTED_ACTION_CLASS = /(^|\s)bg-secondary(\s|$)/;
@@ -276,7 +276,7 @@ async function quickReactionStorageContains(
   return page.evaluate((selectedEmoji) => {
     for (let index = 0; index < window.localStorage.length; index += 1) {
       const key = window.localStorage.key(index);
-      if (!key?.startsWith("buzz.quick-reaction-emojis.v1")) continue;
+      if (!key?.startsWith("kura.quick-reaction-emojis.v1")) continue;
       if (window.localStorage.getItem(key)?.includes(selectedEmoji)) {
         return true;
       }

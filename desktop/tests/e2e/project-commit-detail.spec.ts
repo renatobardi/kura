@@ -12,7 +12,7 @@ const LATEST_COMMIT_HASH = "0123456789abcdef0123456789abcdef01234567";
 async function enableProjectsFeature(page: import("@playwright/test").Page) {
   await page.addInitScript(() => {
     window.localStorage.setItem(
-      "buzz-feature-overrides-v1",
+      "kura-feature-overrides-v1",
       JSON.stringify({ projects: true }),
     );
   });
@@ -71,7 +71,7 @@ test("top-level project lists show metadata and overflow actions", async ({
 }) => {
   await enableProjectsFeature(page);
   await page.addInitScript(() => {
-    window.localStorage.setItem("buzz.projects.viewMode", "list");
+    window.localStorage.setItem("kura.projects.viewMode", "list");
   });
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -464,7 +464,7 @@ test("creating a project opens its channel conversation", async ({ page }) => {
   expect(projectEvent?.content).toBe("");
   expect(projectEvent?.tags.some((tag) => tag[0] === "a")).toBe(true);
   expect(
-    projectEvent?.tags.find((tag) => tag[0] === "buzz-channel")?.[1],
+    projectEvent?.tags.find((tag) => tag[0] === "kura-channel")?.[1],
   ).toMatch(
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
   );
@@ -600,7 +600,7 @@ test("project sidebar rows open the home channel and nest extra channels", async
 
   const projectRow = page.getByTestId("sidebar-project-buzz");
   const expand = page.getByTestId("sidebar-project-expand-buzz");
-  const nestedChannel = page.getByTestId("sidebar-project-channel-buzz-random");
+  const nestedChannel = page.getByTestId("sidebar-project-channel-kura-random");
   await expect(page).toHaveURL(/\/projects\//);
   await expect(page.getByTestId("project-channel-home")).toBeVisible();
   await expect(projectRow).toHaveAttribute("data-active", "true");
@@ -706,7 +706,7 @@ test("project sidebar rows open the home channel and nest extra channels", async
   expect(addedEvents.map((event) => event.kind)).toEqual([30621, 30617]);
   expect(
     addedEvents.find((event) => event.kind === 30617)?.tags,
-  ).toContainEqual(["buzz-channel", "cf63feec-21bb-5bf0-a2f8-0e4c3de8ec73"]);
+  ).toContainEqual(["kura-channel", "cf63feec-21bb-5bf0-a2f8-0e4c3de8ec73"]);
 
   await page.getByTestId("add-project-repository").click();
   await page.getByTestId("attach-project-repository").click();

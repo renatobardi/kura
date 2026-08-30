@@ -27,7 +27,7 @@ async function expectSinglePrimaryTextColumn(row: Locator) {
 async function enableProjectsFeature(page: import("@playwright/test").Page) {
   await page.addInitScript(() => {
     window.localStorage.setItem(
-      "buzz-feature-overrides-v1",
+      "kura-feature-overrides-v1",
       JSON.stringify({ projects: true }),
     );
   });
@@ -50,7 +50,7 @@ async function waitForMockLiveSubscription(
     .toBe(true);
 }
 
-async function openBuzzProject(page: import("@playwright/test").Page) {
+async function openKuraProject(page: import("@playwright/test").Page) {
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await page.getByTestId("open-projects-view").click();
   await page.getByTestId("projects-section-projects").click();
@@ -118,7 +118,7 @@ test("same-second request changes supersedes approval", async ({ page }) => {
     Date.now = () => 1_900_000_000_000;
   });
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   await page.getByRole("tab", { name: "Review" }).click();
   const aliceRow = pullRequestRowByAuthor(page, "alice").first();
@@ -181,7 +181,7 @@ test("PR creator/owner can toggle draft, request reviews, and approve", async ({
     window.__KURA_E2E_REJECT_PROJECT_EVENT_KINDS__ = [1631];
   });
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   await page.getByRole("tab", { name: "Review" }).click();
   const prRows = page.getByTestId("project-pull-request-row");
@@ -611,7 +611,7 @@ test("PR creator/owner can toggle draft, request reviews, and approve", async ({
 test("merge conflicts offer persistent terminal recovery", async ({ page }) => {
   await enableProjectsFeature(page);
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
   await page.evaluate(() => {
     window.__KURA_E2E_PROJECT_MERGE_ERROR__ = {
       code: "merge_conflict",
@@ -682,7 +682,7 @@ test("reviewer can leave a commit-scoped inline diff comment", async ({
 }) => {
   await enableProjectsFeature(page);
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   await page.getByRole("tab", { name: "Review" }).click();
   const aliceRow = pullRequestRowByAuthor(page, "alice").first();
@@ -781,7 +781,7 @@ test("managed agent repository owner can merge", async ({ page }) => {
       },
     ],
   });
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   await page.getByRole("tab", { name: "Review" }).click();
   const agentRow = pullRequestRowByAuthor(page, "Brain").first();
@@ -868,7 +868,7 @@ test("viewer without repository ownership cannot merge", async ({ page }) => {
       },
     ],
   });
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   await page.getByRole("tab", { name: "Review" }).click();
   const prRow = page.getByTestId("project-pull-request-row").first();
@@ -1396,7 +1396,7 @@ test("project section icons lead their titles", async ({ page }) => {
   await page.getByTestId("projects-section-issues").click();
   await expectIconBeforeTitle("projects-page-header");
 
-  await openBuzzProject(page);
+  await openKuraProject(page);
   await page.getByRole("tab", { name: "Tasks", exact: true }).click();
   await expectIconBeforeTitle("project-section-header");
 });
@@ -1406,7 +1406,7 @@ test("project detail lists follow overview header geometry", async ({
 }) => {
   await enableProjectsFeature(page);
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   for (const [tab, title] of [
     ["Tasks", "Tasks"],
@@ -1692,7 +1692,7 @@ test("project overview presents collapsible context beside grouped activity", as
   const overviewLayout = page.getByTestId("projects-overview-layout");
   const overviewContentPod = page.getByTestId("projects-overview-content-pod");
   const appContentSurface = page
-    .locator("[data-buzz-content-surface]")
+    .locator("[data-kura-content-surface]")
     .filter({ has: overviewLayout })
     .first();
   await expect(appContentSurface).toHaveCSS(
@@ -2118,7 +2118,7 @@ test("project overview drawer control animates the context rail", async ({
     .getByTestId("projects-overview-context-icon")
     .locator("rect")
     .nth(1);
-  const contentSurface = page.locator("[data-buzz-content-surface]");
+  const contentSurface = page.locator("[data-kura-content-surface]");
   await expect(page.getByTestId("projects-overview-layout")).toHaveAttribute(
     "data-project-context-detached",
     "true",
@@ -2501,7 +2501,7 @@ test("repository drawer control animates the context rail from the far right", a
 }) => {
   await enableProjectsFeature(page);
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   const chat = page.getByTestId("project-right-panel-chat-tab");
   const terminal = page.getByTestId("project-terminal-toggle");
@@ -2510,7 +2510,7 @@ test("repository drawer control animates the context rail from the far right", a
   const rail = page.getByTestId("project-context-rail");
   const repositoryPanel = page.getByTestId("project-repository-actions-panel");
   const layout = page.getByTestId("project-panel-layout");
-  const contentSurface = page.locator("[data-buzz-content-surface]");
+  const contentSurface = page.locator("[data-kura-content-surface]");
   const workspaceHeader = page.getByTestId("project-workspace-tab-menu");
   await expect(
     workspaceHeader.getByTestId("project-right-panel-chat-tab"),
@@ -2700,7 +2700,7 @@ test("project detail chat resize tracks the pointer without easing", async ({
 }) => {
   await enableProjectsFeature(page);
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
   await page.getByTestId("project-right-panel-chat-tab").click();
 
   const chatPanel = page.getByTestId("project-agent-chat-panel");
@@ -2765,10 +2765,10 @@ test("repository rows identify their git host", async ({ page }) => {
   await page.getByRole("button", { name: "Repositories", exact: true }).click();
   await page.getByRole("button", { name: "List layout" }).click();
 
-  const buzzHostIcon = page
+  const kuraHostIcon = page
     .getByTestId("repository-row-buzz")
     .getByTestId("repository-host-icon");
-  await expect(buzzHostIcon).toHaveAttribute(
+  await expect(kuraHostIcon).toHaveAttribute(
     "aria-label",
     "Kura-hosted repository",
   );
@@ -2889,7 +2889,7 @@ test("project detail content areas do not paint background fills", async ({
 }) => {
   await enableProjectsFeature(page);
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   const expectVisiblePanelsToBeTransparent = async ({
     bordered = true,
@@ -2941,7 +2941,7 @@ test("project without a checkout offers fetch feedback and cloning", async ({
 }) => {
   await enableProjectsFeature(page);
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   await expect(
     page.getByRole("button", { name: "Remote", exact: true }),
@@ -2996,7 +2996,7 @@ test("project branches can be created from the selected remote branch", async ({
     projectHeadBranch: "master",
     relaySelf: TEST_IDENTITIES.bob.pubkey,
   });
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   await page.getByRole("button", { name: /main/ }).click();
   await page.getByTestId("project-create-branch").click();
@@ -3029,7 +3029,7 @@ test("project branches can be created from the selected remote branch", async ({
   );
   expect(commands).toContain("create_project_remote_branch");
 
-  await openBuzzProject(page);
+  await openKuraProject(page);
   await page.getByRole("button", { name: /main/ }).click();
   await expect(
     page.getByRole("menuitemradio", { name: "feature/branch-management" }),
@@ -3041,7 +3041,7 @@ test("repository tags can be browsed as immutable remote snapshots", async ({
 }) => {
   await enableProjectsFeature(page);
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   const repositoryPanel = page.getByTestId("project-repository-actions-panel");
   await repositoryPanel
@@ -3094,7 +3094,7 @@ test("project branches can be deleted but the default branch cannot", async ({
 }) => {
   await enableProjectsFeature(page);
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   await page.getByRole("button", { name: /main/ }).click();
   await expect(page.getByTestId("project-delete-branch")).toBeDisabled();
@@ -3130,7 +3130,7 @@ test("external repositories stay on local source after a branch round trip", asy
     const localBranch =
       "wintermute/entity-link-recipient-cards-with-a-long-branch-name";
     window.sessionStorage.setItem(
-      "buzz-e2e-project-branches",
+      "kura-e2e-project-branches",
       JSON.stringify({ "relay-tools": { [localBranch]: commit } }),
     );
     window.__KURA_E2E_PROJECT_REPO_SYNC_STATUS__ = {
@@ -3316,7 +3316,7 @@ test("pushed local branch can open a pull request", async ({ page }) => {
     };
   });
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   await page.getByRole("button", { name: /main/ }).click();
   await expect(
@@ -3375,7 +3375,7 @@ test("project task can be created with a category from the tasks header", async 
 }) => {
   await enableProjectsFeature(page);
   await installMockBridge(page);
-  await openBuzzProject(page);
+  await openKuraProject(page);
 
   await page.getByRole("tab", { name: "Tasks", exact: true }).click();
   await page

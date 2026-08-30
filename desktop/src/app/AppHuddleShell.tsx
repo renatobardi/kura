@@ -1,6 +1,6 @@
 import * as React from "react";
 import { AppHuddleBar } from "@/app/AppHuddleBar";
-import * as BuzzTheme from "@/app/BuzzThemeSurfaces";
+import * as KuraTheme from "@/app/KuraThemeSurfaces";
 import { HuddleProvider, useHuddle } from "@/features/huddle";
 import { HUDDLE_SHORTCUT_EVENT } from "@/shared/lib/keyboard-shortcuts";
 import { RemindMeLaterProvider } from "@/features/reminders/ui/RemindMeLaterProvider";
@@ -68,31 +68,31 @@ export function AppHuddleShell({
       <HuddleShortcutHandler>
         <RemindMeLaterProvider pubkey={currentPubkey}>
           <div
-            className="buzz-huddle-shell relative h-dvh overflow-hidden overscroll-none"
+            className="kura-huddle-shell relative h-dvh overflow-hidden overscroll-none"
             data-huddle-open={isDrawerOpen}
             data-huddle-window={isRoom}
           >
             <div
               aria-hidden="true"
               className={cn(
-                "buzz-huddle-drawer-backdrop",
-                isDrawerOpen && "buzz-huddle-drawer-backdrop-open",
+                "kura-huddle-drawer-backdrop",
+                isDrawerOpen && "kura-huddle-drawer-backdrop-open",
               )}
             />
             <div
               className={cn(
-                "buzz-huddle-app-surface z-10 flex min-h-0 flex-row overflow-hidden bg-background",
+                "kura-huddle-app-surface z-10 flex min-h-0 flex-row overflow-hidden bg-background",
                 isDrawerOpen &&
                   (isRoom
-                    ? "buzz-huddle-app-surface-room-open"
-                    : "buzz-huddle-app-surface-open"),
+                    ? "kura-huddle-app-surface-room-open"
+                    : "kura-huddle-app-surface-open"),
               )}
             >
-              <BuzzTheme.GradientLayer />
+              <KuraTheme.GradientLayer />
               {children}
             </div>
             {isRoom || !isCompanionOpen ? (
-              <div className="buzz-huddle-drawer-slot absolute inset-x-0 bottom-0 z-[2] h-(--buzz-huddle-drawer-height)">
+              <div className="kura-huddle-drawer-slot absolute inset-x-0 bottom-0 z-[2] h-(--kura-huddle-drawer-height)">
                 <AppHuddleBar
                   mode={isRoom ? "room" : "main"}
                   onOpenHuddleWindow={isRoom ? undefined : onCompanionOpen}

@@ -154,7 +154,7 @@ test("direct-message rows become prominent only when unread", async ({
   page,
 }) => {
   await page.addInitScript(() => {
-    window.localStorage.setItem("buzz-theme", "buzz-dark");
+    window.localStorage.setItem("kura-theme", "kura-dark");
   });
   await page.goto("/");
   const directMessage = page.getByTestId("channel-alice-tyler");
@@ -224,7 +224,7 @@ test("dark mode keeps selected labels regular and channel-level unread labels bo
   page,
 }) => {
   await page.addInitScript(() => {
-    window.localStorage.setItem("buzz-theme", "buzz-dark");
+    window.localStorage.setItem("kura-theme", "kura-dark");
   });
   await page.goto("/");
 
@@ -409,8 +409,8 @@ test("top-level @mention shows an accent-colored numeric badge on its channel", 
   // slack-ochin maps the generic destructive pair to white-on-white, so it
   // doubles as an adversarial theme: the badge still renders the accent.
   await page.addInitScript(() => {
-    window.localStorage.setItem("buzz-theme", "slack-ochin");
-    window.localStorage.setItem("buzz-accent-color", "#22c55e");
+    window.localStorage.setItem("kura-theme", "slack-ochin");
+    window.localStorage.setItem("kura-accent-color", "#22c55e");
   });
   await page.goto("/");
   await page.getByTestId("channel-general").click();

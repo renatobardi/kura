@@ -524,7 +524,7 @@ test("rehypeImageGallery: leaves a single trailing image in the text flow", () =
 // schemes (returns `""`) before our `a` component override can see them,
 // which would break copy → paste → click for `kura://message?…` links and
 // `kura://pr|issue|repo?…` entity links end-to-end. We pass a custom
-// `urlTransform` (`buzzDeepLinkUrlTransform`) that preserves valid Kura
+// `urlTransform` (`kuraDeepLinkUrlTransform`) that preserves valid Kura
 // deep links and delegates everything else to `defaultUrlTransform`.
 //
 // This test renders real `<ReactMarkdown>` with the production transform
@@ -545,7 +545,7 @@ const OWNER_HEX =
 const EVENT_HEX =
   "c3b589fa5713ba25bad6dc095e2de00a4ac8f50050fdea00fc6444e603be1dd1";
 
-function buzzDeepLinkUrlTransform(value, key) {
+function kuraDeepLinkUrlTransform(value, key) {
   if (key !== "href") return defaultUrlTransform(value);
   if (isMessageLink(value) || isChannelLink(value)) return value;
   if (parseEntityLink(value).ok) return value;
@@ -556,7 +556,7 @@ function renderMarkdown(content) {
   return renderToStaticMarkup(
     React.createElement(
       ReactMarkdown,
-      { urlTransform: buzzDeepLinkUrlTransform },
+      { urlTransform: kuraDeepLinkUrlTransform },
       content,
     ),
   );
@@ -628,46 +628,46 @@ test("messageLinkUrlTransform: leaves non-entity kura:// schemes to default", ()
   assert.match(html, /href=""/);
 });
 
-test("buzzDeepLinkUrlTransform: preserves kura://pr entity link href", () => {
-  const prLink = `kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=buzz-world`;
+test("kuraDeepLinkUrlTransform: preserves kura://pr entity link href", () => {
+  const prLink = `kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=kura-world`;
   const html = renderMarkdown(`[My PR](${prLink})`);
   // The href must survive — our transform preserves valid entity links.
   assert.match(html, /href="kura:\/\/pr\?/);
   assert.doesNotMatch(html, /href=""/);
 });
 
-test("buzzDeepLinkUrlTransform: preserves kura://pr autolink href", () => {
-  const prLink = `kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=buzz-world`;
+test("kuraDeepLinkUrlTransform: preserves kura://pr autolink href", () => {
+  const prLink = `kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=kura-world`;
   const html = renderMarkdown(`<${prLink}>`);
   assert.match(html, /href="kura:\/\/pr\?/);
   assert.doesNotMatch(html, /href=""/);
 });
 
-test("buzzDeepLinkUrlTransform: preserves kura://issue entity link href", () => {
-  const issueLink = `kura://issue?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=buzz-world`;
+test("kuraDeepLinkUrlTransform: preserves kura://issue entity link href", () => {
+  const issueLink = `kura://issue?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=kura-world`;
   const html = renderMarkdown(`[Issue title](${issueLink})`);
   assert.match(html, /href="kura:\/\/issue\?/);
   assert.doesNotMatch(html, /href=""/);
 });
 
-test("buzzDeepLinkUrlTransform: preserves kura://repo entity link href", () => {
-  const repoLink = `kura://repo?owner=${OWNER_HEX}&d=buzz-world`;
+test("kuraDeepLinkUrlTransform: preserves kura://repo entity link href", () => {
+  const repoLink = `kura://repo?owner=${OWNER_HEX}&d=kura-world`;
   const html = renderMarkdown(`[My repo](${repoLink})`);
   assert.match(html, /href="kura:\/\/repo\?/);
   assert.doesNotMatch(html, /href=""/);
 });
 
-test("buzzDeepLinkUrlTransform: preserves kura://project autolink href", () => {
+test("kuraDeepLinkUrlTransform: preserves kura://project autolink href", () => {
   const projectLink = `kura://project?owner=${OWNER_HEX}&d=onboarding`;
   const html = renderMarkdown(`<${projectLink}>`);
   assert.match(html, /href="kura:\/\/project\?/);
   assert.doesNotMatch(html, /href=""/);
 });
 
-test("buzzDeepLinkUrlTransform: strips malformed kura://pr (unknown param)", () => {
+test("kuraDeepLinkUrlTransform: strips malformed kura://pr (unknown param)", () => {
   // Strict parser rejects unknown params — transform falls back to default sanitizer.
   const html = renderMarkdown(
-    `[link](kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=buzz-world&extra=ignored)`,
+    `[link](kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=kura-world&extra=ignored)`,
   );
   assert.match(html, /href=""/);
 });
@@ -741,7 +741,7 @@ test("renderEntityLinkAnchor_noRelayOrigin_cloneUrlReturnsNull", () => {
 
 test("renderEntityLinkAnchor_directEntityLink_returnsAnchorRegardlessOfOrigin", () => {
   // A direct kura://pr link always resolves in-app — it does not require origin.
-  const prLink = `kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=buzz-world`;
+  const prLink = `kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=kura-world`;
   const el = renderEntityLinkAnchor({
     children: React.createElement("span", null, "My PR"),
     href: prLink,
@@ -944,7 +944,7 @@ function nudgeBody(agentPubkey) {
     "",
     "Open Edit Agent in the Kura app to set these.",
     "",
-    "```buzz:config-nudge",
+    "```kura:config-nudge",
     JSON.stringify({
       agent_name: "Fizz",
       agent_pubkey: agentPubkey,
@@ -1077,9 +1077,9 @@ test("bare Kura permalinks render cohesive icon-prefixed chips", () => {
     messageLink,
     compatibilityMessageLink,
     channelLink,
-    `kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=buzz-world`,
-    `kura://issue?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=buzz-world`,
-    `kura://repo?owner=${OWNER_HEX}&d=buzz-world`,
+    `kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=kura-world`,
+    `kura://issue?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=kura-world`,
+    `kura://repo?owner=${OWNER_HEX}&d=kura-world`,
   ];
   const markdown = renderCachedMarkdown({
     components: createMarkdownComponents(true, false),
@@ -1107,7 +1107,7 @@ test("bare Kura permalinks render cohesive icon-prefixed chips", () => {
   );
 
   const visibleText = html.replace(/<[^>]+>/g, "");
-  assert.equal((html.match(/data-buzz-link=""/g) ?? []).length, 6);
+  assert.equal((html.match(/data-kura-link=""/g) ?? []).length, 6);
   assert.equal(
     (
       html.match(
@@ -1127,7 +1127,7 @@ test("bare Kura permalinks render cohesive icon-prefixed chips", () => {
   assert.match(html, /inline-chip-icon-repo/);
   // PR, issue, and repository chips all use the stable repository identity;
   // fetched subjects and event hashes never alter their inline width.
-  assert.equal((visibleText.match(/buzz-world/g) ?? []).length, 3);
+  assert.equal((visibleText.match(/kura-world/g) ?? []).length, 3);
   assert.doesNotMatch(visibleText, /c3b589fa/);
 });
 
@@ -1143,25 +1143,25 @@ test("inline issue and pull-request chips show the repository name without the e
     );
 
   const issueHtml = renderEntityChip(
-    `kura://issue?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=buzz-world`,
+    `kura://issue?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=kura-world`,
   );
   const issueText = issueHtml.replace(/<[^>]+>/g, "");
-  assert.equal(issueText, "buzz-world");
+  assert.equal(issueText, "kura-world");
   assert.doesNotMatch(issueText, /c3b589fa/);
   assert.doesNotMatch(issueText, /·/);
   // Identity, icon, and navigation affordances survive the shorter label.
-  assert.match(issueHtml, /data-buzz-link-kind="issue"/);
+  assert.match(issueHtml, /data-kura-link-kind="issue"/);
   assert.match(issueHtml, /inline-chip-icon-issue/);
   assert.match(
     issueHtml,
-    /aria-label="Open issue c3b589fa in repository buzz-world"/,
+    /aria-label="Open issue c3b589fa in repository kura-world"/,
   );
 
   // Pull-request chips follow the same stable inline identity policy.
   const pullRequestText = renderEntityChip(
-    `kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=buzz-world`,
+    `kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=kura-world`,
   ).replace(/<[^>]+>/g, "");
-  assert.equal(pullRequestText, "buzz-world");
+  assert.equal(pullRequestText, "kura-world");
   assert.doesNotMatch(pullRequestText, /c3b589fa/);
   assert.doesNotMatch(pullRequestText, /·/);
 });
@@ -1234,12 +1234,12 @@ test("authored Kura permalink labels remain ordinary links", () => {
     `[the message](kura://message?channel=${channelId}&id=${EVENT_HEX})`,
     `[the compatibility message](kura://channel/${channelId}/${EVENT_HEX})`,
     `[**design discussion**](kura://channel/${channelId})`,
-    `[the issue](kura://issue?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=buzz-world)`,
+    `[the issue](kura://issue?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=kura-world)`,
   ];
   const markdown = renderCachedMarkdown({
     components: createMarkdownComponents(true, false),
     content: links.join(" "),
-    variant: "authored-buzz-link-integration-test",
+    variant: "authored-kura-link-integration-test",
   });
   const html = renderToStaticMarkup(
     React.createElement(
@@ -1261,7 +1261,7 @@ test("authored Kura permalink labels remain ordinary links", () => {
     ),
   );
 
-  assert.equal((html.match(/data-buzz-link=""/g) ?? []).length, 0);
+  assert.equal((html.match(/data-kura-link=""/g) ?? []).length, 0);
   assert.match(html, />the message</);
   assert.match(html, />the compatibility message</);
   assert.match(html, /aria-label="Open message: the compatibility message"/);
@@ -1280,7 +1280,7 @@ test("bare Kura permalinks shorten unavailable channel identifiers", () => {
       `kura://message?channel=${channelId}&id=${EVENT_HEX}`,
       `kura://channel/${channelId}`,
     ].join(" "),
-    variant: "unknown-channel-buzz-link-integration-test",
+    variant: "unknown-channel-kura-link-integration-test",
   });
   const html = renderToStaticMarkup(
     React.createElement(
@@ -1400,7 +1400,7 @@ test("agent mentions retain the bot treatment instead of the human icon", () => 
 });
 
 test("renderEntityLinkAnchor renders Kura entity links as chips", () => {
-  const prLink = `kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=buzz-world`;
+  const prLink = `kura://pr?id=${EVENT_HEX}&owner=${OWNER_HEX}&d=kura-world`;
   const el = renderEntityLinkAnchor({
     children: "PR · abc123",
     href: prLink,
@@ -1409,29 +1409,29 @@ test("renderEntityLinkAnchor renders Kura entity links as chips", () => {
     relayOrigin: null,
   });
   const html = renderToStaticMarkup(el);
-  assert.match(html, /data-buzz-link=""/);
+  assert.match(html, /data-kura-link=""/);
   assert.match(html, /<span/);
   assert.match(html, /role="button"/);
   assert.match(html, /tabindex="0"/);
-  assert.match(html, /data-buzz-link-kind="pr"/);
+  assert.match(html, /data-kura-link-kind="pr"/);
   assert.match(html, /wrapping-inline-chip/);
-  assert.match(html, /inline-chip-leading-fragment[^>]*>buzz-</);
+  assert.match(html, /inline-chip-leading-fragment[^>]*>kura-</);
   assert.doesNotMatch(html, /\btruncate\b/);
   assert.doesNotMatch(html, /<a/);
   assert.doesNotMatch(html, /<button/);
 });
 
 test("renderEntityLinkAnchor keeps chip styling when interaction is disabled", () => {
-  const repoLink = `kura://repo?owner=${OWNER_HEX}&d=buzz-world`;
+  const repoLink = `kura://repo?owner=${OWNER_HEX}&d=kura-world`;
   const el = renderEntityLinkAnchor({
-    children: "buzz-world",
+    children: "kura-world",
     href: repoLink,
     interactive: false,
     onOpenEntityLink: () => {},
     relayOrigin: null,
   });
   const html = renderToStaticMarkup(el);
-  assert.match(html, /data-buzz-link=""/);
+  assert.match(html, /data-kura-link=""/);
   assert.match(html, /<span/);
   assert.match(html, /class="mention-chip\s/);
   assert.doesNotMatch(html, /<button/);

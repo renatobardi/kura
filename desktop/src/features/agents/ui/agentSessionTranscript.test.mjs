@@ -39,7 +39,7 @@ function toolItems(events) {
 }
 
 function activityTitle(item) {
-  return formatToolTitle(item.buzzToolName ?? item.toolName, item.title);
+  return formatToolTitle(item.kuraToolName ?? item.toolName, item.title);
 }
 
 // --- stub-overflow vanish (pins the pre-existing degraded-frame behavior) ---
@@ -120,13 +120,13 @@ test("buildTranscript preserves a slash-command preamble before semantic prompt 
           {
             type: "text",
             text: [
-              '<buzz-event type="@mention">',
+              '<kura-event type="@mention">',
               `Event ID: ${PROMPT_EVENT_ID.toUpperCase()}`,
               "Channel: agents",
               "Kind: 40002",
               `From: Eva (hex: ${authorPubkey})`,
               "Content: @Eva /goal ship it",
-              "</buzz-event>",
+              "</kura-event>",
             ].join("\n"),
           },
         ],
@@ -212,7 +212,7 @@ test("buildTranscript keeps read_file activity categorized by the actual tool wh
   ]);
 
   assert.equal(item.toolName, "read_file");
-  assert.equal(item.buzzToolName, null);
+  assert.equal(item.kuraToolName, null);
   assert.equal(item.title, "read_file");
   assert.equal(activityTitle(item), "read_file");
   assert.equal(item.status, "completed");
@@ -248,7 +248,7 @@ test("buildTranscript keeps shell activity categorized by the actual tool when g
   ]);
 
   assert.equal(item.toolName, "shell");
-  assert.equal(item.buzzToolName, null);
+  assert.equal(item.kuraToolName, null);
   assert.equal(activityTitle(item), "shell");
   assert.equal(item.status, "completed");
   assert.match(item.result, /get_event/);
@@ -276,7 +276,7 @@ test("buildTranscript categorizes explicit Kura tool calls for the activity bar"
   ]);
 
   assert.equal(item.toolName, "get_feed");
-  assert.equal(item.buzzToolName, "get_feed");
+  assert.equal(item.kuraToolName, "get_feed");
   assert.equal(activityTitle(item), "Get Feed");
   assert.deepEqual(item.args, { limit: 20 });
   assert.equal(item.status, "completed");
@@ -623,7 +623,7 @@ test("buildTranscript surfaces session/request_permission as a permission lifecy
         method: "session/request_permission",
         params: {
           toolCallId: "tool-1",
-          title: "Confirm force-with-lease push to block/buzz.",
+          title: "Confirm force-with-lease push to block/kura.",
           options: [
             { optionId: "allow_once", kind: "allow_once", name: "Allow" },
             { optionId: "reject_once", kind: "reject_once", name: "Reject" },
@@ -1811,7 +1811,7 @@ test("buildTranscript five-section system prompt card is standalone with all sec
             "[Channel Canvas]",
             "Canvas revision (event ID): a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
             "Last modified: 2026-07-01T10:00:00Z",
-            "Fetch current content with: buzz canvas get --channel 44444444-4444-4444-4444-444444444444",
+            "Fetch current content with: kura canvas get --channel 44444444-4444-4444-4444-444444444444",
           ].join("\n"),
         },
       },
@@ -1912,7 +1912,7 @@ test("buildTranscript five-section system prompt card is standalone with all sec
   );
   // Must have Kura event and Thread context sections, NOT Base/System/Team Instructions/Core Memory/Channel Canvas.
   assert.ok(
-    contextSectionTitles.some((t) => /\b(buzz|kura) event\b/i.test(t)),
+    contextSectionTitles.some((t) => /\bkura event\b/i.test(t)),
     "prompt context must contain a Kura event section",
   );
   assert.ok(
@@ -1953,7 +1953,7 @@ test("buildTranscript session/new via _meta.systemPrompt.append produces identic
     "[Channel Canvas]",
     "Canvas revision (event ID): a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
     "Last modified: 2026-07-01T10:00:00Z",
-    "Fetch current content with: buzz canvas get --channel 55555555-5555-5555-5555-555555555555",
+    "Fetch current content with: kura canvas get --channel 55555555-5555-5555-5555-555555555555",
   ].join("\n");
 
   const makeEvents = (params) => [

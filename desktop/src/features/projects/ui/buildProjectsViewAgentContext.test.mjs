@@ -37,7 +37,7 @@ const base = {
       description: "Repository discussion",
       id: "repository-channel",
       memberCount: 4,
-      name: "buzz-dev",
+      name: "kura-dev",
     },
   ],
   issues: [],
@@ -55,7 +55,7 @@ for (const [filter, expected] of [
   ["repositories", "Kura"],
   ["issues", "Agent context"],
   ["prs", "Expose overview data"],
-  ["channels", "#buzz-dev"],
+  ["channels", "#kura-dev"],
 ]) {
   test(`builds ${filter} overview agent items`, () => {
     const items = buildProjectsViewAgentContextItems({ ...base, filter });

@@ -27,7 +27,7 @@ const REPLY_CONTENT = "Projects conversation reply body";
 async function enableProjectsFeature(page: Page) {
   await page.addInitScript(() => {
     window.localStorage.setItem(
-      "buzz-feature-overrides-v1",
+      "kura-feature-overrides-v1",
       JSON.stringify({ projects: true }),
     );
   });

@@ -728,15 +728,15 @@ test("buildRecord_runtime_switch_new_hiddenKeys_then_generic_edit", () => {
     loginHint: null,
   };
 
-  const buzzDescriptors = deriveNumericDescriptors(kuraAgentRuntime);
+  const kuraDescriptors = deriveNumericDescriptors(kuraAgentRuntime);
   const gooseDescriptors = deriveNumericDescriptors(gooseRuntime);
-  const buzzHiddenKeys = structuredEnvKeys(buzzDescriptors);
+  const kuraHiddenKeys = structuredEnvKeys(kuraDescriptors);
   const gooseHiddenKeys = structuredEnvKeys(gooseDescriptors);
 
   // Sanity-check that KURA_AGENT_MAX_ROUNDS is hidden under kura-agent but not
   // under Goose — that contrast is what makes it become a generic row.
   assert.ok(
-    buzzHiddenKeys.includes("KURA_AGENT_MAX_ROUNDS"),
+    kuraHiddenKeys.includes("KURA_AGENT_MAX_ROUNDS"),
     "KURA_AGENT_MAX_ROUNDS must be hidden under kura-agent descriptors",
   );
   assert.equal(

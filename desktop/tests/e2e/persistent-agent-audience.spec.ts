@@ -10,7 +10,7 @@ const AGENT_A = "a".repeat(64);
 const AGENT_B = "b".repeat(64);
 const THREAD_ROOT_ID = "mock-general-welcome";
 const KEEP_MENTIONED_AGENTS_PINNED_STORAGE_KEY =
-  "buzz.messages.keepMentionedAgentsPinned";
+  "kura.messages.keepMentionedAgentsPinned";
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript((storageKey) => {
@@ -27,8 +27,8 @@ async function keepMentionedAgentsPinned(page: Page) {
 async function seedTheme(page: Page, theme: string, accent = "#c0a2f1") {
   await page.addInitScript(
     ({ selectedTheme, selectedAccent }) => {
-      window.localStorage.setItem("buzz-theme", selectedTheme);
-      window.localStorage.setItem("buzz-accent-color", selectedAccent);
+      window.localStorage.setItem("kura-theme", selectedTheme);
+      window.localStorage.setItem("kura-accent-color", selectedAccent);
     },
     { selectedTheme: theme, selectedAccent: accent },
   );
@@ -1087,7 +1087,7 @@ test("implicit automatic mentions stay out of persisted drafts", async ({
     .poll(() =>
       page.evaluate((channelId) => {
         for (const storageKey of Object.keys(window.localStorage)) {
-          if (!storageKey.startsWith("buzz-drafts.v2:")) continue;
+          if (!storageKey.startsWith("kura-drafts.v2:")) continue;
           const drafts = JSON.parse(
             window.localStorage.getItem(storageKey) ?? "{}",
           ) as Record<string, { channelId?: string; content?: string }>;
@@ -1125,7 +1125,7 @@ test("an authored duplicate leading mention survives draft restoration", async (
     .poll(() =>
       page.evaluate((channelId) => {
         for (const storageKey of Object.keys(window.localStorage)) {
-          if (!storageKey.startsWith("buzz-drafts.v2:")) continue;
+          if (!storageKey.startsWith("kura-drafts.v2:")) continue;
           const drafts = JSON.parse(
             window.localStorage.getItem(storageKey) ?? "{}",
           ) as Record<string, { channelId?: string; content?: string }>;
@@ -1165,7 +1165,7 @@ test("typed deletion preserves an identical authored mention in drafts", async (
     .poll(() =>
       page.evaluate((channelId) => {
         for (const storageKey of Object.keys(window.localStorage)) {
-          if (!storageKey.startsWith("buzz-drafts.v2:")) continue;
+          if (!storageKey.startsWith("kura-drafts.v2:")) continue;
           const draft = (
             JSON.parse(
               window.localStorage.getItem(storageKey) ?? "{}",
@@ -1198,7 +1198,7 @@ test("removing an automatic mention preserves an identical authored mention in d
     .poll(() =>
       page.evaluate((channelId) => {
         for (const storageKey of Object.keys(window.localStorage)) {
-          if (!storageKey.startsWith("buzz-drafts.v2:")) continue;
+          if (!storageKey.startsWith("kura-drafts.v2:")) continue;
           const draft = (
             JSON.parse(
               window.localStorage.getItem(storageKey) ?? "{}",
@@ -1234,7 +1234,7 @@ test("multiple automatic mentions stay out of persisted drafts", async ({
     .poll(() =>
       page.evaluate((channelId) => {
         for (const storageKey of Object.keys(window.localStorage)) {
-          if (!storageKey.startsWith("buzz-drafts.v2:")) continue;
+          if (!storageKey.startsWith("kura-drafts.v2:")) continue;
           const draft = (
             JSON.parse(
               window.localStorage.getItem(storageKey) ?? "{}",
@@ -1276,7 +1276,7 @@ test("re-enabling an automatic mention preserves an authored duplicate after dra
     .poll(() =>
       page.evaluate((channelId) => {
         for (const storageKey of Object.keys(window.localStorage)) {
-          if (!storageKey.startsWith("buzz-drafts.v2:")) continue;
+          if (!storageKey.startsWith("kura-drafts.v2:")) continue;
           const drafts = JSON.parse(
             window.localStorage.getItem(storageKey) ?? "{}",
           ) as Record<string, { channelId?: string; content?: string }>;
@@ -1361,7 +1361,7 @@ test("reduced motion removes addressed agents without spatial animation", async 
   await expect(removeButton).toHaveCount(0);
 });
 
-for (const theme of ["buzz", "buzz-dark"]) {
+for (const theme of ["kura", "kura-dark"]) {
   test(`captures the mention-button placement in ${theme}`, async ({
     page,
   }) => {
@@ -1397,7 +1397,7 @@ test("the mention-button placement fits the narrow composer", async ({
 });
 
 test("captures the lightweight auto-pin popover", async ({ page }) => {
-  await seedTheme(page, "buzz-dark");
+  await seedTheme(page, "kura-dark");
   await installAudienceFixtures(page);
   await openGeneral(page);
 

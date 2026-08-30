@@ -60,9 +60,9 @@ async function setRelayConnectionState(
   }, state);
 }
 
-const HOME_SEEN_STORAGE_KEY_PREFIX = "buzz-home-feed-seen.v1:";
+const HOME_SEEN_STORAGE_KEY_PREFIX = "kura-home-feed-seen.v1:";
 const COMMUNITY_ONBOARDING_TRANSACTION_STORAGE_KEY =
-  "buzz-community-onboarding-transaction.v1";
+  "kura-community-onboarding-transaction.v1";
 const ONE_PIXEL_PNG_BASE64 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
 const DEFAULT_MOCK_PUBKEY = "deadbeef".repeat(8);
@@ -91,7 +91,7 @@ async function seedOnboardingCompletion(page: Page, pubkey: string) {
       window.localStorage.setItem(storageKey, "true");
     },
     {
-      storageKey: `buzz-onboarding-complete.v1:${pubkey}`,
+      storageKey: `kura-onboarding-complete.v1:${pubkey}`,
     },
   );
 }
@@ -101,7 +101,7 @@ async function seedCommunityProfileStage(page: Page, id: string) {
   await page.addInitScript(
     ({ pubkey, transactionId, transactionStorageKey }) => {
       window.localStorage.setItem(
-        `buzz-machine-onboarding-complete.v2:${pubkey}`,
+        `kura-machine-onboarding-complete.v2:${pubkey}`,
         "true",
       );
       const timestamp = new Date().toISOString();
@@ -1037,7 +1037,7 @@ test("non-local runtime override keeps community selection without release flag"
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1052,7 +1052,7 @@ test("non-local runtime override keeps community selection without release flag"
     page.getByRole("button", { name: /Join a community/ }),
   ).toBeVisible();
   await expect
-    .poll(() => page.evaluate(() => localStorage.getItem("buzz-communities")))
+    .poll(() => page.evaluate(() => localStorage.getItem("kura-communities")))
     .toBeNull();
 });
 
@@ -1062,7 +1062,7 @@ test("non-local default auto-connects when the release flag is enabled", async (
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1078,14 +1078,14 @@ test("non-local default auto-connects when the release flag is enabled", async (
   await expect
     .poll(() =>
       page.evaluate(() => {
-        const raw = window.localStorage.getItem("buzz-communities");
+        const raw = window.localStorage.getItem("kura-communities");
         const communities = raw
           ? (JSON.parse(raw) as Array<{ id: string; relayUrl: string }>)
           : [];
         return {
           activeMatchesCommunity:
             communities.length === 1 &&
-            window.localStorage.getItem("buzz-active-community-id") ===
+            window.localStorage.getItem("kura-active-community-id") ===
               communities[0]?.id,
           relayUrl: communities[0]?.relayUrl ?? null,
         };
@@ -1103,7 +1103,7 @@ test("first-community choices route join, create, owner, and member intents", as
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1173,7 +1173,7 @@ test("first-community owner can connect an existing hosted community", async ({
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1210,14 +1210,14 @@ test("first-community owner can connect an existing hosted community", async ({
   await expect
     .poll(() =>
       page.evaluate(() =>
-        window.localStorage.getItem("buzz-community-onboarding-transaction.v1"),
+        window.localStorage.getItem("kura-community-onboarding-transaction.v1"),
       ),
     )
     .toContain('"source":"first-community"');
   await expect
     .poll(() =>
       page.evaluate(() =>
-        window.localStorage.getItem("buzz-community-onboarding-transaction.v1"),
+        window.localStorage.getItem("kura-community-onboarding-transaction.v1"),
       ),
     )
     .toContain("wss://north-star.communities.kura.oute.pro");
@@ -1232,7 +1232,7 @@ test("first-community owner can connect an existing hosted community", async ({
   await expect
     .poll(() =>
       page.evaluate(() =>
-        window.localStorage.getItem("buzz-community-onboarding-transaction.v1"),
+        window.localStorage.getItem("kura-community-onboarding-transaction.v1"),
       ),
     )
     .toBeNull();
@@ -1244,7 +1244,7 @@ test("first-community owner can create and connect a hosted community", async ({
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1306,7 +1306,7 @@ test("first-community owner can create and connect a hosted community", async ({
   await expect
     .poll(() =>
       page.evaluate(() =>
-        window.localStorage.getItem("buzz-community-onboarding-transaction.v1"),
+        window.localStorage.getItem("kura-community-onboarding-transaction.v1"),
       ),
     )
     .toContain("wss://bee-lab.communities.kura.oute.pro");
@@ -1318,7 +1318,7 @@ test("hosted community address line stays within the card for a long name", asyn
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1379,7 +1379,7 @@ test("first-community reports a created community without a relay address", asyn
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1420,7 +1420,7 @@ test("first-community X cancels a pending sign-in", async ({ page }) => {
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1456,7 +1456,7 @@ test("first-community owner can replace a mismatched account identity", async ({
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1505,7 +1505,7 @@ test("first-community explains when the local identity belongs to another accoun
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1547,7 +1547,7 @@ test("back clears Builderlab auth before returning to first-community choices", 
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1580,7 +1580,7 @@ test("first-community shows the scenario cards for localhost", async ({
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1631,12 +1631,12 @@ test("first-community shows the scenario cards for localhost", async ({
   await expect(
     page
       .getByTestId("welcome-setup")
-      .locator(".buzz-onboarding-transition-line"),
+      .locator(".kura-onboarding-transition-line"),
   ).toHaveAttribute("data-onboarding-direction", "forward");
   await expect(
     page
       .getByTestId("welcome-setup")
-      .locator(".buzz-onboarding-transition-line"),
+      .locator(".kura-onboarding-transition-line"),
   ).toHaveAttribute("data-onboarding-effect", "line-slide");
   const joinBack = page.getByTestId("welcome-join-back");
   await expect(joinBack).toBeVisible();
@@ -1644,7 +1644,7 @@ test("first-community shows the scenario cards for localhost", async ({
   await expect(
     page
       .getByTestId("welcome-setup")
-      .locator(".buzz-onboarding-transition-line"),
+      .locator(".kura-onboarding-transition-line"),
   ).toHaveAttribute("data-onboarding-direction", "backward");
 
   await page.getByTestId("welcome-setup-back").click();
@@ -1664,7 +1664,7 @@ test("first-community direct join reaches profile", async ({ page }) => {
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1689,7 +1689,7 @@ test("first-community direct join reaches profile", async ({ page }) => {
   await expect
     .poll(() =>
       page.evaluate((transactionStorageKey) => {
-        const communitiesRaw = window.localStorage.getItem("buzz-communities");
+        const communitiesRaw = window.localStorage.getItem("kura-communities");
         const transactionRaw = window.localStorage.getItem(
           transactionStorageKey,
         );
@@ -1717,7 +1717,7 @@ test("community onboarding reuses an existing relay profile", async ({
   await page.addInitScript(
     ({ pubkey, transactionStorageKey }) => {
       window.localStorage.setItem(
-        `buzz-machine-onboarding-complete.v2:${pubkey}`,
+        `kura-machine-onboarding-complete.v2:${pubkey}`,
         "true",
       );
       const timestamp = new Date().toISOString();
@@ -1768,7 +1768,7 @@ test("community onboarding reuses an existing relay profile", async ({
   await expect(
     page
       .getByTestId("community-onboarding-flow")
-      .locator(".buzz-onboarding-transition-line"),
+      .locator(".kura-onboarding-transition-line"),
   ).toHaveAttribute("data-onboarding-direction", "forward");
   await expect(
     page.getByRole("heading", { name: "Build your profile" }),
@@ -1780,7 +1780,7 @@ test("community onboarding reuses an existing relay profile", async ({
   await expect(
     page
       .getByTestId("community-onboarding-flow")
-      .locator(".buzz-onboarding-transition-line"),
+      .locator(".kura-onboarding-transition-line"),
   ).toHaveAttribute("data-onboarding-direction", "backward");
 });
 
@@ -1790,7 +1790,7 @@ test("first-community direct join cancel returns to request access", async ({
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await page.addInitScript((pubkey) => {
     window.localStorage.setItem(
-      `buzz-machine-onboarding-complete.v2:${pubkey}`,
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
       "true",
     );
   }, BLANK_TYLER_IDENTITY.pubkey);
@@ -1822,7 +1822,7 @@ test("first-community direct join cancel returns to request access", async ({
     .poll(() =>
       page.evaluate(
         (storageKey) => ({
-          communities: window.localStorage.getItem("buzz-communities"),
+          communities: window.localStorage.getItem("kura-communities"),
           transaction: window.localStorage.getItem(storageKey),
         }),
         COMMUNITY_ONBOARDING_TRANSACTION_STORAGE_KEY,
@@ -1838,12 +1838,12 @@ test("canceling a join to an existing inactive community preserves it", async ({
   await page.addInitScript(
     ({ pubkey, relayUrl }) => {
       window.localStorage.setItem(
-        `buzz-machine-onboarding-complete.v2:${pubkey}`,
+        `kura-machine-onboarding-complete.v2:${pubkey}`,
         "true",
       );
       const timestamp = new Date().toISOString();
       window.localStorage.setItem(
-        "buzz-communities",
+        "kura-communities",
         JSON.stringify([
           {
             id: "active-community",
@@ -1860,7 +1860,7 @@ test("canceling a join to an existing inactive community preserves it", async ({
         ]),
       );
       window.localStorage.setItem(
-        "buzz-active-community-id",
+        "kura-active-community-id",
         "active-community",
       );
     },
@@ -1903,7 +1903,7 @@ test("canceling a join to an existing inactive community preserves it", async ({
   await expect
     .poll(() =>
       page.evaluate(() => {
-        const raw = window.localStorage.getItem("buzz-communities");
+        const raw = window.localStorage.getItem("kura-communities");
         return raw
           ? (JSON.parse(raw) as Array<{ id: string }>).map(({ id }) => id)
           : [];
@@ -1919,7 +1919,7 @@ test("connected first-community profile keeps Back bottom-left and balances the 
   await page.addInitScript(
     ({ pubkey, transactionStorageKey }) => {
       window.localStorage.setItem(
-        `buzz-machine-onboarding-complete.v2:${pubkey}`,
+        `kura-machine-onboarding-complete.v2:${pubkey}`,
         "true",
       );
       const timestamp = new Date().toISOString();
@@ -2248,7 +2248,7 @@ test("connected first-community profile keeps Back bottom-left and balances the 
   await page.getByRole("tab", { name: "Emoji" }).click();
   await selectFirstEmojiFromPicker(page);
   const liveEmoji = page.getByTestId("community-avatar-live-preview-emoji");
-  await expect(liveEmoji).toHaveClass(/buzz-avatar-squish/);
+  await expect(liveEmoji).toHaveClass(/kura-avatar-squish/);
   await expect(
     page.getByTestId("community-avatar-live-preview-panel"),
   ).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
@@ -2806,7 +2806,7 @@ test("membership denial on community profile save offers recovery", async ({
   await page.addInitScript(
     ({ pubkey, transactionStorageKey }) => {
       window.localStorage.setItem(
-        `buzz-machine-onboarding-complete.v2:${pubkey}`,
+        `kura-machine-onboarding-complete.v2:${pubkey}`,
         "true",
       );
       const timestamp = new Date().toISOString();
@@ -2935,7 +2935,7 @@ test("no-event profile cached then reloaded still sees onboarding", async ({
   // Seed a stale v1 cache entry WITHOUT hasProfileEvent (simulating a cache
   // written by the old code path or a no-event fallback). updatedAt > 0 so
   // the seed is eligible, but hasProfileEvent is absent → conservative false.
-  const SELF_PROFILE_CACHE_KEY = `buzz-self-profile.v1:ws://localhost:3000:${TEST_IDENTITIES.tyler.pubkey}`;
+  const SELF_PROFILE_CACHE_KEY = `kura-self-profile.v1:ws://localhost:3000:${TEST_IDENTITIES.tyler.pubkey}`;
   await page.addInitScript(
     ({ key, cache }) => {
       window.localStorage.setItem(key, JSON.stringify(cache));
@@ -3646,7 +3646,7 @@ test("same-relay identity replacement rebuilds the community boundary (A→B→A
   // flush polling exceed the default budget.
   test.slow();
   const GENERAL_CHANNEL_ID = "9a1657ac-f7aa-5db0-b632-d8bbeb6dfb50";
-  const DRAFT_STORE_KEY_PREFIX = "buzz-drafts.v2";
+  const DRAFT_STORE_KEY_PREFIX = "kura-drafts.v2";
   // Mirrors the bridge's DEFAULT_RELAY_WS_URL and useDrafts'
   // canonicalizeRelayScope (scheme://host, no trailing slash).
   const relayScope = (process.env.KURA_E2E_RELAY_URL ?? "http://localhost:3000")
@@ -3955,7 +3955,7 @@ test("membership denied shows all four affordances and change-community edits no
   await expect
     .poll(() =>
       page.evaluate(() => {
-        const raw = window.localStorage.getItem("buzz-communities");
+        const raw = window.localStorage.getItem("kura-communities");
         const communities = raw
           ? (JSON.parse(raw) as Array<{ relayUrl?: string }>)
           : [];
@@ -4034,7 +4034,7 @@ test("denied on relay A then paste relay B invite URL switches community to B", 
 
   // Record the initial relay URL (relay A).
   const initialRelayUrl = await page.evaluate(() => {
-    const raw = window.localStorage.getItem("buzz-communities");
+    const raw = window.localStorage.getItem("kura-communities");
     const communities = raw
       ? (JSON.parse(raw) as Array<{ relayUrl?: string }>)
       : [];
@@ -4115,9 +4115,9 @@ test("denied on relay A then paste relay B invite URL switches community to B", 
   await expect
     .poll(() =>
       page.evaluate(() => {
-        const raw = window.localStorage.getItem("buzz-communities");
+        const raw = window.localStorage.getItem("kura-communities");
         const activeCommunityId = window.localStorage.getItem(
-          "buzz-active-community-id",
+          "kura-active-community-id",
         );
         const communities = raw
           ? (JSON.parse(raw) as Array<{ id?: string; relayUrl?: string }>)

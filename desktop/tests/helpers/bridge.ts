@@ -627,8 +627,8 @@ type BridgeOptions = {
 };
 
 const WELCOME_CHANNEL_ENSURED_STORAGE_KEY_PREFIX =
-  "buzz-welcome-channel-ensured.v2:";
-const ONBOARDING_COMPLETION_STORAGE_KEY_PREFIX = "buzz-onboarding-complete.v1:";
+  "kura-welcome-channel-ensured.v2:";
+const ONBOARDING_COMPLETION_STORAGE_KEY_PREFIX = "kura-onboarding-complete.v1:";
 const DEFAULT_MOCK_PUBKEY = "deadbeef".repeat(8);
 // The relay HTTP/WS URLs follow KURA_E2E_RELAY_URL (same env var seed.ts reads),
 // so a suite pointed at an isolated relay (e.g. the read-model harness on :3030)
@@ -658,14 +658,14 @@ export function createMockAgentMemoryListing(
 
 I prefer concise updates, explicit next steps, and visual polish before edge-case handling.
 
-See [[mem/preferences/ui-density]] and [[mem/projects/buzz-memory-viewer]] for details.
+See [[mem/preferences/ui-density]] and [[mem/projects/kura-memory-viewer]] for details.
 
 A retired launch checklist used to live at [[mem/archive/deleted-launch-checklist]], but that memory was deleted after the plan changed.`,
       eventId: "mock-core",
       createdAt: 1_700_000_000,
       outgoingRefs: [
         "mem/preferences/ui-density",
-        "mem/projects/buzz-memory-viewer",
+        "mem/projects/kura-memory-viewer",
         "mem/archive/deleted-launch-checklist",
       ],
     },
@@ -685,14 +685,14 @@ A retired launch checklist used to live at [[mem/archive/deleted-launch-checklis
         outgoingRefs: [],
       },
       {
-        slug: "mem/projects/buzz-memory-viewer",
-        body: "Building the IXI-7 read-only memory viewer in the profile panel.\n\nChild memory: [[mem/projects/buzz-memory-viewer/notes]]",
+        slug: "mem/projects/kura-memory-viewer",
+        body: "Building the IXI-7 read-only memory viewer in the profile panel.\n\nChild memory: [[mem/projects/kura-memory-viewer/notes]]",
         eventId: "mock-project",
         createdAt: 1_700_000_300,
-        outgoingRefs: ["mem/projects/buzz-memory-viewer/notes"],
+        outgoingRefs: ["mem/projects/kura-memory-viewer/notes"],
       },
       {
-        slug: "mem/projects/buzz-memory-viewer/notes",
+        slug: "mem/projects/kura-memory-viewer/notes",
         body: "Tree should auto-expand core. Everything else collapsed with a one-line preview.",
         eventId: "mock-project-notes",
         createdAt: 1_700_000_400,
@@ -815,14 +815,14 @@ async function seedDefaultCommunity(
         addedAt: new Date().toISOString(),
       };
       window.localStorage.setItem(
-        "buzz-communities",
+        "kura-communities",
         JSON.stringify([community]),
       );
-      window.localStorage.setItem("buzz-active-community-id", communityId);
+      window.localStorage.setItem("kura-active-community-id", communityId);
     },
     {
       fallback: fallbackPubkey,
-      identityOverrideKey: "buzz:e2e-identity-override.v1",
+      identityOverrideKey: "kura:e2e-identity-override.v1",
       relayUrl: relayWsUrl ?? DEFAULT_RELAY_WS_URL,
     },
   );

@@ -11,7 +11,7 @@ function makeTool(overrides = {}) {
     type: "tool",
     title: "Tool call",
     toolName: "shell",
-    buzzToolName: null,
+    kuraToolName: null,
     status: "completed",
     args: {},
     result: "",
@@ -27,7 +27,7 @@ test("buildCompactToolSummary formats Kura send_message preview", () => {
   const summary = buildCompactToolSummary(
     makeTool({
       toolName: "send_message",
-      buzzToolName: "send_message",
+      kuraToolName: "send_message",
       title: "Send Message",
       args: { content: "Hello team" },
     }),
@@ -39,13 +39,13 @@ test("buildCompactToolSummary formats Kura send_message preview", () => {
   assert.equal(summary.presentation, "message");
 });
 
-test("buildCompactToolSummary treats buzz messages send commands as messages", () => {
+test("buildCompactToolSummary treats kura messages send commands as messages", () => {
   const summary = buildCompactToolSummary(
     makeTool({
-      toolName: "buzz-dev-mcp__shell",
+      toolName: "kura-dev-mcp__shell",
       args: {
         command:
-          'buzz --format compact messages send --channel channel-1 --content "@Ned are you working"',
+          'kura --format compact messages send --channel channel-1 --content "@Ned are you working"',
       },
     }),
   );
@@ -62,7 +62,7 @@ test("buildCompactToolSummary returns null preview for piped stdin sends", () =>
       toolName: "shell",
       args: {
         command:
-          'echo "hello from stdin" | ./target/release/buzz messages send --channel channel-1 --content -',
+          'echo "hello from stdin" | ./target/release/kura messages send --channel channel-1 --content -',
       },
     }),
   );
@@ -75,7 +75,7 @@ test("buildCompactToolSummary returns null preview for piped stdin sends", () =>
 test("buildCompactToolSummary formats shell command preview", () => {
   const summary = buildCompactToolSummary(
     makeTool({
-      toolName: "buzz-dev-mcp__shell",
+      toolName: "kura-dev-mcp__shell",
       args: { command: "git status" },
     }),
   );
@@ -91,7 +91,7 @@ test("buildCompactToolSummary formats view_image thumbnail source", () => {
     "https://sprout-oss.stage.blox.sqprod.co/media/ffd1b2721f2d52e19f0ca2be9aa7842cdec5b4e0215aaab2a67c26a2a76a6a83.png";
   const summary = buildCompactToolSummary(
     makeTool({
-      toolName: "buzz-dev-mcp__view_image",
+      toolName: "kura-dev-mcp__view_image",
       args: { source },
     }),
   );
@@ -192,12 +192,12 @@ test("buildCompactToolSummary uses running and failed labels", () => {
   );
 });
 
-test("buildCompactToolSummary promotes non-send buzz CLI commands to relay ops", () => {
+test("buildCompactToolSummary promotes non-send kura CLI commands to relay ops", () => {
   const summary = buildCompactToolSummary(
     makeTool({
       toolName: "shell",
       args: {
-        command: "buzz channels get --channel channel-1",
+        command: "kura channels get --channel channel-1",
       },
     }),
   );
@@ -207,12 +207,12 @@ test("buildCompactToolSummary promotes non-send buzz CLI commands to relay ops",
   assert.equal(summary.preview, "channel-1");
   assert.deepEqual(summary.action, { verb: "Read", object: "channel-1" });
   assert.equal(summary.presentation, "inline");
-  assert.equal(summary.shellContent, "buzz channels get --channel channel-1");
+  assert.equal(summary.shellContent, "kura channels get --channel channel-1");
 });
 
-test("buildCompactToolSummary exposes shellContent for shell-sourced buzz CLI reads", () => {
+test("buildCompactToolSummary exposes shellContent for shell-sourced kura CLI reads", () => {
   const command =
-    "sleep 45; buzz messages thread --channel channel-uuid --event abc | tail -n 20";
+    "sleep 45; kura messages thread --channel channel-uuid --event abc | tail -n 20";
   const summary = buildCompactToolSummary(
     makeTool({
       toolName: "shell",
@@ -236,7 +236,7 @@ test("buildCompactToolSummary derives structured actions for native Kura MCP too
   const summary = buildCompactToolSummary(
     makeTool({
       toolName: "get_channel",
-      buzzToolName: "get_channel",
+      kuraToolName: "get_channel",
       args: {
         channel_id: "channel-1",
       },
