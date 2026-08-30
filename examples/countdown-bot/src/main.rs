@@ -82,32 +82,32 @@ struct Config {
 impl Config {
     fn from_env() -> Result<Self> {
         let relay_url =
-            std::env::var("BUZZ_RELAY_URL").unwrap_or_else(|_| DEFAULT_RELAY_URL.to_string());
-        let channel_id = required_env("BUZZ_CHANNEL_ID")?;
-        let bot_keys = Keys::parse(&required_env("BUZZ_BOT_PRIVATE_KEY")?)
-            .context("BUZZ_BOT_PRIVATE_KEY must be an nsec or hex private key")?;
+            std::env::var("KURA_RELAY_URL").unwrap_or_else(|_| DEFAULT_RELAY_URL.to_string());
+        let channel_id = required_env("KURA_CHANNEL_ID")?;
+        let bot_keys = Keys::parse(&required_env("KURA_BOT_PRIVATE_KEY")?)
+            .context("KURA_BOT_PRIVATE_KEY must be an nsec or hex private key")?;
 
         let auth_mode =
-            std::env::var("BUZZ_BOT_AUTH_MODE").unwrap_or_else(|_| "standalone".to_string());
+            std::env::var("KURA_BOT_AUTH_MODE").unwrap_or_else(|_| "standalone".to_string());
         let owner_auth_tag = match auth_mode.as_str() {
             "standalone" => None,
             "owner-attested" => {
-                let tag_json = match std::env::var("BUZZ_AUTH_TAG") {
+                let tag_json = match std::env::var("KURA_AUTH_TAG") {
                     Ok(value) if !value.trim().is_empty() => value,
                     _ => {
-                        let owner_keys = Keys::parse(&required_env("BUZZ_OWNER_PRIVATE_KEY")?)
-                            .context("BUZZ_OWNER_PRIVATE_KEY must be an nsec or hex private key")?;
-                        buzz_sdk::nip_oa::compute_auth_tag(&owner_keys, &bot_keys.public_key(), "")?
+                        let owner_keys = Keys::parse(&required_env("KURA_OWNER_PRIVATE_KEY")?)
+                            .context("KURA_OWNER_PRIVATE_KEY must be an nsec or hex private key")?;
+                        kura_sdk::nip_oa::compute_auth_tag(&owner_keys, &bot_keys.public_key(), "")?
                     }
                 };
 
-                let owner = buzz_sdk::nip_oa::verify_auth_tag(&tag_json, &bot_keys.public_key())
-                    .context("BUZZ_AUTH_TAG is not valid for BUZZ_BOT_PRIVATE_KEY")?;
+                let owner = kura_sdk::nip_oa::verify_auth_tag(&tag_json, &bot_keys.public_key())
+                    .context("KURA_AUTH_TAG is not valid for KURA_BOT_PRIVATE_KEY")?;
                 eprintln!("owner-attested auth tag verified; owner={}", owner.to_hex());
-                Some(buzz_sdk::nip_oa::parse_auth_tag(&tag_json)?)
+                Some(kura_sdk::nip_oa::parse_auth_tag(&tag_json)?)
             }
             other => {
-                bail!("BUZZ_BOT_AUTH_MODE must be 'standalone' or 'owner-attested', got {other:?}")
+                bail!("KURA_BOT_AUTH_MODE must be 'standalone' or 'owner-attested', got {other:?}")
             }
         };
 
@@ -153,7 +153,7 @@ fn build_auth_event(config: &Config, challenge: &str) -> Result<Event> {
 }
 
 async fn publish_profile(ws: &mut Ws, config: &Config) -> Result<()> {
-    let builder = buzz_sdk::builders::build_profile(
+    let builder = kura_sdk::builders::build_profile(
         Some(BOT_DISPLAY_NAME),
         Some(BOT_NAME),
         Some(BOT_ICON_DATA_URL),
@@ -233,7 +233,7 @@ async fn maybe_reply(
         return Ok(());
     };
 
-    let builder = buzz_sdk::builders::build_message(
+    let builder = kura_sdk::builders::build_message(
         config.channel_id.parse()?,
         &reply,
         None,

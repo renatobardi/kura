@@ -1,7 +1,7 @@
-# Default condition for the local benchmarks/buzz-dataset suite: one production
+# Default condition for the local benchmarks/kura-dataset suite: one production
 # Buzz agent on gpt-5.6-luna at reasoning effort `medium`.
 #
-# buzz-acp supplies crates/buzz-acp/src/base_prompt.md from the checked-out
+# kura-acp supplies crates/kura-acp/src/base_prompt.md from the checked-out
 # source build; the persona below only establishes that there is no team. The
 # suite scores Buzz product behavior (threading, mentions, exact membership),
 # and that behavior comes from the base prompt — so the cheap model at a
@@ -9,12 +9,12 @@
 # not a model finding.
 #
 # The endpoint name is the literal OpenAI model id: the runtime passes it to
-# the provider as BUZZ_AGENT_MODEL. Resolution to provider/key lives in
+# the provider as KURA_AGENT_MODEL. Resolution to provider/key lives in
 # testbed/endpoints/openai-live.json (OPENAI_COMPAT_API_KEY), which is
 # deployment config and deliberately outside this manifest — pass it with
 # `--endpoint-config`, since the default is anthropic-live.json.
 schema_version: "1"
-condition: buzz-native-solo-luna-medium
+condition: kura-native-solo-luna-medium
 roster:
   - id: solo
     kind: orchestrator
@@ -23,7 +23,7 @@ roster:
     endpoint: gpt-5.6-luna
     model_revision: gpt-5.6-luna
     prompt:
-      path: personas/buzz-native-solo.md
+      path: personas/kura-native-solo.md
       sha256: 972950f0e2bfb9bf540c98e70e075479ab80cd596cb5ad405dad0cafdc60840b
     generation:
       max_output_tokens: 4096

@@ -11,7 +11,7 @@
 
 const HARNESS_DESCRIPTIONS: Record<string, string> = {
   // Built-in runtimes.
-  "buzz-agent": "Kura's built-in agent runtime, bundled with the app.",
+  "kura-agent": "Kura's built-in agent runtime, bundled with the app.",
   // Source: https://code.claude.com/docs/en/overview — "Claude Code is an
   // agentic coding tool" that lives in the terminal.
   claude: "Anthropic's agentic coding tool that runs in the terminal.",

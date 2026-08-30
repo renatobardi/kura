@@ -14,11 +14,11 @@ import type { AcpRuntimeCatalogEntry } from "@/shared/api/types";
 import {
   BuzzAgentModelTuningFields,
   NumericTuningFields,
-} from "./buzzAgentModelTuningFields";
+} from "./kuraAgentModelTuningFields";
 import {
-  isBuzzAgentRuntime,
-  BUZZ_AGENT_THINKING_EFFORT,
-} from "./buzzAgentConfig";
+  isKuraAgentRuntime,
+  KURA_AGENT_THINKING_EFFORT,
+} from "./kuraAgentConfig";
 import {
   EDIT_AGENT_PARALLELISM_HELP,
   parallelismCapHint,
@@ -73,7 +73,7 @@ export function EditAgentAdvancedFields({
   model?: string;
   /**
    * The actual/prospective runtime id used to decide whether to show the
-   * buzz-agent effort-tuning field. Uses `prospectiveRuntimeId` from
+   * kura-agent effort-tuning field. Uses `prospectiveRuntimeId` from
    * EditAgentDialog — the resolved runtime, not the "inherit"/"custom" sentinel.
    */
   modelTuningRuntimeId: string;
@@ -123,8 +123,8 @@ export function EditAgentAdvancedFields({
   const effectiveHiddenKeys = React.useMemo(
     () => [
       ...hiddenEnvKeys,
-      ...(isBuzzAgentRuntime(modelTuningRuntimeId)
-        ? [BUZZ_AGENT_THINKING_EFFORT]
+      ...(isKuraAgentRuntime(modelTuningRuntimeId)
+        ? [KURA_AGENT_THINKING_EFFORT]
         : []),
       ...structuredEnvKeys(numericDescriptors),
     ],
@@ -358,8 +358,8 @@ export function EditAgentAdvancedFields({
         />
       ) : null}
 
-      {/* Effort-tuning knob — only shown for buzz-agent. */}
-      {isBuzzAgentRuntime(modelTuningRuntimeId) ? (
+      {/* Effort-tuning knob — only shown for kura-agent. */}
+      {isKuraAgentRuntime(modelTuningRuntimeId) ? (
         <BuzzAgentModelTuningFields
           envVars={envVars}
           inheritedEnvVars={inheritedEnvVars}

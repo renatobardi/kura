@@ -39,8 +39,8 @@ If you are on **Ubuntu 22.04 LTS or Debian 12**, upgrade to the latest **`.deb`/
 **Workaround (before upgrading):** Add a fontconfig override that removes color-format fonts from Kura's view:
 
 ```bash
-mkdir -p ~/.config/buzz-fontconfig
-cat > ~/.config/buzz-fontconfig/fonts.conf <<'XML'
+mkdir -p ~/.config/kura-fontconfig
+cat > ~/.config/kura-fontconfig/fonts.conf <<'XML'
 <?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
 <fontconfig>
@@ -54,7 +54,7 @@ cat > ~/.config/buzz-fontconfig/fonts.conf <<'XML'
   </selectfont>
 </fontconfig>
 XML
-FONTCONFIG_FILE=~/.config/buzz-fontconfig/fonts.conf ./Buzz_*.AppImage
+FONTCONFIG_FILE=~/.config/kura-fontconfig/fonts.conf ./Buzz_*.AppImage
 ```
 
 **Native packages (`deb`/`rpm`):** The COLRv1 crash ([#2548](https://github.com/block/buzz/issues/2548), [#2982](https://github.com/block/buzz/issues/2982)) is AppImage-only — native packages use the system WebKit, which has a consistent FreeType ABI, and are not affected.
@@ -78,7 +78,7 @@ FONTCONFIG_FILE=~/.config/buzz-fontconfig/fonts.conf ./Buzz_*.AppImage
 ```bash
 ./Buzz_*.AppImage --safe-rendering
 # or for a native install:
-buzz-desktop --safe-rendering
+kura-desktop --safe-rendering
 ```
 
 `--safe-rendering` is a per-launch flag — it is not remembered between runs. If it fixes your issue, you can make it permanent by setting the env vars yourself:
@@ -106,7 +106,7 @@ export WEBKIT_DMABUF_RENDERER_FORCE_SHM=1
 export WEBKIT_SKIA_ENABLE_CPU_RENDERING=1
 ./Buzz_*.AppImage
 # or for native:
-buzz-desktop
+kura-desktop
 ```
 
 - `WEBKIT_SKIA_ENABLE_CPU_RENDERING=1` forces Skia to use CPU rendering, bypassing the RDNA4 Skia/radv paint failure.
@@ -123,7 +123,7 @@ If none of the above match your situation:
 
 1. Run Kura from a terminal and capture the output:
    ```bash
-   ./Buzz_*.AppImage 2>&1 | tee buzz-crash.log
+   ./Buzz_*.AppImage 2>&1 | tee kura-crash.log
    ```
 
 2. Check for a core dump:

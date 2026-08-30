@@ -163,14 +163,14 @@ test("classifyTool promotes buzz CLI shell commands to relay operations", () => 
     title: "Shell",
     toolName: "dev__shell",
     buzzToolName: null,
-    args: { command: "buzz channels get --channel buzz-agent-observability" },
+    args: { command: "buzz channels get --channel kura-agent-observability" },
     result: "{}",
     isError: false,
   });
 
   assert.equal(descriptor.renderClass, "relay-op");
   assert.equal(descriptor.label, "Channels Get");
-  assert.equal(descriptor.preview, "buzz-agent-observability");
+  assert.equal(descriptor.preview, "kura-agent-observability");
   assert.equal(descriptor.groupKey, "buzz-cli:channels.get");
 });
 

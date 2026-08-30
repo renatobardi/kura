@@ -33,10 +33,10 @@ class BuzzOrchestraAgent(BaseAgent):
         provisioner_config: str | Path | dict[str, Any] | None = None,
         artifact_root: str | Path | None = None,
         endpoint_config: str | Path | dict[str, Any] | None = None,
-        buzz_acp_binary: str = "buzz-acp",
-        buzz_agent_binary: str = "buzz-agent",
-        buzz_dev_mcp_binary: str = "buzz-dev-mcp",
-        buzz_cli_binary: str = "buzz",
+        buzz_acp_binary: str = "kura-acp",
+        buzz_agent_binary: str = "kura-agent",
+        buzz_dev_mcp_binary: str = "kura-dev-mcp",
+        buzz_cli_binary: str = "kura",
         relay_gateway: str = "",
         forwarder_binary: str = "relay-forwarder",
         run_id: str | None = None,
@@ -62,7 +62,7 @@ class BuzzOrchestraAgent(BaseAgent):
 
     @staticmethod
     def name() -> str:
-        return "buzz-orchestra"
+        return "kura-orchestra"
 
     def version(self) -> str:
         return "0.1.0"

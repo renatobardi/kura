@@ -144,17 +144,17 @@ async def test_cli_runtime_construction_from_json(tmp_path, manifest_data):
         manifest=manifest_data,
         artifact_root=tmp_path,
         endpoint_config=endpoint_path,
-        buzz_acp_binary="/pinned/buzz-acp",
-        buzz_agent_binary="/pinned/buzz-agent",
-        buzz_dev_mcp_binary="/pinned/buzz-dev-mcp",
-        buzz_cli_binary="/pinned/buzz",
+        buzz_acp_binary="/pinned/kura-acp",
+        buzz_agent_binary="/pinned/kura-agent",
+        buzz_dev_mcp_binary="/pinned/kura-dev-mcp",
+        buzz_cli_binary="/pinned/kura",
     )
     assert agent.runtime.artifact_root == tmp_path
     assert agent.runtime.endpoints["frontier/rev"].provider == "anthropic"
-    assert agent.runtime.buzz_acp_binary == "/pinned/buzz-acp"
-    assert agent.runtime.buzz_agent_binary == "/pinned/buzz-agent"
-    assert agent.runtime.buzz_dev_mcp_binary == "/pinned/buzz-dev-mcp"
-    assert agent.runtime.buzz_cli_binary == "/pinned/buzz"
+    assert agent.runtime.buzz_acp_binary == "/pinned/kura-acp"
+    assert agent.runtime.buzz_agent_binary == "/pinned/kura-agent"
+    assert agent.runtime.buzz_dev_mcp_binary == "/pinned/kura-dev-mcp"
+    assert agent.runtime.buzz_cli_binary == "/pinned/kura"
 
 
 async def test_cli_construction_requires_complete_pairs(tmp_path, manifest_data):

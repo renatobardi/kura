@@ -95,9 +95,9 @@ test.describe("project conversation load failure", () => {
           () =>
             typeof (
               window as typeof window & {
-                __BUZZ_E2E_EMIT_MOCK_MESSAGE__?: unknown;
+                __KURA_E2E_EMIT_MOCK_MESSAGE__?: unknown;
               }
-            ).__BUZZ_E2E_EMIT_MOCK_MESSAGE__ === "function",
+            ).__KURA_E2E_EMIT_MOCK_MESSAGE__ === "function",
         ),
       )
       .toBe(true);
@@ -106,7 +106,7 @@ test.describe("project conversation load failure", () => {
         const now = Math.floor(Date.now() / 1000);
         const emit = (
           window as typeof window & {
-            __BUZZ_E2E_EMIT_MOCK_MESSAGE__: (input: {
+            __KURA_E2E_EMIT_MOCK_MESSAGE__: (input: {
               channelName: string;
               content: string;
               parentEventId?: string;
@@ -114,7 +114,7 @@ test.describe("project conversation load failure", () => {
               createdAt?: number;
             }) => { id: string };
           }
-        ).__BUZZ_E2E_EMIT_MOCK_MESSAGE__;
+        ).__KURA_E2E_EMIT_MOCK_MESSAGE__;
         const root = emit({
           channelName: "general",
           content: rootContent,

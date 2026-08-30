@@ -7,7 +7,7 @@ Buzz-native tasks use their ``evaluation_layer`` metadata: regression runs
 default to 1 attempt and workflow runs default to 3. The script owns
 everything around the run:
 
-- A dedicated ``buzz-benchmark`` compose project reusing the production
+- A dedicated ``kura-benchmark`` compose project reusing the production
   bundle (``deploy/compose/compose.yml``) plus the benchmark port overlay,
   on its own ports (relay :3600, Postgres :5633, metrics :9602) so it never
   collides with a dev stack. Secrets and identities are generated once into
@@ -20,8 +20,8 @@ everything around the run:
 
 Run inside the testbed environment (the just recipe does this):
 
-    uv run --project benchmarks/harbor-buzz-orchestra/testbed \
-        benchmarks/harbor-buzz-orchestra/scripts/benchmark.py [--gui] [...]
+    uv run --project benchmarks/harbor-kura-orchestra/testbed \
+        benchmarks/harbor-kura-orchestra/scripts/benchmark.py [--gui] [...]
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ PACKAGE_ROOT = Path(__file__).resolve().parent.parent
 REPO_ROOT = PACKAGE_ROOT.parents[1]
 STATE_DIR = PACKAGE_ROOT / ".benchmark"
 
-COMPOSE_PROJECT = "buzz-benchmark"
+COMPOSE_PROJECT = "kura-benchmark"
 COMPOSE_FILES = (
     REPO_ROOT / "deploy" / "compose" / "compose.yml",
     PACKAGE_ROOT / "testbed" / "compose.benchmark.yml",
@@ -53,11 +53,11 @@ COMPOSE_FILES = (
 RELAY_HTTP_PORT = 3600
 PG_HOST_PORT = 5633
 METRICS_HOST_PORT = 9602
-GUI_BUNDLE_IDENTIFIER = "xyz.block.buzz.app.benchmark"
+GUI_BUNDLE_IDENTIFIER = "xyz.block.kura.app.benchmark"
 
 DEFAULT_DATASET = "terminal-bench/terminal-bench-2-1"
 DEFAULT_ATTEMPTS = 5
-BUZZ_DATASET_ROOT = REPO_ROOT / "benchmarks" / "buzz-dataset"
+KURA_DATASET_ROOT = REPO_ROOT / "benchmarks" / "kura-dataset"
 EVALUATION_LAYERS = ("regression", "workflow")
 LAYER_DEFAULT_ATTEMPTS = {"regression": 1, "workflow": 3}
 DEFAULT_MANIFEST = PACKAGE_ROOT / "manifests" / "tb-cobol-sonnet-haiku.yaml"
@@ -67,7 +67,7 @@ SCHEMA_SQL = PACKAGE_ROOT / "testbed" / "sql" / "benchmark_schema.sql"
 # Linux builds of the production agent stack, uploaded into each task
 # container per trial. Built once in a rust:alpine container (musl → fully
 # static, runs on any Linux task image of the same architecture) and cached.
-AGENT_BINARIES = ("buzz-acp", "buzz-agent", "buzz-dev-mcp")
+AGENT_BINARIES = ("kura-acp", "kura-agent", "kura-dev-mcp")
 # Std-only loopback forwarder (not a workspace crate): agents dial the
 # relay's canonical localhost address inside the task container and the
 # forwarder bridges to the Docker host gateway. Compiled with plain rustc
@@ -206,7 +206,7 @@ def buzz_tasks_for_path(path: Path | None) -> tuple[BuzzTask, ...] | None:
     """Return validated Buzz tasks, or ``None`` for an unrelated problem set."""
     if path is None:
         return None
-    root = BUZZ_DATASET_ROOT.resolve()
+    root = KURA_DATASET_ROOT.resolve()
     selected_path = path.resolve()
     if not selected_path.is_relative_to(root):
         return None
@@ -283,7 +283,7 @@ def plan_benchmark_runs(
     tasks = buzz_tasks_for_path(args.path)
     if args.layer and tasks is None:
         raise SystemExit(
-            "--layer is only valid with --path under benchmarks/buzz-dataset"
+            "--layer is only valid with --path under benchmarks/kura-dataset"
         )
     if tasks is None:
         return (
@@ -383,31 +383,31 @@ def write_env_file(state: dict[str, str]) -> Path:
     """Compose interpolation env — regenerated from state on every run."""
     env_path = STATE_DIR / ".env"
     lines = {
-        "BUZZ_IMAGE": os.environ.get("BUZZ_IMAGE", "ghcr.io/block/buzz:main"),
-        "BUZZ_DOMAIN": "localhost",
+        "KURA_IMAGE": os.environ.get("KURA_IMAGE", "ghcr.io/block/kura:main"),
+        "KURA_DOMAIN": "localhost",
         "RELAY_URL": f"ws://localhost:{RELAY_HTTP_PORT}",
-        "BUZZ_MEDIA_BASE_URL": f"http://localhost:{RELAY_HTTP_PORT}/media",
-        "BUZZ_MEDIA_SERVER_DOMAIN": "localhost",
-        "BUZZ_CORS_ORIGINS": f"http://localhost:{RELAY_HTTP_PORT}",
-        "BUZZ_REQUIRE_AUTH_TOKEN": "true",
-        "BUZZ_REQUIRE_RELAY_MEMBERSHIP": "true",
-        "BUZZ_ALLOW_NIP_OA_AUTH": "true",
-        "BUZZ_AUTO_MIGRATE": "true",
-        "BUZZ_GIT_CONFORMANCE_PROBE": "true",
+        "KURA_MEDIA_BASE_URL": f"http://localhost:{RELAY_HTTP_PORT}/media",
+        "KURA_MEDIA_SERVER_DOMAIN": "localhost",
+        "KURA_CORS_ORIGINS": f"http://localhost:{RELAY_HTTP_PORT}",
+        "KURA_REQUIRE_AUTH_TOKEN": "true",
+        "KURA_REQUIRE_RELAY_MEMBERSHIP": "true",
+        "KURA_ALLOW_NIP_OA_AUTH": "true",
+        "KURA_AUTO_MIGRATE": "true",
+        "KURA_GIT_CONFORMANCE_PROBE": "true",
         "RUST_LOG": "buzz_relay=info,buzz_db=info,buzz_auth=info",
         "RELAY_OWNER_PUBKEY": state["owner_pubkey"],
-        "BUZZ_RELAY_PRIVATE_KEY": state["relay_private_key"],
-        "BUZZ_GIT_HOOK_HMAC_SECRET": state["git_hook_hmac_secret"],
-        "POSTGRES_DB": "buzz",
-        "POSTGRES_USER": "buzz",
+        "KURA_RELAY_PRIVATE_KEY": state["relay_private_key"],
+        "KURA_GIT_HOOK_HMAC_SECRET": state["git_hook_hmac_secret"],
+        "POSTGRES_DB": "kura",
+        "POSTGRES_USER": "kura",
         "POSTGRES_PASSWORD": state["postgres_password"],
         "REDIS_PASSWORD": state["redis_password"],
-        "BUZZ_S3_ACCESS_KEY": state["s3_access_key"],
-        "BUZZ_S3_SECRET_KEY": state["s3_secret_key"],
-        "BUZZ_S3_BUCKET": "buzz-media",
-        "BUZZ_HTTP_PORT": str(RELAY_HTTP_PORT),
-        "BUZZ_PG_HOST_PORT": str(PG_HOST_PORT),
-        "BUZZ_METRICS_HOST_PORT": str(METRICS_HOST_PORT),
+        "KURA_S3_ACCESS_KEY": state["s3_access_key"],
+        "KURA_S3_SECRET_KEY": state["s3_secret_key"],
+        "KURA_S3_BUCKET": "kura-media",
+        "KURA_HTTP_PORT": str(RELAY_HTTP_PORT),
+        "KURA_PG_HOST_PORT": str(PG_HOST_PORT),
+        "KURA_METRICS_HOST_PORT": str(METRICS_HOST_PORT),
     }
     env_path.touch(mode=0o600)
     env_path.write_text("".join(f"{k}={v}\n" for k, v in lines.items()))
@@ -416,7 +416,7 @@ def write_env_file(state: dict[str, str]) -> Path:
 
 def postgres_dsn(state: dict[str, str]) -> str:
     return (
-        f"postgresql://buzz:{state['postgres_password']}@127.0.0.1:{PG_HOST_PORT}/buzz"
+        f"postgresql://kura:{state['postgres_password']}@127.0.0.1:{PG_HOST_PORT}/kura"
     )
 
 
@@ -538,18 +538,18 @@ def ensure_stack(state: dict[str, str]) -> None:
     raise SystemExit(f"benchmark schema apply failed: {last_error}")
 
 
-# -- buzz binaries -----------------------------------------------------------
+# -- kura binaries -----------------------------------------------------------
 
 
 def ensure_binaries() -> dict[str, Path]:
-    """Find the host buzz CLI, building it once if missing."""
+    """Find the host kura CLI, building it once if missing."""
     try:
         return run_leaderboard.find_binaries(None)
     except SystemExit:
-        print("host buzz CLI missing — building (cargo build, first run only)...")
+        print("host kura CLI missing — building (cargo build, first run only)...")
     cargo = REPO_ROOT / "bin" / "cargo"
     subprocess.run(
-        [str(cargo), "build", "-p", "buzz-cli"],
+        [str(cargo), "build", "-p", "kura-cli"],
         cwd=REPO_ROOT,
         check=True,
     )
@@ -577,7 +577,7 @@ def ensure_agent_binaries() -> Path:
     """Cross-build the static Linux agent stack once, cached in .benchmark/.
 
     The agents run *inside* each Harbor task container as the real
-    buzz-acp → buzz-agent → buzz-dev-mcp stack, so the binaries must be
+    kura-acp → kura-agent → kura-dev-mcp stack, so the binaries must be
     Linux ELF for the task image architecture. musl-static means they run
     on any Linux base image (glibc or not). The relay loopback forwarder
     is compiled in the same step with plain rustc (std-only, no deps).
@@ -635,7 +635,7 @@ def launch_gui(state: dict[str, str]) -> subprocess.Popen:
     """Open the Buzz desktop app logged in as the benchmark user.
 
     The relay runs closed (membership required), so the user pubkey is first
-    added to the relay membership list via buzz-admin inside the container —
+    added to the relay membership list via kura-admin inside the container —
     NIP-OA auth tags cover the agents, but the GUI authenticates as a plain
     member, exactly like a human.
     """
@@ -644,7 +644,7 @@ def launch_gui(state: dict[str, str]) -> subprocess.Popen:
             "exec",
             "-T",
             "relay",
-            "buzz-admin",
+            "kura-admin",
             "add-member",
             "--pubkey",
             state["user_pubkey"],
@@ -670,17 +670,17 @@ def launch_gui(state: dict[str, str]) -> subprocess.Popen:
     sidecar_dir.mkdir(parents=True, exist_ok=True)
     binaries = ensure_binaries()
     for name in (
-        "buzz-acp",
-        "buzz-agent",
-        "buzz-dev-mcp",
+        "kura-acp",
+        "kura-agent",
+        "kura-dev-mcp",
         "git-credential-nostr",
-        "buzz",
+        "kura",
     ):
         stub = sidecar_dir / f"{name}-{triple}"
         if not stub.exists():
             stub.touch()
-    real_cli = sidecar_dir / f"buzz-{triple}"
-    real_cli.write_bytes(binaries["buzz"].read_bytes())
+    real_cli = sidecar_dir / f"kura-{triple}"
+    real_cli.write_bytes(binaries["kura"].read_bytes())
     real_cli.chmod(0o755)
 
     print(
@@ -689,7 +689,7 @@ def launch_gui(state: dict[str, str]) -> subprocess.Popen:
     )
     # Distinct bundle identifier: the desktop app persists workspaces (incl.
     # their relay URLs) in per-identifier WebKit localStorage, and a stored
-    # workspace's relay URL overrides BUZZ_RELAY_URL by design. Reusing the
+    # workspace's relay URL overrides KURA_RELAY_URL by design. Reusing the
     # default identifier means any past local-dev session's ws://localhost:3000
     # workspace silently shadows the benchmark relay. An identifier of our own
     # keeps that state isolated both ways.
@@ -701,8 +701,8 @@ def launch_gui(state: dict[str, str]) -> subprocess.Popen:
         cwd=desktop_dir,
         env={
             **os.environ,
-            "BUZZ_RELAY_URL": f"ws://localhost:{RELAY_HTTP_PORT}",
-            "BUZZ_PRIVATE_KEY": state["user_secret_key"],
+            "KURA_RELAY_URL": f"ws://localhost:{RELAY_HTTP_PORT}",
+            "KURA_PRIVATE_KEY": state["user_secret_key"],
         },
     )
 
@@ -736,11 +736,11 @@ def leaderboard_argv(
         # The relay as reachable from inside a task container: Docker's
         # host alias, bridged to the canonical localhost address by the
         # uploaded forwarder. Override the alias with
-        # BUZZ_BENCHMARK_DOCKER_HOST if your engine exposes the host
+        # KURA_BENCHMARK_DOCKER_HOST if your engine exposes the host
         # differently.
         "--relay-gateway",
         (
-            f"{os.environ.get('BUZZ_BENCHMARK_DOCKER_HOST', 'host.docker.internal')}"
+            f"{os.environ.get('KURA_BENCHMARK_DOCKER_HOST', 'host.docker.internal')}"
             f":{RELAY_HTTP_PORT}"
         ),
         "--n-concurrent",

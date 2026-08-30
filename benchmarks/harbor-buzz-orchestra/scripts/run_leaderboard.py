@@ -10,14 +10,14 @@ exact upload/submit commands.
 Run inside the testbed environment so ``harbor`` and the adapter are
 importable:
 
-    uv run --project benchmarks/harbor-buzz-orchestra/testbed \
-        benchmarks/harbor-buzz-orchestra/scripts/run_leaderboard.py \
+    uv run --project benchmarks/harbor-kura-orchestra/testbed \
+        benchmarks/harbor-kura-orchestra/scripts/run_leaderboard.py \
         --dataset terminal-bench/terminal-bench-2-1 \
         --attempts 5 \
-        --manifest benchmarks/harbor-buzz-orchestra/manifests/<TEAM>.yaml \
-        --endpoint-config benchmarks/harbor-buzz-orchestra/testbed/endpoints/<ENDPOINTS>.json \
+        --manifest benchmarks/harbor-kura-orchestra/manifests/<TEAM>.yaml \
+        --endpoint-config benchmarks/harbor-kura-orchestra/testbed/endpoints/<ENDPOINTS>.json \
         --provisioner-config <PROVISIONER.json> \
-        --agent-bin-dir <DIR with Linux buzz-acp/buzz-agent/buzz-dev-mcp>
+        --agent-bin-dir <DIR with Linux kura-acp/kura-agent/kura-dev-mcp>
 """
 
 from __future__ import annotations
@@ -36,10 +36,10 @@ PACKAGE_ROOT = Path(__file__).resolve().parent.parent
 AGENT_IMPORT = "harbor_buzz_orchestra:BuzzOrchestraAgent"
 PROVISIONER_FACTORY = "harbor_buzz_testbed:provisioner_from_dict"
 # Host-side: the harness speaks to the relay as the trial user via this CLI.
-BINARIES = ("buzz",)
+BINARIES = ("kura",)
 # Container-side: the production stack uploaded into each task container.
 # These must be Linux builds matching the task image architecture.
-AGENT_BINARIES = ("buzz-acp", "buzz-agent", "buzz-dev-mcp")
+AGENT_BINARIES = ("kura-acp", "kura-agent", "kura-dev-mcp")
 # Uploaded alongside the stack when --relay-gateway is set: bridges the
 # agents' canonical relay address to the host gateway (the relay is
 # host-header tenant-bound, so agents must present its canonical Host).
@@ -103,16 +103,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="JSON config for the Buzz relay/Postgres provisioner",
     )
     parser.add_argument(
-        "--buzz-bin-dir",
+        "--kura-bin-dir",
         type=Path,
         default=None,
-        help="Directory with the host buzz CLI (default: repo target/release, then target/debug)",
+        help="Directory with the host kura CLI (default: repo target/release, then target/debug)",
     )
     parser.add_argument(
         "--agent-bin-dir",
         type=Path,
         required=True,
-        help="Directory with Linux builds of buzz-acp/buzz-agent/buzz-dev-mcp "
+        help="Directory with Linux builds of kura-acp/kura-agent/kura-dev-mcp "
         "to upload into each task container",
     )
     parser.add_argument(
@@ -157,8 +157,8 @@ def find_binaries(bin_dir: Path | None) -> dict[str, Path]:
             return found
     searched = ", ".join(str(c) for c in candidates)
     raise SystemExit(
-        f"buzz binaries not found (need {', '.join(BINARIES)}; searched {searched}). "
-        "Build them with `cargo build` or pass --buzz-bin-dir."
+        f"kura binaries not found (need {', '.join(BINARIES)}; searched {searched}). "
+        "Build them with `cargo build` or pass --kura-bin-dir."
     )
 
 
@@ -214,10 +214,10 @@ def build_command(
         "provisioner_config": args.provisioner_config,
         "artifact_root": PACKAGE_ROOT,
         "endpoint_config": args.endpoint_config,
-        "buzz_acp_binary": agent_binaries["buzz-acp"],
-        "buzz_agent_binary": agent_binaries["buzz-agent"],
-        "buzz_dev_mcp_binary": agent_binaries["buzz-dev-mcp"],
-        "buzz_cli_binary": binaries["buzz"],
+        "buzz_acp_binary": agent_binaries["kura-acp"],
+        "buzz_agent_binary": agent_binaries["kura-agent"],
+        "buzz_dev_mcp_binary": agent_binaries["kura-dev-mcp"],
+        "buzz_cli_binary": binaries["kura"],
         "run_id": args.job_name,
     }
     if args.relay_gateway:
@@ -250,7 +250,7 @@ def write_metadata_template(args: argparse.Namespace, job_dir: Path) -> Path:
             }
         )
     metadata = {
-        "agent_url": "https://github.com/block/buzz",
+        "agent_url": "https://github.com/block/kura",
         "agent_display_name": f"Buzz Orchestra ({manifest.get('condition', 'team')})",
         "agent_org_display_name": "Block",
         "models": models,

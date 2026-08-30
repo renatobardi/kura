@@ -1623,7 +1623,7 @@ test("glass background keeps the content panel solid", async ({ page }) => {
   await expect
     .poll(() =>
       page.evaluate(() =>
-        (window.__BUZZ_E2E_COMMAND_LOG__ ?? []).some(
+        (window.__KURA_E2E_COMMAND_LOG__ ?? []).some(
           (entry) =>
             entry.command === "set_window_vibrancy" &&
             (entry.payload as { enabled?: boolean } | undefined)?.enabled ===
@@ -1695,7 +1695,7 @@ test("glass background is unavailable on Linux", async ({ page }) => {
   await expect
     .poll(() =>
       page.evaluate(() =>
-        (window.__BUZZ_E2E_COMMAND_LOG__ ?? []).some(
+        (window.__KURA_E2E_COMMAND_LOG__ ?? []).some(
           (entry) => entry.command === "set_window_vibrancy",
         ),
       ),

@@ -673,7 +673,7 @@ wheels = [
 ]
 
 [[package]]
-name = "harbor-buzz-orchestra"
+name = "harbor-kura-orchestra"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

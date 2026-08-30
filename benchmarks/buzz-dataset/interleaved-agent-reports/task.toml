@@ -1,10 +1,10 @@
 schema_version = "1.3"
 
 [task]
-name = "buzz-native/interleaved-agent-reports"
+name = "kura-native/interleaved-agent-reports"
 description = "Aggregate multiple agent reports delivered together without losing an input or waking reporters again."
 authors = [{ name = "Buzz" }]
-keywords = ["buzz-native", "agents", "batching", "synthesis"]
+keywords = ["kura-native", "agents", "batching", "synthesis"]
 
 [metadata]
 evaluation_layer = "workflow"

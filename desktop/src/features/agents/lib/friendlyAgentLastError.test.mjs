@@ -28,8 +28,8 @@ test("buzz-acp wrapped auth failure → denied copy", () => {
   });
 });
 
-test("unwrapped buzz-agent prefix → denied copy", () => {
-  // buzz-agent's AgentError::LlmAuth Display is "llm auth: <body>"; if the
+test("unwrapped kura-agent prefix → denied copy", () => {
+  // kura-agent's AgentError::LlmAuth Display is "llm auth: <body>"; if the
   // desktop ever picks that up directly (no AcpError wrapper), we should
   // still recognize it as denial.
   const result = friendlyAgentLastError("llm auth: 403 forbidden");

@@ -72,14 +72,14 @@ test("model discovery status stays quiet for missing Databricks defaults", () =>
 test("Databricks sign-in-required is a muted note pointing at the picker and CLI", () => {
   const status = formatModelDiscoveryErrorStatus(
     new Error(
-      "Databricks sign-in is required; save this agent, then open its model picker to sign in, or run `buzz-agent auth databricks`",
+      "Databricks sign-in is required; save this agent, then open its model picker to sign in, or run `kura-agent auth databricks`",
     ),
     "databricks_v2",
   );
 
   assert.equal(status?.tone, "muted");
   assert.match(status?.message ?? "", /model picker/);
-  assert.match(status?.message ?? "", /buzz-agent auth databricks/);
+  assert.match(status?.message ?? "", /kura-agent auth databricks/);
 });
 
 test("Databricks sign-in failure warns and points at the explicit retry", () => {
@@ -96,14 +96,14 @@ test("Databricks sign-in failure warns and points at the explicit retry", () => 
 test("Databricks sign-in timeout warns and points at the explicit retry", () => {
   const status = formatModelDiscoveryErrorStatus(
     new Error(
-      "Databricks sign-in timed out; open the model picker to retry, or run `buzz-agent auth databricks`",
+      "Databricks sign-in timed out; open the model picker to retry, or run `kura-agent auth databricks`",
     ),
     "databricks_v2",
   );
 
   assert.equal(status?.tone, "warning");
   assert.match(status?.message ?? "", /didn't complete/);
-  assert.match(status?.message ?? "", /buzz-agent auth databricks/);
+  assert.match(status?.message ?? "", /kura-agent auth databricks/);
 });
 
 test("other Databricks discovery failures fall through to the generic notice", () => {

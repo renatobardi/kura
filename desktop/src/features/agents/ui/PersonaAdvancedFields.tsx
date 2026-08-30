@@ -9,9 +9,9 @@ import {
 } from "./RespondToField";
 import type { PersonaBehaviorDraft } from "./personaBehaviorDraft";
 import {
-  isBuzzAgentRuntime,
-  BUZZ_AGENT_THINKING_EFFORT,
-} from "./buzzAgentConfig";
+  isKuraAgentRuntime,
+  KURA_AGENT_THINKING_EFFORT,
+} from "./kuraAgentConfig";
 import {
   AGENT_PARALLELISM_HELP,
   AGENT_PARALLELISM_PLACEHOLDER,
@@ -20,7 +20,7 @@ import {
 import {
   BuzzAgentModelTuningFields,
   NumericTuningFields,
-} from "./buzzAgentModelTuningFields";
+} from "./kuraAgentModelTuningFields";
 import {
   CARD_MINT_KEY_ANNOTATIONS,
   PERSONA_FIELD_CONTROL_CLASS,
@@ -63,7 +63,7 @@ export function PersonaAdvancedFields({
   inheritedEnvVars?: EnvVarsValue;
   /** Active LLM model — forwarded to BuzzAgentModelTuningFields for effort filtering. */
   model?: string;
-  /** Runtime id for the buzz-agent effort-tuning knob visibility gate. */
+  /** Runtime id for the kura-agent effort-tuning knob visibility gate. */
   modelTuningRuntimeId?: string;
   namePoolText: string;
   onBehaviorDraftChange: (value: PersonaBehaviorDraft) => void;
@@ -108,8 +108,8 @@ export function PersonaAdvancedFields({
   const effectiveHiddenKeys = React.useMemo(
     () => [
       ...hiddenEnvKeys,
-      ...(isBuzzAgentRuntime(modelTuningRuntimeId)
-        ? [BUZZ_AGENT_THINKING_EFFORT]
+      ...(isKuraAgentRuntime(modelTuningRuntimeId)
+        ? [KURA_AGENT_THINKING_EFFORT]
         : []),
       ...structuredEnvKeys(numericDescriptors),
     ],
@@ -265,8 +265,8 @@ export function PersonaAdvancedFields({
         />
       ) : null}
 
-      {/* Effort-tuning knob — only shown for buzz-agent. */}
-      {isBuzzAgentRuntime(modelTuningRuntimeId) ? (
+      {/* Effort-tuning knob — only shown for kura-agent. */}
+      {isKuraAgentRuntime(modelTuningRuntimeId) ? (
         <BuzzAgentModelTuningFields
           envVars={envVars}
           inheritedEnvVars={inheritedEnvVars}

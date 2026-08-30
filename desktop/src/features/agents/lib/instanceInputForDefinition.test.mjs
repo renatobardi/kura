@@ -41,11 +41,11 @@ const claudeRuntime = {
   mcpCommand: null,
 };
 
-const buzzAgentRuntime = {
+const kuraAgentRuntime = {
   ...gooseRuntime,
-  id: "buzz-agent",
+  id: "kura-agent",
   label: "Kura Agent",
-  command: "buzz-agent-cmd",
+  command: "kura-agent-cmd",
   mcpCommand: null,
 };
 
@@ -184,13 +184,13 @@ test("no backend intent is byte-identical to the pre-intent mapping", async () =
 test("Kura shared compute definition carries native provider and auto model", async () => {
   const input = await buildInstanceInputForDefinition(
     persona({
-      runtime: "buzz-agent",
+      runtime: "kura-agent",
       provider: "relay-mesh",
       model: "auto",
     }),
-    { ...gooseRuntime, id: "buzz-agent", command: "buzz-agent" },
+    { ...gooseRuntime, id: "kura-agent", command: "kura-agent" },
   );
-  assert.equal(input.agentCommand, "buzz-agent");
+  assert.equal(input.agentCommand, "kura-agent");
   assert.equal(input.provider, "relay-mesh");
   assert.equal(input.model, "auto");
   assert.equal(input.spawnAfterCreate, true);
@@ -298,22 +298,22 @@ test("row 6: unfetched query refetches instead of resolving empty", async () => 
   );
 });
 
-// ── item-13 regression: buzz-agent-first default runtime ─────────────────────
+// ── item-13 regression: kura-agent-first default runtime ─────────────────────
 //
 // Before this fix, resolveStartRuntimeForDefinition used runtimes[0] (catalog
-// order: goose, claude, codex, buzz-agent), so an installed goose would beat
-// the bundled buzz-agent sidecar as the default for runtime-less personas.
-// The fix applies the preference order: buzz-agent → goose → first available.
+// order: goose, claude, codex, kura-agent), so an installed goose would beat
+// the bundled kura-agent sidecar as the default for runtime-less personas.
+// The fix applies the preference order: kura-agent → goose → first available.
 
-test("item-13: goose+buzz-agent both available — persona with no runtime resolves buzz-agent", () => {
+test("item-13: goose+kura-agent both available — persona with no runtime resolves kura-agent", () => {
   const { runtime, warnings } = resolveStartRuntimeForDefinition(
     persona({ runtime: undefined }),
-    [gooseRuntime, claudeRuntime, buzzAgentRuntime],
+    [gooseRuntime, claudeRuntime, kuraAgentRuntime],
   );
   assert.equal(
     runtime.id,
-    "buzz-agent",
-    "buzz-agent must win over catalog-first goose for runtime-less personas",
+    "kura-agent",
+    "kura-agent must win over catalog-first goose for runtime-less personas",
   );
   assert.deepEqual(warnings, []);
 });

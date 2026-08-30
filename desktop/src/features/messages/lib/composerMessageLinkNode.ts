@@ -34,9 +34,9 @@ export type ComposerMessageLinkAttributes = {
   href: string;
 };
 
-const BARE_BUZZ_LINK_AT_START =
+const BARE_KURA_LINK_AT_START =
   /^kura:\/\/(?:message\?|channel\/|(?:pr|issue|repo|project)\?)[^\s<>"')\]}*]+/i;
-const BUZZ_LINK_SUFFIX_AT_START =
+const KURA_LINK_SUFFIX_AT_START =
   /^:\/\/(?:message\?|channel\/|(?:pr|issue|repo|project)\?)[^\s<>"')\]}*]+/i;
 const TRAILING_PUNCTUATION = /[.,;:!?]+$/;
 
@@ -303,8 +303,8 @@ export function registerComposerMessageLinkMarkdownIt(
   // biome-ignore lint/suspicious/noExplicitAny: markdown-it state/silent
   const rule = (state: any, silent: boolean): boolean => {
     const remaining = state.src.slice(state.pos);
-    const fullMatch = BARE_BUZZ_LINK_AT_START.exec(remaining);
-    const suffixMatch = BUZZ_LINK_SUFFIX_AT_START.exec(remaining);
+    const fullMatch = BARE_KURA_LINK_AT_START.exec(remaining);
+    const suffixMatch = KURA_LINK_SUFFIX_AT_START.exec(remaining);
     const resumesTextToken =
       !fullMatch && suffixMatch && /kura$/i.test(state.pending ?? "");
     const rawHref =

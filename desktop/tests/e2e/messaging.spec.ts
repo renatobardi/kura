@@ -462,19 +462,19 @@ test("markdown tables overflow wide content and fill the message when narrow", a
   await page.getByTestId("channel-general").click();
   await expect(page.getByTestId("chat-title")).toHaveText("general");
   await page.waitForFunction(
-    () => typeof window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__ === "function",
+    () => typeof window.__KURA_E2E_EMIT_MOCK_MESSAGE__ === "function",
   );
 
   const longCell = "WIDE TABLE COLUMN VALUE ".repeat(8);
   await page.evaluate(
     ({ wide, narrow }) => {
       const createdAt = Math.floor(Date.now() / 1000);
-      window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__?.({
+      window.__KURA_E2E_EMIT_MOCK_MESSAGE__?.({
         channelName: "general",
         content: wide,
         createdAt,
       });
-      window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__?.({
+      window.__KURA_E2E_EMIT_MOCK_MESSAGE__?.({
         channelName: "general",
         content: narrow,
         createdAt: createdAt + 1,
@@ -551,7 +551,7 @@ test("sent link preview media uses the authenticated proxy in compact and rich c
   await expect(compactFavicon).toHaveAttribute("src", fallbackMediaPattern);
 
   const releasedPort = await page.evaluate(() =>
-    window.__BUZZ_E2E_RELEASE_MEDIA_PROXY__?.(),
+    window.__KURA_E2E_RELEASE_MEDIA_PROXY__?.(),
   );
   expect(releasedPort).toBe(54321);
   await expect(compactThumbnail).toHaveAttribute("src", proxyMediaPattern);
@@ -606,20 +606,20 @@ test("link preview style defaults to compact and Rich unfurls descriptions", asy
     .locator("[data-composer-link-previews]")
     .locator('[data-link-preview="github-pull-request"]');
   await expect(composerPreview).toHaveAttribute("data-image-state", "pending");
-  if (process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR) {
+  if (process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR) {
     await waitForAnimations(page);
     await page.screenshot({
       animations: "disabled",
-      path: `${process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR}/compact-composer-loading.png`,
+      path: `${process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR}/compact-composer-loading.png`,
     });
   }
   await waitForReadyComposerSnapshots(page);
   await expect(composerPreview).toHaveAttribute("data-image-state", "none");
-  if (process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR) {
+  if (process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR) {
     await waitForAnimations(page);
     await page.screenshot({
       animations: "disabled",
-      path: `${process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR}/compact-composer-ready.png`,
+      path: `${process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR}/compact-composer-ready.png`,
     });
   }
   await page.getByTestId("send-message").click();
@@ -630,11 +630,11 @@ test("link preview style defaults to compact and Rich unfurls descriptions", asy
   );
   await expect(compactPreview).toHaveCSS("border-top-left-radius", "0px");
   await expect(compactPreview).toHaveCSS("border-left-width", "3px");
-  if (process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR) {
+  if (process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR) {
     await waitForAnimations(page);
     await page.screenshot({
       animations: "disabled",
-      path: `${process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR}/recipient-compact.png`,
+      path: `${process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR}/recipient-compact.png`,
     });
   }
 
@@ -664,11 +664,11 @@ test("link preview style defaults to compact and Rich unfurls descriptions", asy
   const richHostname = richPreview.locator("[data-link-preview-hostname]");
   await expect(richHostname).toHaveText("github.com");
   await expect(richHostname).toHaveAttribute("href", previewUrl);
-  if (process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR) {
+  if (process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR) {
     await waitForAnimations(page);
     await page.screenshot({
       animations: "disabled",
-      path: `${process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR}/recipient-rich.png`,
+      path: `${process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR}/recipient-rich.png`,
     });
     const richComposerUrl = `${previewUrl}&composer=rich`;
     await page.getByTestId("message-input").fill(richComposerUrl);
@@ -682,7 +682,7 @@ test("link preview style defaults to compact and Rich unfurls descriptions", asy
     await waitForAnimations(page);
     await page.screenshot({
       animations: "disabled",
-      path: `${process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR}/rich-composer-loading.png`,
+      path: `${process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR}/rich-composer-loading.png`,
     });
     await waitForReadyComposerSnapshots(page);
     await expect(richComposerPreview).toHaveAttribute(
@@ -692,7 +692,7 @@ test("link preview style defaults to compact and Rich unfurls descriptions", asy
     await waitForAnimations(page);
     await page.screenshot({
       animations: "disabled",
-      path: `${process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR}/rich-composer-ready.png`,
+      path: `${process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR}/rich-composer-ready.png`,
     });
     await page.getByTestId("message-input").fill("");
   }
@@ -735,7 +735,7 @@ for (const [pasteShape, wrapUrl] of [
       );
       return {
         elapsedMs: performance.now() - startedAt,
-        resolverStarted: (window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? []).some(
+        resolverStarted: (window.__KURA_E2E_COMMAND_PAYLOADS__ ?? []).some(
           (entry) => entry.command === "fetch_link_preview_metadata",
         ),
         text: element.textContent,
@@ -784,7 +784,7 @@ test("display-text link preview produces and sends its preview", async ({
   ).toHaveAttribute("href", previewUrl);
   await expect(row.locator("[data-link-preview]")).toBeVisible();
   const linkPreviewTags = await page.evaluate(() => {
-    const call = [...(window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? [])]
+    const call = [...(window.__KURA_E2E_COMMAND_PAYLOADS__ ?? [])]
       .reverse()
       .find((entry) => entry.command === "send_channel_message");
     return (
@@ -865,7 +865,7 @@ test("completed link previews normalize a trailing-fragment URL and still send",
   await expect(page.getByTestId("message-input")).toHaveText("");
 
   const calls = await page.evaluate(() =>
-    (window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? []).filter(
+    (window.__KURA_E2E_COMMAND_PAYLOADS__ ?? []).filter(
       (entry) => entry.command === "send_channel_message",
     ),
   );
@@ -962,7 +962,7 @@ test("explicit cancellation suppresses a pending link preview and sends without 
   await expect(row.locator("[data-link-preview]")).toHaveCount(0);
 
   const linkPreviewTags = await page.evaluate(() => {
-    const call = [...(window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? [])]
+    const call = [...(window.__KURA_E2E_COMMAND_PAYLOADS__ ?? [])]
       .reverse()
       .find((entry) => entry.command === "send_channel_message");
     return (
@@ -993,7 +993,7 @@ test("Enter during an in-flight snapshot upload hands off and sends once", async
 
   const sendsDuringUpload = await page.evaluate(
     () =>
-      (window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? []).filter(
+      (window.__KURA_E2E_COMMAND_PAYLOADS__ ?? []).filter(
         (entry) => entry.command === "send_channel_message",
       ).length,
   );
@@ -1005,7 +1005,7 @@ test("Enter during an in-flight snapshot upload hands off and sends once", async
   await expect(progress).toHaveCount(0);
   const sends = await page.evaluate(
     () =>
-      (window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? []).filter(
+      (window.__KURA_E2E_COMMAND_PAYLOADS__ ?? []).filter(
         (entry) => entry.command === "send_channel_message",
       ).length,
   );
@@ -1057,7 +1057,7 @@ test("async upload beyond metadata budget retains preview image", async ({
     "image",
   );
   const tags = await page.evaluate(() => {
-    const call = [...(window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? [])]
+    const call = [...(window.__KURA_E2E_COMMAND_PAYLOADS__ ?? [])]
       .reverse()
       .find((entry) => entry.command === "send_channel_message");
     return (call?.payload as { linkPreviewTags?: string[][] }).linkPreviewTags;
@@ -1088,7 +1088,7 @@ test("Skip wins the upload race and sends without preview", async ({
   await expect(row.locator("[data-link-preview]")).toHaveCount(0);
   await page.waitForTimeout(1_500);
   const calls = await page.evaluate(() =>
-    (window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? []).filter(
+    (window.__KURA_E2E_COMMAND_PAYLOADS__ ?? []).filter(
       (entry) => entry.command === "send_channel_message",
     ),
   );
@@ -1115,7 +1115,7 @@ test("promoted link preview send clears Sending after REST publication", async (
   await expect(row).not.toContainText("Sending…");
 
   const restCalls = await page.evaluate(() =>
-    (window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? []).filter(
+    (window.__KURA_E2E_COMMAND_PAYLOADS__ ?? []).filter(
       (entry) => entry.command === "send_channel_message",
     ),
   );
@@ -1143,10 +1143,10 @@ test("settled-empty promoted link preview send uses REST and clears Sending afte
   await expect(row.locator("[data-link-preview]")).toHaveCount(0);
 
   const result = await page.evaluate(() => ({
-    restCalls: (window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? []).filter(
+    restCalls: (window.__KURA_E2E_COMMAND_PAYLOADS__ ?? []).filter(
       (entry) => entry.command === "send_channel_message",
     ),
-    websocketSends: (window.__BUZZ_E2E_SIGNED_EVENTS__ ?? []).filter(
+    websocketSends: (window.__KURA_E2E_SIGNED_EVENTS__ ?? []).filter(
       (event) => event.kind === 9,
     ),
   }));
@@ -1223,7 +1223,7 @@ test("draft auto-send promotes link preview preparation and sends exactly once",
     .poll(async () =>
       page.evaluate(
         () =>
-          (window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? []).filter(
+          (window.__KURA_E2E_COMMAND_PAYLOADS__ ?? []).filter(
             (entry) => entry.command === "send_channel_message",
           ).length,
       ),
@@ -1231,7 +1231,7 @@ test("draft auto-send promotes link preview preparation and sends exactly once",
     .toBe(1);
 
   const linkPreviewTags = await page.evaluate(() => {
-    const call = [...(window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? [])]
+    const call = [...(window.__KURA_E2E_COMMAND_PAYLOADS__ ?? [])]
       .reverse()
       .find((entry) => entry.command === "send_channel_message");
     return (
@@ -1270,7 +1270,7 @@ test("rapid Enter presses on a ready link preview send exactly once", async ({
     .poll(async () =>
       page.evaluate(
         () =>
-          (window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? []).filter(
+          (window.__KURA_E2E_COMMAND_PAYLOADS__ ?? []).filter(
             (entry) => entry.command === "send_channel_message",
           ).length,
       ),
@@ -1295,7 +1295,7 @@ test("pasting a link and immediately pressing Enter prepares it after submit", a
   await expect(row).toContainText(previewUrl);
   await expect(row.locator("[data-link-preview]")).toBeVisible();
   const calls = await page.evaluate(() =>
-    (window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? []).filter(
+    (window.__KURA_E2E_COMMAND_PAYLOADS__ ?? []).filter(
       (entry) => entry.command === "send_channel_message",
     ),
   );
@@ -1316,7 +1316,7 @@ test("a snapshot media upload failure preserves a metadata-only preview", async 
   await expect(row).toContainText(previewUrl);
   await expect(row.locator("[data-link-preview]")).toBeVisible();
   const tags = await page.evaluate(() => {
-    const call = [...(window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? [])]
+    const call = [...(window.__KURA_E2E_COMMAND_PAYLOADS__ ?? [])]
       .reverse()
       .find((entry) => entry.command === "send_channel_message");
     return (call?.payload as { linkPreviewTags?: string[][] }).linkPreviewTags;
@@ -1357,7 +1357,7 @@ test("editing a message excludes link previews entirely", async ({ page }) => {
   // No snapshot upload was attempted for the edited link.
   const uploadedPreviewMedia = await page.evaluate(
     () =>
-      (window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? []).filter(
+      (window.__KURA_E2E_COMMAND_PAYLOADS__ ?? []).filter(
         (entry) =>
           entry.command === "upload_media_bytes" &&
           typeof (entry.payload as { filename?: string })?.filename ===
@@ -1394,7 +1394,7 @@ test("hiding composer link previews suppresses the whole draft and emits the bla
   await expect(row).toContainText(secondUrl);
   await expect(row.locator("[data-link-preview]")).toHaveCount(0);
   const linkPreviewTags = await page.evaluate(() => {
-    const call = [...(window.__BUZZ_E2E_COMMAND_PAYLOADS__ ?? [])]
+    const call = [...(window.__KURA_E2E_COMMAND_PAYLOADS__ ?? [])]
       .reverse()
       .find((entry) => entry.command === "send_channel_message");
     return (
@@ -1434,11 +1434,11 @@ test("composer link preview embeds stay attachment-sized while loading and ready
         .querySelector("[data-link-preview-thumbnail]")
         ?.getBoundingClientRect().width,
     }));
-    if (process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR) {
+    if (process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR) {
       await waitForAnimations(page);
       await page.screenshot({
         animations: "disabled",
-        path: `${process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR}/composer-${width}-loading.png`,
+        path: `${process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR}/composer-${width}-loading.png`,
       });
     }
 
@@ -1456,11 +1456,11 @@ test("composer link preview embeds stay attachment-sized while loading and ready
         .querySelector("[data-link-preview-thumbnail]")
         ?.getBoundingClientRect().width,
     }));
-    if (process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR) {
+    if (process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR) {
       await waitForAnimations(page);
       await page.screenshot({
         animations: "disabled",
-        path: `${process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR}/composer-${width}-ready.png`,
+        path: `${process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR}/composer-${width}-ready.png`,
       });
     }
 
@@ -1512,11 +1512,11 @@ test("compact link preview image geometry truncates long titles to one line", as
     )
     .toBeGreaterThan(1);
 
-  if (process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR) {
+  if (process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR) {
     await waitForAnimations(page);
     await row.screenshot({
       animations: "disabled",
-      path: `${process.env.BUZZ_LINK_PREVIEW_SCREENSHOTS_DIR}/recipient-compact-long-title.png`,
+      path: `${process.env.KURA_LINK_PREVIEW_SCREENSHOTS_DIR}/recipient-compact-long-title.png`,
     });
   }
 });
@@ -1999,12 +1999,12 @@ test("relay GIF search selects content-only media and reports the share", async 
         return Boolean(
           (
             window as Window & {
-              __BUZZ_E2E_SIGNED_EVENTS__?: Array<{
+              __KURA_E2E_SIGNED_EVENTS__?: Array<{
                 content?: string;
                 kind?: number;
               }>;
             }
-          ).__BUZZ_E2E_SIGNED_EVENTS__?.some(
+          ).__KURA_E2E_SIGNED_EVENTS__?.some(
             (event) => event.kind === 9 && event.content?.includes(expectedUrl),
           ),
         );
@@ -2014,13 +2014,13 @@ test("relay GIF search selects content-only media and reports the share", async 
   const matchingEvent = await page.evaluate((expectedUrl) => {
     return (
       window as Window & {
-        __BUZZ_E2E_SIGNED_EVENTS__?: Array<{
+        __KURA_E2E_SIGNED_EVENTS__?: Array<{
           content?: string;
           kind?: number;
           tags?: string[][];
         }>;
       }
-    ).__BUZZ_E2E_SIGNED_EVENTS__?.find(
+    ).__KURA_E2E_SIGNED_EVENTS__?.find(
       (event) => event.kind === 9 && event.content?.includes(expectedUrl),
     );
   }, gifUrl);
@@ -2422,12 +2422,12 @@ test("send message to DM channel p-tags the recipient", async ({ page }) => {
       page.evaluate((content) => {
         const events = (
           window as Window & {
-            __BUZZ_E2E_SIGNED_EVENTS__?: Array<{
+            __KURA_E2E_SIGNED_EVENTS__?: Array<{
               content: string;
               tags: string[][];
             }>;
           }
-        ).__BUZZ_E2E_SIGNED_EVENTS__;
+        ).__KURA_E2E_SIGNED_EVENTS__;
         return events?.find((event) => event.content === content)?.tags ?? [];
       }, message),
     )
@@ -2486,8 +2486,8 @@ test("sends a thread message to its parent channel with a root-thread link", asy
   await expect(page.getByTestId("chat-title")).toHaveText("general");
   await page.waitForFunction(
     () =>
-      typeof window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__ === "function" &&
-      (window.__BUZZ_E2E_HAS_MOCK_LIVE_SUBSCRIPTION__?.({
+      typeof window.__KURA_E2E_EMIT_MOCK_MESSAGE__ === "function" &&
+      (window.__KURA_E2E_HAS_MOCK_LIVE_SUBSCRIPTION__?.({
         channelName: "general",
       }) ??
         false),
@@ -2495,7 +2495,7 @@ test("sends a thread message to its parent channel with a root-thread link", asy
 
   const { ownReplyId, rootId } = await page.evaluate(
     ({ alicePubkey, ownReply, root, semanticTags }) => {
-      const emit = window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__;
+      const emit = window.__KURA_E2E_EMIT_MOCK_MESSAGE__;
       if (!emit) throw new Error("Mock message emitter is unavailable.");
       const rootEvent = emit({
         channelName: "general",
@@ -2581,7 +2581,7 @@ test("sends a thread message to its parent channel with a root-thread link", asy
     .poll(() =>
       page.evaluate((content) => {
         return Boolean(
-          (window.__BUZZ_E2E_COMMAND_LOG__ ?? []).findLast(
+          (window.__KURA_E2E_COMMAND_LOG__ ?? []).findLast(
             (entry) =>
               entry.command === "send_channel_message" &&
               (entry.payload as { content?: string } | undefined)?.content ===
@@ -2593,7 +2593,7 @@ test("sends a thread message to its parent channel with a root-thread link", asy
     .toBe(true);
   const sentPayload = await page.evaluate(
     (content) =>
-      (window.__BUZZ_E2E_COMMAND_LOG__ ?? []).findLast(
+      (window.__KURA_E2E_COMMAND_LOG__ ?? []).findLast(
         (entry) =>
           entry.command === "send_channel_message" &&
           (entry.payload as { content?: string } | undefined)?.content ===
@@ -2967,7 +2967,7 @@ test("opens a single-level thread panel with inline expansion", async ({
 
   await page.evaluate(
     ({ content, parentEventId, pubkey }) => {
-      window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__?.({
+      window.__KURA_E2E_EMIT_MOCK_MESSAGE__?.({
         channelName: "general",
         content,
         parentEventId,
@@ -3243,12 +3243,12 @@ test("thread refetch preserves a live reply and reaction received in flight", as
   const replyId = await page.evaluate(
     async ({ channelId, content, parentEventId }) => {
       const bridgeWindow = window as Window & {
-        __BUZZ_E2E_INVOKE_MOCK_COMMAND__?: (
+        __KURA_E2E_INVOKE_MOCK_COMMAND__?: (
           command: string,
           payload?: Record<string, unknown>,
         ) => Promise<unknown>;
       };
-      const invoke = bridgeWindow.__BUZZ_E2E_INVOKE_MOCK_COMMAND__;
+      const invoke = bridgeWindow.__KURA_E2E_INVOKE_MOCK_COMMAND__;
       if (!invoke) throw new Error("Mock Tauri invoke bridge is unavailable.");
       const sent = (await invoke("send_channel_message", {
         channelId,
@@ -3400,11 +3400,11 @@ test("editing a pre-seeded thread reply uses and focuses the thread composer", a
 
   await page.goto("/");
   await page.waitForFunction(
-    () => typeof window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__ === "function",
+    () => typeof window.__KURA_E2E_EMIT_MOCK_MESSAGE__ === "function",
   );
   const { replyId, rootId } = await page.evaluate(
     ({ replyContent, rootContent }) => {
-      const emit = window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__;
+      const emit = window.__KURA_E2E_EMIT_MOCK_MESSAGE__;
       if (!emit) throw new Error("Mock message emitter is unavailable.");
       const rootEvent = emit({
         channelName: "general",
@@ -3451,11 +3451,11 @@ test("thread composer switches directly between visible reply edits", async ({
 
   await page.goto("/");
   await page.waitForFunction(
-    () => typeof window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__ === "function",
+    () => typeof window.__KURA_E2E_EMIT_MOCK_MESSAGE__ === "function",
   );
   const { firstId, rootId, secondId } = await page.evaluate(
     ({ firstContent, rootContent, secondContent }) => {
-      const emit = window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__;
+      const emit = window.__KURA_E2E_EMIT_MOCK_MESSAGE__;
       if (!emit) throw new Error("Mock message emitter is unavailable.");
       const rootEvent = emit({
         channelName: "general",
@@ -3513,10 +3513,10 @@ test("editing a broadcast reply from a thread returns to the main composer", asy
 }) => {
   await page.goto("/");
   await page.waitForFunction(
-    () => typeof window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__ === "function",
+    () => typeof window.__KURA_E2E_EMIT_MOCK_MESSAGE__ === "function",
   );
   const { broadcastId, rootId } = await page.evaluate(() => {
-    const emit = window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__;
+    const emit = window.__KURA_E2E_EMIT_MOCK_MESSAGE__;
     if (!emit) throw new Error("Mock message emitter is unavailable.");
     const rootEvent = emit({
       channelName: "general",
@@ -4075,11 +4075,11 @@ test("a refused sent-from-thread link preserves the edit and retries after cance
 
   await page.goto("/");
   await page.waitForFunction(
-    () => typeof window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__ === "function",
+    () => typeof window.__KURA_E2E_EMIT_MOCK_MESSAGE__ === "function",
   );
   const { destinationRootId, sourceRootId } = await page.evaluate(
     ({ destinationRoot, sharedMessage, sourceReply, sourceRoot }) => {
-      const emit = window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__;
+      const emit = window.__KURA_E2E_EMIT_MOCK_MESSAGE__;
       if (!emit) throw new Error("Mock message emitter is unavailable.");
       const destination = emit({
         channelName: "general",
@@ -4154,11 +4154,11 @@ test("a refused search result preserves the edit and retries after cancel", asyn
 
   await page.goto("/");
   await page.waitForFunction(
-    () => typeof window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__ === "function",
+    () => typeof window.__KURA_E2E_EMIT_MOCK_MESSAGE__ === "function",
   );
   const { destinationRootId, sourceRootId } = await page.evaluate(
     ({ destinationRoot, sourceReply, sourceRoot }) => {
-      const emit = window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__;
+      const emit = window.__KURA_E2E_EMIT_MOCK_MESSAGE__;
       if (!emit) throw new Error("Mock message emitter is unavailable.");
       const destination = emit({
         channelName: "general",
@@ -4231,11 +4231,11 @@ test("a refused forum search result preserves the edit and retries after cancel"
 
   await page.goto("/");
   await page.waitForFunction(
-    () => typeof window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__ === "function",
+    () => typeof window.__KURA_E2E_EMIT_MOCK_MESSAGE__ === "function",
   );
   const sourceRootId = await page.evaluate(
     ({ sourceReply, sourceRoot }) => {
-      const emit = window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__;
+      const emit = window.__KURA_E2E_EMIT_MOCK_MESSAGE__;
       if (!emit) throw new Error("Mock message emitter is unavailable.");
       const source = emit({ channelName: "general", content: sourceRoot });
       emit({
@@ -4312,11 +4312,11 @@ for (const targetKind of ["reply", "root"] as const) {
 
     await page.goto("/");
     await page.waitForFunction(
-      () => typeof window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__ === "function",
+      () => typeof window.__KURA_E2E_EMIT_MOCK_MESSAGE__ === "function",
     );
     const { sourceReplyId, sourceRootId } = await page.evaluate(
       ({ sourceReply, sourceRoot, targetKind }) => {
-        const emit = window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__;
+        const emit = window.__KURA_E2E_EMIT_MOCK_MESSAGE__;
         if (!emit) throw new Error("Mock message emitter is unavailable.");
         const root = emit({ channelName: "general", content: sourceRoot });
         const reply = emit({
@@ -4358,7 +4358,7 @@ for (const targetKind of ["reply", "root"] as const) {
     }));
     const sendsBefore = await page.evaluate(
       () =>
-        (window.__BUZZ_E2E_COMMAND_LOG__ ?? []).filter(
+        (window.__KURA_E2E_COMMAND_LOG__ ?? []).filter(
           (entry) => entry.command === "send_channel_message",
         ).length,
     );
@@ -4380,7 +4380,7 @@ for (const targetKind of ["reply", "root"] as const) {
     expect(
       await page.evaluate(
         () =>
-          (window.__BUZZ_E2E_COMMAND_LOG__ ?? []).filter(
+          (window.__KURA_E2E_COMMAND_LOG__ ?? []).filter(
             (entry) => entry.command === "send_channel_message",
           ).length,
       ),
@@ -4410,11 +4410,11 @@ test("a refused channel switch preserves the reply edit and retries after cancel
 
   await page.goto("/");
   await page.waitForFunction(
-    () => typeof window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__ === "function",
+    () => typeof window.__KURA_E2E_EMIT_MOCK_MESSAGE__ === "function",
   );
   const { sourceReplyId, sourceRootId } = await page.evaluate(
     ({ sourceReply, sourceRoot }) => {
-      const emit = window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__;
+      const emit = window.__KURA_E2E_EMIT_MOCK_MESSAGE__;
       if (!emit) throw new Error("Mock message emitter is unavailable.");
       const root = emit({ channelName: "general", content: sourceRoot });
       const reply = emit({
@@ -4448,7 +4448,7 @@ test("a refused channel switch preserves the reply edit and retries after cancel
   }));
   const sendsBefore = await page.evaluate(
     () =>
-      (window.__BUZZ_E2E_COMMAND_LOG__ ?? []).filter(
+      (window.__KURA_E2E_COMMAND_LOG__ ?? []).filter(
         (entry) => entry.command === "send_channel_message",
       ).length,
   );
@@ -4470,7 +4470,7 @@ test("a refused channel switch preserves the reply edit and retries after cancel
   expect(
     await page.evaluate(
       () =>
-        (window.__BUZZ_E2E_COMMAND_LOG__ ?? []).filter(
+        (window.__KURA_E2E_COMMAND_LOG__ ?? []).filter(
           (entry) => entry.command === "send_channel_message",
         ).length,
     ),
@@ -4493,11 +4493,11 @@ for (const backInput of ["button", "keyboard"] as const) {
 
     await page.goto("/");
     await page.waitForFunction(
-      () => typeof window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__ === "function",
+      () => typeof window.__KURA_E2E_EMIT_MOCK_MESSAGE__ === "function",
     );
     const { sourceReplyId, sourceRootId } = await page.evaluate(
       ({ sourceReply, sourceRoot }) => {
-        const emit = window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__;
+        const emit = window.__KURA_E2E_EMIT_MOCK_MESSAGE__;
         if (!emit) throw new Error("Mock message emitter is unavailable.");
         const root = emit({ channelName: "general", content: sourceRoot });
         const reply = emit({
@@ -4532,7 +4532,7 @@ for (const backInput of ["button", "keyboard"] as const) {
     }));
     const sendsBefore = await page.evaluate(
       () =>
-        (window.__BUZZ_E2E_COMMAND_LOG__ ?? []).filter(
+        (window.__KURA_E2E_COMMAND_LOG__ ?? []).filter(
           (entry) => entry.command === "send_channel_message",
         ).length,
     );
@@ -4563,7 +4563,7 @@ for (const backInput of ["button", "keyboard"] as const) {
     expect(
       await page.evaluate(
         () =>
-          (window.__BUZZ_E2E_COMMAND_LOG__ ?? []).filter(
+          (window.__KURA_E2E_COMMAND_LOG__ ?? []).filter(
             (entry) => entry.command === "send_channel_message",
           ).length,
       ),

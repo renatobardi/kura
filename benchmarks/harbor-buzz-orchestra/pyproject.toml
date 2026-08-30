@@ -1,5 +1,5 @@
 [project]
-name = "harbor-buzz-orchestra"
+name = "harbor-kura-orchestra"
 version = "0.1.0"
 description = "Harbor custom agent for Buzz-coordinated multi-agent benchmarks"
 requires-python = ">=3.12"

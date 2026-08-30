@@ -1,4 +1,4 @@
-"""Thin subprocess wrapper over the ``buzz`` CLI — the production client path."""
+"""Thin subprocess wrapper over the ``kura`` CLI — the production client path."""
 
 from __future__ import annotations
 
@@ -8,11 +8,11 @@ from typing import Any
 
 
 class BuzzCliError(RuntimeError):
-    """A buzz CLI invocation failed."""
+    """A kura CLI invocation failed."""
 
 
 class BuzzCli:
-    """Run buzz CLI commands as one relay identity (key + NIP-OA auth tag)."""
+    """Run kura CLI commands as one relay identity (key + NIP-OA auth tag)."""
 
     def __init__(
         self,
@@ -20,7 +20,7 @@ class BuzzCli:
         secret_key: str,
         auth_tag: str,
         *,
-        binary: str = "buzz",
+        binary: str = "kura",
         timeout_seconds: float = 30.0,
     ) -> None:
         self._relay_url = relay_url
@@ -30,7 +30,7 @@ class BuzzCli:
         self._timeout = timeout_seconds
 
     def run(self, *args: str) -> Any:
-        """Run a buzz subcommand and return its parsed JSON stdout."""
+        """Run a kura subcommand and return its parsed JSON stdout."""
         command = [self._binary, *args]
         try:
             completed = subprocess.run(
@@ -40,17 +40,17 @@ class BuzzCli:
                 timeout=self._timeout,
                 check=False,
                 env={
-                    "BUZZ_RELAY_URL": self._relay_url,
-                    "BUZZ_PRIVATE_KEY": self._secret_key,
-                    "BUZZ_AUTH_TAG": self._auth_tag,
+                    "KURA_RELAY_URL": self._relay_url,
+                    "KURA_PRIVATE_KEY": self._secret_key,
+                    "KURA_AUTH_TAG": self._auth_tag,
                     "PATH": _path(),
                 },
             )
         except (OSError, subprocess.TimeoutExpired) as error:
-            raise BuzzCliError(f"buzz {args[0]}: {error}") from error
+            raise BuzzCliError(f"kura {args[0]}: {error}") from error
         if completed.returncode != 0:
             raise BuzzCliError(
-                f"buzz {' '.join(args)} exited {completed.returncode}: "
+                f"kura {' '.join(args)} exited {completed.returncode}: "
                 f"{completed.stderr.strip() or completed.stdout.strip()}"
             )
         if not completed.stdout.strip():
@@ -59,7 +59,7 @@ class BuzzCli:
             return json.loads(completed.stdout)
         except json.JSONDecodeError as error:
             raise BuzzCliError(
-                f"buzz {args[0]} returned non-JSON output: {completed.stdout[:200]!r}"
+                f"kura {args[0]} returned non-JSON output: {completed.stdout[:200]!r}"
             ) from error
 
     def create_private_channel(self, name: str, description: str) -> str:

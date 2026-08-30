@@ -219,7 +219,7 @@ export function ProjectDetailScreen(props: ProjectDetailScreenProps) {
     activeBranch,
     activeRepoPullRequest,
     activeTag,
-    isBuzzHost: repoRemote.host.kind === "buzz",
+    isKuraHost: repoRemote.host.kind === "buzz",
     repository,
     reposDir: activeCommunity?.reposDir,
     repoSource,

@@ -68,7 +68,7 @@ test("repository-only relays keep the Repositories section available", async ({
   page,
 }) => {
   await page.addInitScript(() => {
-    window.__BUZZ_E2E_REPOSITORY_ONLY_PROJECTS__ = true;
+    window.__KURA_E2E_REPOSITORY_ONLY_PROJECTS__ = true;
   });
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -195,7 +195,7 @@ test("restricted repositories keep event work visible and offer access help", as
   page,
 }) => {
   await page.addInitScript((owner) => {
-    window.__BUZZ_E2E_PROJECT_OWNER_OVERRIDE__ = owner;
+    window.__KURA_E2E_PROJECT_OWNER_OVERRIDE__ = owner;
   }, TEST_IDENTITIES.alice.pubkey);
   await installMockBridge(page, {
     projectAccessChannelId: "11111111-1111-4111-8111-111111111111",
@@ -739,7 +739,7 @@ test("projects v3 workspace screenshot states", async ({ page }) => {
     async ({ channelId, parentEventId }) => {
       if (!channelId)
         throw new Error("Project agent DM channel was not recorded.");
-      await window.__BUZZ_E2E_INVOKE_MOCK_COMMAND__?.("send_channel_message", {
+      await window.__KURA_E2E_INVOKE_MOCK_COMMAND__?.("send_channel_message", {
         channelId,
         content: "A persisted threaded agent response.",
         parentEventId: parentEventId ?? undefined,

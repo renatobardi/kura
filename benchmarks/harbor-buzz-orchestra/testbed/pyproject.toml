@@ -1,10 +1,10 @@
 [project]
-name = "harbor-buzz-testbed"
+name = "harbor-kura-testbed"
 version = "0.1.0"
-description = "Trial provisioning and local Buzz stack tooling for harbor-buzz-orchestra"
+description = "Trial provisioning and local Buzz stack tooling for harbor-kura-orchestra"
 requires-python = ">=3.12"
 dependencies = [
-    "harbor-buzz-orchestra",
+    "harbor-kura-orchestra",
     "coincurve>=20",
     "psycopg[binary]>=3.2",
 ]
@@ -20,7 +20,7 @@ dev = [
 ]
 
 [tool.uv.sources]
-harbor-buzz-orchestra = { path = "..", editable = true }
+harbor-kura-orchestra = { path = "..", editable = true }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

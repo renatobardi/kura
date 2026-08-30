@@ -1,8 +1,8 @@
 """Run the production Buzz agent stack inside the Harbor task container.
 
-Each provisioned identity is a full ``buzz-acp`` → ``buzz-agent`` →
-``buzz-dev-mcp`` process tree launched *inside* the task container — the same
-binaries and the same MCP toolset (shell, file tools, the ``buzz`` CLI on
+Each provisioned identity is a full ``kura-acp`` → ``kura-agent`` →
+``kura-dev-mcp`` process tree launched *inside* the task container — the same
+binaries and the same MCP toolset (shell, file tools, the ``kura`` CLI on
 PATH) that the desktop app gives a Buzz agent. The harness stays outside:
 it provisions, uploads the pinned binaries, posts the task as the trial
 user, and observes the channel until the orchestrator publishes DONE.
@@ -29,7 +29,7 @@ from .runtime import RuntimeResult
 from .task_fixtures import fixture_for
 
 DEFAULT_MAX_AGENT_ROUNDS = (
-    0  # 0 = unbounded (BUZZ_AGENT_MAX_ROUNDS=0); the trial budget is the clock
+    0  # 0 = unbounded (KURA_AGENT_MAX_ROUNDS=0); the trial budget is the clock
 )
 # Reasoning effort for a roster entry that does not pin one. Pinned here rather
 # than left to the provider so an unset effort still means a recorded, stable
@@ -37,11 +37,11 @@ DEFAULT_MAX_AGENT_ROUNDS = (
 # to", which is neither captured in the condition hash nor comparable.
 THINKING_EFFORT = "medium"
 # Container-side layout for the uploaded Buzz stack.
-REMOTE_ROOT = "/opt/buzz"
+REMOTE_ROOT = "/opt/kura"
 REMOTE_BIN = f"{REMOTE_ROOT}/bin"
 REMOTE_PROMPTS = f"{REMOTE_ROOT}/prompts"
 REMOTE_LOGS = f"{REMOTE_ROOT}/logs"
-REMOTE_EVIDENCE = "/logs/artifacts/buzz-evidence.json"
+REMOTE_EVIDENCE = "/logs/artifacts/kura-evidence.json"
 # The relay is host-header tenant-bound (its community row is the authority
 # of its own RELAY_URL), so agents must present that exact Host. When the
 # relay actually lives outside the container, this forwarder listens on the
@@ -93,10 +93,10 @@ class BuzzContainerRuntime:
         logs_dir: Path,
         artifact_root: Path,
         endpoints: dict[str, EndpointLaunchConfig],
-        buzz_acp_binary: str = "buzz-acp",
-        buzz_agent_binary: str = "buzz-agent",
-        buzz_dev_mcp_binary: str = "buzz-dev-mcp",
-        buzz_cli_binary: str = "buzz",
+        buzz_acp_binary: str = "kura-acp",
+        buzz_agent_binary: str = "kura-agent",
+        buzz_dev_mcp_binary: str = "kura-dev-mcp",
+        buzz_cli_binary: str = "kura",
         relay_gateway: str = "",
         forwarder_binary: str = "relay-forwarder",
         max_agent_rounds: int = DEFAULT_MAX_AGENT_ROUNDS,
@@ -136,7 +136,7 @@ class BuzzContainerRuntime:
     ) -> RuntimeResult:
         classes = self._classes_by_agent_id(manifest, trial.credentials)
         orchestrator = next(c for c in trial.credentials if c.role == "orchestrator")
-        trial_dir = self.logs_dir / "buzz"
+        trial_dir = self.logs_dir / "kura"
         trial_dir.mkdir(parents=True, exist_ok=True)
 
         agents: list[_Agent] = []
@@ -237,7 +237,7 @@ class BuzzContainerRuntime:
         # task is graded by its own tests and must still report its result.
         if fixture_for(trial.task_name).requires_evidence and not evidence_exported:
             raise RuntimeLaunchError(
-                "failed to export buzz-evidence.json; the trial has no "
+                "failed to export kura-evidence.json; the trial has no "
                 "verifiable relay state and must not be scored"
             )
 
@@ -268,9 +268,9 @@ class BuzzContainerRuntime:
     async def _install_stack(self, environment: BaseEnvironment) -> None:
         """Upload the pinned Linux binaries into the task container."""
         uploads = {
-            f"{REMOTE_BIN}/buzz-acp": self.buzz_acp_binary,
-            f"{REMOTE_BIN}/buzz-agent": self.buzz_agent_binary,
-            f"{REMOTE_BIN}/buzz-dev-mcp": self.buzz_dev_mcp_binary,
+            f"{REMOTE_BIN}/kura-acp": self.buzz_acp_binary,
+            f"{REMOTE_BIN}/kura-agent": self.buzz_agent_binary,
+            f"{REMOTE_BIN}/kura-dev-mcp": self.buzz_dev_mcp_binary,
         }
         if self.relay_gateway:
             uploads[FORWARDER] = self.forwarder_binary
@@ -402,7 +402,7 @@ class BuzzContainerRuntime:
             remote_prompt=remote_prompt,
         )
         command = (
-            f"{shlex.quote(f'{REMOTE_BIN}/buzz-acp')} </dev/null "
+            f"{shlex.quote(f'{REMOTE_BIN}/kura-acp')} </dev/null "
             f">{shlex.quote(stdout_log)} 2>{shlex.quote(stderr_log)} & echo $!"
         )
         result = await environment.exec(command, env=env)
@@ -428,37 +428,37 @@ class BuzzContainerRuntime:
         return {
             **endpoint.env,
             "RUST_LOG": self._rust_log(endpoint.env.get("RUST_LOG")),
-            "BUZZ_RELAY_URL": trial.relay_ws_url,
-            "BUZZ_PRIVATE_KEY": credential.nostr_secret_key,
-            # Desktop parity: the GUI also sets NOSTR_PRIVATE_KEY on buzz-acp
-            # so buzz-dev-mcp's shim can wire git auth/signing for the agent.
+            "KURA_RELAY_URL": trial.relay_ws_url,
+            "KURA_PRIVATE_KEY": credential.nostr_secret_key,
+            # Desktop parity: the GUI also sets NOSTR_PRIVATE_KEY on kura-acp
+            # so kura-dev-mcp's shim can wire git auth/signing for the agent.
             "NOSTR_PRIVATE_KEY": credential.nostr_secret_key,
-            "BUZZ_AUTH_TAG": credential.nostr_auth_tag,
-            "BUZZ_ACP_AGENT_COMMAND": f"{REMOTE_BIN}/buzz-agent",
-            "BUZZ_ACP_AGENT_ARGS": "",
-            "BUZZ_ACP_MCP_COMMAND": f"{REMOTE_BIN}/buzz-dev-mcp",
-            "BUZZ_ACP_CHANNELS": trial.channel_id,
-            "BUZZ_ACP_SUBSCRIBE": "mentions",
-            "BUZZ_ACP_RESPOND_TO": "anyone",
-            "BUZZ_ACP_NO_MEMORY": "true",
-            "BUZZ_ACP_SYSTEM_PROMPT_FILE": remote_prompt,
-            "BUZZ_AGENT_PROVIDER": endpoint.provider,
-            "BUZZ_AGENT_MODEL": credential.llm_endpoint,
-            "BUZZ_AGENT_THINKING_EFFORT": (
+            "KURA_AUTH_TAG": credential.nostr_auth_tag,
+            "KURA_ACP_AGENT_COMMAND": f"{REMOTE_BIN}/kura-agent",
+            "KURA_ACP_AGENT_ARGS": "",
+            "KURA_ACP_MCP_COMMAND": f"{REMOTE_BIN}/kura-dev-mcp",
+            "KURA_ACP_CHANNELS": trial.channel_id,
+            "KURA_ACP_SUBSCRIBE": "mentions",
+            "KURA_ACP_RESPOND_TO": "anyone",
+            "KURA_ACP_NO_MEMORY": "true",
+            "KURA_ACP_SYSTEM_PROMPT_FILE": remote_prompt,
+            "KURA_AGENT_PROVIDER": endpoint.provider,
+            "KURA_AGENT_MODEL": credential.llm_endpoint,
+            "KURA_AGENT_THINKING_EFFORT": (
                 agent_class.generation.thinking_effort or THINKING_EFFORT
             ),
-            "BUZZ_AGENT_MAX_OUTPUT_TOKENS": str(
+            "KURA_AGENT_MAX_OUTPUT_TOKENS": str(
                 agent_class.generation.max_output_tokens
             ),
-            "BUZZ_AGENT_MAX_CONTEXT_TOKENS": str(
+            "KURA_AGENT_MAX_CONTEXT_TOKENS": str(
                 agent_class.generation.context_window_tokens
             ),
-            "BUZZ_AGENT_MAX_ROUNDS": str(
+            "KURA_AGENT_MAX_ROUNDS": str(
                 agent_class.budget.max_calls or self.max_agent_rounds
             ),
             # The pinned persona is the whole prompt: no hint-file or skill
             # discovery from the task filesystem (metadata reports this).
-            "BUZZ_AGENT_NO_HINTS": "1",
+            "KURA_AGENT_NO_HINTS": "1",
             endpoint.api_key_env: credential.llm_api_key,
         }
 
@@ -679,7 +679,7 @@ class BuzzContainerRuntime:
                 observed_channels=observed_channels,
                 scripted_events=scripted_events,
             )
-            evidence_path = trial_dir / "buzz-evidence.json"
+            evidence_path = trial_dir / "kura-evidence.json"
             evidence_path.write_text(
                 json.dumps(evidence, indent=2, sort_keys=True) + "\n",
                 encoding="utf-8",
@@ -710,7 +710,7 @@ class BuzzContainerRuntime:
     def _record_evidence_error(trial_dir: Path, reason: str) -> None:
         """Persist why the snapshot failed; the caller only sees a bool."""
         try:
-            (trial_dir / "buzz-evidence-error.txt").write_text(reason, encoding="utf-8")
+            (trial_dir / "kura-evidence-error.txt").write_text(reason, encoding="utf-8")
         except OSError:
             # Diagnostics only — never mask the failure we are reporting.
             pass
@@ -878,21 +878,21 @@ class BuzzContainerRuntime:
             stderr=asyncio.subprocess.PIPE,
             env={
                 **os.environ,
-                "BUZZ_RELAY_URL": self._user_relay_url(trial),
-                "BUZZ_PRIVATE_KEY": credential.nostr_secret_key,
-                "BUZZ_AUTH_TAG": credential.nostr_auth_tag,
+                "KURA_RELAY_URL": self._user_relay_url(trial),
+                "KURA_PRIVATE_KEY": credential.nostr_secret_key,
+                "KURA_AUTH_TAG": credential.nostr_auth_tag,
             },
         )
         stdout, stderr = await process.communicate()
         if process.returncode != 0:
             raise RuntimeLaunchError(
-                f"buzz {shlex.join(args)} exited {process.returncode}: "
+                f"kura {shlex.join(args)} exited {process.returncode}: "
                 f"{stderr.decode(errors='replace').strip()}"
             )
         try:
             return json.loads(stdout)
         except json.JSONDecodeError as error:
-            raise RuntimeLaunchError("buzz returned invalid JSON") from error
+            raise RuntimeLaunchError("kura returned invalid JSON") from error
 
     @staticmethod
     def _user_relay_url(trial: TrialHandle) -> str:
@@ -995,12 +995,12 @@ class BuzzContainerRuntime:
     @staticmethod
     def _reject_identity_overrides(endpoint: EndpointLaunchConfig) -> None:
         forbidden = {
-            "BUZZ_RELAY_URL",
-            "BUZZ_PRIVATE_KEY",
-            "BUZZ_AUTH_TAG",
-            "BUZZ_ACP_CHANNELS",
-            "BUZZ_ACP_MCP_COMMAND",
-            "BUZZ_ACP_AGENT_COMMAND",
+            "KURA_RELAY_URL",
+            "KURA_PRIVATE_KEY",
+            "KURA_AUTH_TAG",
+            "KURA_ACP_CHANNELS",
+            "KURA_ACP_MCP_COMMAND",
+            "KURA_ACP_AGENT_COMMAND",
         }
         overlap = forbidden & endpoint.env.keys()
         if overlap:

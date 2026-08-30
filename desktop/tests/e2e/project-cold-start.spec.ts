@@ -34,22 +34,22 @@ async function mutateProjectCache(
     .poll(() =>
       page.evaluate(
         () =>
-          "__BUZZ_E2E_QUERY_CLIENT__" in window &&
-          Boolean(window.__BUZZ_E2E_QUERY_CLIENT__),
+          "__KURA_E2E_QUERY_CLIENT__" in window &&
+          Boolean(window.__KURA_E2E_QUERY_CLIENT__),
       ),
     )
     .toBe(true);
   await page.evaluate(() => {
     const queryClient = (
       window as typeof window & {
-        __BUZZ_E2E_QUERY_CLIENT__?: {
+        __KURA_E2E_QUERY_CLIENT__?: {
           setQueryData: (
             key: readonly string[],
             updater: (current: unknown) => unknown,
           ) => void;
         };
       }
-    ).__BUZZ_E2E_QUERY_CLIENT__;
+    ).__KURA_E2E_QUERY_CLIENT__;
     if (!queryClient) throw new Error("E2E query client is unavailable.");
     queryClient.setQueryData(["projects"], (current) =>
       Array.isArray(current) ? [...current] : current,
@@ -63,7 +63,7 @@ async function waitForProjectEnumeration(
   await expect
     .poll(() =>
       page.evaluate(() => {
-        const queryClient = window.__BUZZ_E2E_QUERY_CLIENT__;
+        const queryClient = window.__KURA_E2E_QUERY_CLIENT__;
         const state = queryClient?.getQueryState(["projects"]);
         return Boolean(
           state && state.fetchStatus === "idle" && state.dataUpdatedAt > 0,
@@ -84,8 +84,8 @@ test("snapshot project home cannot publish repository healing", async ({
   await expect(page.getByTestId("project-home-context-panel")).toBeVisible();
 
   await page.addInitScript(() => {
-    window.__BUZZ_E2E_DEFER_FULL_PROJECT_QUERIES__ = true;
-    window.__BUZZ_E2E_ACCEPTED_PROJECT_EVENTS__ = [];
+    window.__KURA_E2E_DEFER_FULL_PROJECT_QUERIES__ = true;
+    window.__KURA_E2E_ACCEPTED_PROJECT_EVENTS__ = [];
   });
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await mutateProjectCache(page);
@@ -95,7 +95,7 @@ test("snapshot project home cannot publish repository healing", async ({
   await page.waitForTimeout(500);
   const projectPublications = await page.evaluate(
     () =>
-      window.__BUZZ_E2E_ACCEPTED_PROJECT_EVENTS__?.filter(
+      window.__KURA_E2E_ACCEPTED_PROJECT_EVENTS__?.filter(
         (event) =>
           event.kind === 30621 &&
           event.tags.some((tag) => tag[0] === "d" && tag[1] === "buzz"),
@@ -134,7 +134,7 @@ test("stale non-matching snapshot uses the scoped project-home lookup", async ({
     window.localStorage.setItem(key, JSON.stringify(snapshot));
   });
   await page.addInitScript(() => {
-    window.__BUZZ_E2E_DEFER_FULL_PROJECT_QUERIES__ = true;
+    window.__KURA_E2E_DEFER_FULL_PROJECT_QUERIES__ = true;
   });
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await mutateProjectCache(page);
@@ -142,7 +142,7 @@ test("stale non-matching snapshot uses the scoped project-home lookup", async ({
 
   await expect(page.getByTestId("project-home-context-panel")).toBeVisible();
   const usedScopedLookup = await page.evaluate((channelId) => {
-    return window.__BUZZ_E2E_PROJECT_QUERY_FILTERS__?.some((filter) =>
+    return window.__KURA_E2E_PROJECT_QUERY_FILTERS__?.some((filter) =>
       filter["#buzz-channel"]?.includes(channelId),
     );
   }, PROJECT_HOME_CHANNEL_ID);

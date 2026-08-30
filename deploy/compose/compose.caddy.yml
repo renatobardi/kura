@@ -8,22 +8,22 @@ services:
       relay:
         condition: service_healthy
     environment:
-      BUZZ_DOMAIN: ${BUZZ_DOMAIN:?set BUZZ_DOMAIN}
+      KURA_DOMAIN: ${KURA_DOMAIN:?set KURA_DOMAIN}
     ports:
       - "${CADDY_HTTP_PORT:-80}:80"
       - "${CADDY_HTTPS_PORT:-443}:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - buzz-caddy-data:/data
-      - buzz-caddy-config:/config
+      - kura-caddy-data:/data
+      - kura-caddy-config:/config
     restart: unless-stopped
     networks:
-      - buzz-net
+      - kura-net
 
 volumes:
-  buzz-caddy-data:
+  kura-caddy-data:
     labels:
-      com.buzz.volume: caddy-data
-  buzz-caddy-config:
+      com.kura.volume: caddy-data
+  kura-caddy-config:
     labels:
-      com.buzz.volume: caddy-config
+      com.kura.volume: caddy-config

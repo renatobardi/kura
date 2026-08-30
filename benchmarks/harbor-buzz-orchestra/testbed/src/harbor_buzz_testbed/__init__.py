@@ -1,4 +1,4 @@
-"""Testbed-side provisioning for harbor-buzz-orchestra trials."""
+"""Testbed-side provisioning for harbor-kura-orchestra trials."""
 
 from .provisioner import (
     BuzzTrialProvisioner,

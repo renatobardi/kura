@@ -7,7 +7,7 @@ Use the **Staging dev relay image** GitHub Actions workflow to publish a pre-mer
 3. Wait for the workflow summary. It resolves that ref to a commit and publishes only the relay `runtime` image to:
 
    ```text
-   ghcr.io/block/buzz-staging-dev:dev-sha-<40-character-commit-sha>-run-<run-id>-<run-attempt>
+   ghcr.io/block/kura-staging-dev:dev-sha-<40-character-commit-sha>-run-<run-id>-<run-attempt>
    ```
 
 4. In `squareup/builderbot-platform-core-infrastructure`, set bb-block staging values to the distinct pull-through ECR path and immutable tag from the workflow summary:
@@ -15,7 +15,7 @@ Use the **Staging dev relay image** GitHub Actions workflow to publish a pre-mer
    ```yaml
    buzz:
      image:
-       repository: 929862310821.dkr.ecr.us-west-2.amazonaws.com/ghcr.io/block/buzz-staging-dev
+       repository: 929862310821.dkr.ecr.us-west-2.amazonaws.com/ghcr.io/block/kura-staging-dev
        tag: dev-sha-<40-character-commit-sha>-run-<run-id>-<run-attempt>
    ```
 

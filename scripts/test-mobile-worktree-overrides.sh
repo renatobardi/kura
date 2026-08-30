@@ -124,8 +124,8 @@ grep -q '^applicationIdSuffix=\.w_2fast$' "$wt2/mobile/android/worktree.properti
   || fail "digit-leading dir segment wrong: $(cat "$wt2/mobile/android/worktree.properties")"
 
 # ── Explicit Android debug identity: readable and isolated ───────────────────
-BUZZ_ANDROID_DEBUG_APP_NAME="Kura Huddles" \
-  BUZZ_ANDROID_DEBUG_ID_SUFFIX=".huddles_829c" \
+KURA_ANDROID_DEBUG_APP_NAME="Kura Huddles" \
+  KURA_ANDROID_DEBUG_ID_SUFFIX=".huddles_829c" \
   "$wt/scripts/mobile-worktree-overrides.sh" > /dev/null
 grep -q '^appName=Kura Huddles$' "$android" \
   && pass "explicit Android debug app name is persisted" \
@@ -138,12 +138,12 @@ grep -q '^APP_DISPLAY_NAME = Kura (' "$ios" \
   && pass "Android debug overrides do not change the iOS identity" \
   || fail "Android debug overrides must not change iOS identity: $(cat "$ios")"
 
-if BUZZ_ANDROID_DEBUG_ID_SUFFIX=".Huddles" "$wt/scripts/mobile-worktree-overrides.sh" >/dev/null 2>&1; then
+if KURA_ANDROID_DEBUG_ID_SUFFIX=".Huddles" "$wt/scripts/mobile-worktree-overrides.sh" >/dev/null 2>&1; then
   fail "invalid explicit Android debug suffix must be rejected"
 else
   pass "invalid explicit Android debug suffix is rejected"
 fi
-if BUZZ_ANDROID_DEBUG_APP_NAME=$'Kura Huddles\nInjected' "$wt/scripts/mobile-worktree-overrides.sh" >/dev/null 2>&1; then
+if KURA_ANDROID_DEBUG_APP_NAME=$'Kura Huddles\nInjected' "$wt/scripts/mobile-worktree-overrides.sh" >/dev/null 2>&1; then
   fail "unsafe explicit Android debug app name must be rejected"
 else
   pass "unsafe explicit Android debug app name is rejected"

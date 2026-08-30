@@ -30,7 +30,7 @@ function makeAgent(overrides = {}) {
     personaId: null,
     relayUrl: RELAY_A,
     acpCommand: "buzz-acp",
-    agentCommand: "buzz-agent",
+    agentCommand: "kura-agent",
     agentCommandOverride: null,
     agentArgs: [],
     mcpCommand: "buzz-dev-mcp",
@@ -173,11 +173,11 @@ test("all Welcome starters use the onboarding runtime preference", async () => {
     canAutoInstall: false,
     underlyingCliPath: "/bin/claude",
   };
-  const buzzAgent = {
+  const kuraAgent = {
     ...claude,
-    id: "buzz-agent",
+    id: "kura-agent",
     label: "Kura Agent",
-    command: "buzz-agent",
+    command: "kura-agent",
   };
 
   for (const starter of WELCOME_TEAM_STARTERS) {
@@ -195,7 +195,7 @@ test("all Welcome starters use the onboarding runtime preference", async () => {
         isBuiltIn: true,
         isActive: true,
       },
-      [buzzAgent, claude],
+      [kuraAgent, claude],
       "claude",
       RELAY_A,
     );

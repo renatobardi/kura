@@ -56,31 +56,31 @@ access information.
 ```
 crates/
   # Relay + core
-  buzz-relay          # WebSocket relay server — main entry point; also hosts git + huddle audio
-  buzz-core           # Core types, event verification, filter matching, kind registry
-  buzz-db             # Postgres event store and data access layer
-  buzz-auth           # Authentication and authorization
-  buzz-pubsub         # Redis pub/sub fan-out, presence, typing indicators
-  buzz-search         # Postgres FTS full-text search
-  buzz-audit          # Hash-chain audit log
-  buzz-media          # Blossom/S3 media storage
+  kura-relay          # WebSocket relay server — main entry point; also hosts git + huddle audio
+  kura-core           # Core types, event verification, filter matching, kind registry
+  kura-db             # Postgres event store and data access layer
+  kura-auth           # Authentication and authorization
+  kura-pubsub         # Redis pub/sub fan-out, presence, typing indicators
+  kura-search         # Postgres FTS full-text search
+  kura-audit          # Hash-chain audit log
+  kura-media          # Blossom/S3 media storage
   # Agent surface
-  buzz-acp            # ACP harness bridging Buzz events to AI agents
-  buzz-agent          # Minimal ACP-compliant agent (non-streaming, tool-calls-as-output)
-  buzz-dev-mcp        # Developer MCP server — shell + file-edit tools
-  buzz-persona        # Agent persona packs
-  buzz-workflow       # YAML-as-code workflow engine (evalexpr conditions)
+  kura-acp            # ACP harness bridging Buzz events to AI agents
+  kura-agent          # Minimal ACP-compliant agent (non-streaming, tool-calls-as-output)
+  kura-dev-mcp        # Developer MCP server — shell + file-edit tools
+  kura-persona        # Agent persona packs
+  kura-workflow       # YAML-as-code workflow engine (evalexpr conditions)
   # Clients + interop
-  buzz-pair-relay     # Ephemeral sidecar relay for NIP-AB device pairing
-  buzz-pairing-cli    # CLI for NIP-AB device pairing interop testing
+  kura-pair-relay     # Ephemeral sidecar relay for NIP-AB device pairing
+  kura-pairing-cli    # CLI for NIP-AB device pairing interop testing
   git-sign-nostr      # Sign git objects with a Nostr key
   git-credential-nostr # Git credential helper for Nostr-authed push/fetch
   # Tooling + shared
-  buzz-cli            # Agent-first CLI
-  buzz-sdk            # Typed Nostr event builders
-  buzz-admin          # Operator CLI for relay administration
-  buzz-ws-client      # Shared NIP-42 WebSocket client (connect, auth, publish)
-  buzz-test-client    # Integration test client and E2E test suite
+  kura-cli            # Agent-first CLI
+  kura-sdk            # Typed Nostr event builders
+  kura-admin          # Operator CLI for relay administration
+  kura-ws-client      # Shared NIP-42 WebSocket client (connect, auth, publish)
+  kura-test-client    # Integration test client and E2E test suite
   sprig               # All-in-one harness bundling ACP, agent, and dev MCP
 
 desktop/              # Tauri 2 + React 19 desktop app
@@ -113,8 +113,8 @@ Run `just ci` before every PR — it runs repository-wide formatting, lint,
 and static checks; Rust, Tauri, desktop, and mobile tests; and desktop and web
 builds. Clippy passing does not mean fmt passes; run both.
 
-Run `just test` for integration tests if you touched `buzz-relay`,
-`buzz-db`, or `buzz-auth` — these require a running Postgres and Redis.
+Run `just test` for integration tests if you touched `kura-relay`,
+`kura-db`, or `kura-auth` — these require a running Postgres and Redis.
 
 **Pre-commit hooks** are installed automatically by `just setup` and auto-fix
 formatting via `stage_fixed`. Pre-commit runs fix variants in parallel (Rust
@@ -156,15 +156,15 @@ Additional rules:
 **Nostr-first HTTP surface**: Buzz's primary API is NIP-29 over WebSocket. The relay also exposes a narrow HTTP surface: NIP-11/NIP-05 metadata, `POST /events`, `POST /query`, `POST /count`, workflow webhooks at `/hooks/{id}`, Blossom media, git smart HTTP, git policy hooks, and health probes. These HTTP paths all preserve the same host-derived community boundary.
 
 **Prefer Nostr events over new HTTP endpoints**: For new feature work, model
-the operation as a Nostr event (new kind in `buzz-core/src/kind.rs`, handler
-in `buzz-relay`) rather than adding endpoint-specific JSON APIs. HTTP is
+the operation as a Nostr event (new kind in `kura-core/src/kind.rs`, handler
+in `kura-relay`) rather than adding endpoint-specific JSON APIs. HTTP is
 reserved for things that genuinely need an HTTP-only surface: media upload/download
 (Blossom), webhooks, git smart HTTP, NIP-11/NIP-05 metadata, health checks,
 and the generic Nostr bridge endpoints:
 
 - `POST /events` — submit any signed event (same path the WebSocket uses).
 - `POST /query` — Nostr REQ filters over HTTP. NIP-50 `search` filters
-  are routed to `buzz-search` (Postgres FTS) automatically.
+  are routed to `kura-search` (Postgres FTS) automatically.
 - `POST /count` — Nostr COUNT filters over HTTP.
 
 If you find yourself reaching for a new HTTP endpoint, first check whether
@@ -174,7 +174,7 @@ fan-out, NIP-29 scoping, and the existing auth pipeline for free.
 Reference https://github.com/nostr-protocol/nips
 
 **Event kinds**: All event kind integers are defined in
-`buzz-core/src/kind.rs`. New features get new kind integers — add them here
+`kura-core/src/kind.rs`. New features get new kind integers — add them here
 first, then implement handling in the relay.
 
 **Channel scoping**: Channels use `h` tags (NIP-29 group tag), not `e` tags.
@@ -184,9 +184,9 @@ channel carry its id in their `d` tag instead: kind:39000 (metadata),
 kind:39001, kind:39002 (membership). `get_channels` resolves a user's channels
 from the `d` tag of their kind:39002 events, not from `h`.
 
-**Agent-facing operations go in `buzz-cli`**: New agent-facing features belong in `buzz-cli` — add a subcommand there first, then wire the REST/WebSocket call in `client.rs`. `buzz-dev-mcp` (shell + file tools for `buzz-agent`) is separate.
+**Agent-facing operations go in `kura-cli`**: New agent-facing features belong in `kura-cli` — add a subcommand there first, then wire the REST/WebSocket call in `client.rs`. `kura-dev-mcp` (shell + file tools for `kura-agent`) is separate.
 
-**Workflow conditions**: `buzz-workflow` uses
+**Workflow conditions**: `kura-workflow` uses
 [evalexpr](https://docs.rs/evalexpr) for condition evaluation. Keep expressions
 simple and testable.
 
@@ -196,29 +196,29 @@ check existing reply handlers for the pattern.
 
 ---
 
-## Agent CLI (`buzz-cli`)
+## Agent CLI (`kura-cli`)
 
-`buzz` is the agent-first CLI. Auth env vars
-(`BUZZ_RELAY_URL`, `BUZZ_PRIVATE_KEY`, `BUZZ_AUTH_TAG`) are auto-injected
+`kura` is the agent-first CLI. Auth env vars
+(`KURA_RELAY_URL`, `KURA_PRIVATE_KEY`, `KURA_AUTH_TAG`) are auto-injected
 by the ACP harness into managed agent subprocesses. In development, set
-`BUZZ_PRIVATE_KEY` and `BUZZ_RELAY_URL` in your environment manually.
+`KURA_PRIVATE_KEY` and `KURA_RELAY_URL` in your environment manually.
 
 ### Building the CLI
 
 ```bash
-cargo build --release -p buzz-cli
+cargo build --release -p kura-cli
 ```
 
-Binary location: `./target/release/buzz`. Add `./target/release` to `PATH`
+Binary location: `./target/release/kura`. Add `./target/release` to `PATH`
 or invoke with the full path.
 
 ### Deep Links
 
-`buzz://message?channel=<uuid>&id=<hex>` links reference a specific message
+`kura://message?channel=<uuid>&id=<hex>` links reference a specific message
 thread. Pass the link directly to the CLI:
 
 ```bash
-buzz --format compact messages thread --link '<buzz://message?...>'
+kura --format compact messages thread --link '<kura://message?...>'
 ```
 
 The selected message ID is authoritative: `messages thread` verifies its
@@ -233,9 +233,9 @@ canonical signed Nostr event fields (`id`, `pubkey`, `kind`, `content`,
 0=ok, 1=input error, 2=network/relay, 3=auth, 4=other, 5=write conflict (NIP-33 LWW).
 
 `--format compact` is a **global** flag — it goes before the subcommand:
-`buzz --format compact channels list`, NOT `buzz channels list --format compact`.
+`kura --format compact channels list`, NOT `kura channels list --format compact`.
 
-See `crates/buzz-cli/TESTING.md` for the full live-testing runbook.
+See `crates/kura-cli/TESTING.md` for the full live-testing runbook.
 
 ---
 
@@ -246,7 +246,7 @@ just test-unit    # unit tests, no infrastructure needed
 just test         # full integration suite (requires Postgres + Redis)
 ```
 
-E2E tests live in `crates/buzz-test-client/tests/`:
+E2E tests live in `crates/kura-test-client/tests/`:
 - `e2e_relay.rs` — WebSocket relay protocol
 - `e2e_media.rs` — media upload/download (Blossom)
 - `e2e_media_extended.rs` — extended media scenarios
@@ -260,7 +260,7 @@ See [TESTING.md](TESTING.md) for the full multi-agent E2E guide.
 
 ### PR Screenshots
 
-> **Do NOT use `buzz upload`, the relay media endpoint, or any third-party
+> **Do NOT use `kura upload`, the relay media endpoint, or any third-party
 > image host for PR screenshots.** Relay media URLs fail through GitHub's camo
 > proxy. Always use `scripts/post-screenshots.sh` for PNGs before linking them
 > from a PR body/comment. If you hand-edit PR markdown, run
@@ -291,7 +291,7 @@ Output is a PNG path on stdout.
 
 Use `--messages` to inject content into a channel before capture. The JSON file
 is an array of objects — `channelName` and `content` are required, all other
-fields are optional and passed through to `__BUZZ_E2E_EMIT_MOCK_MESSAGE__`:
+fields are optional and passed through to `__KURA_E2E_EMIT_MOCK_MESSAGE__`:
 
 ```json
 [
@@ -405,7 +405,7 @@ must run BEFORE `installMockBridge(page)` — React reads state on mount, the
 bridge triggers mount.
 
 **Live messages:** Call `waitForMockLiveSubscription(page, channelName)` before
-`__BUZZ_E2E_EMIT_MOCK_MESSAGE__` — messages are silently dropped without a
+`__KURA_E2E_EMIT_MOCK_MESSAGE__` — messages are silently dropped without a
 subscription. Navigate to the channel first (triggers subscription), then away
 (so unread indicators appear), then inject.
 
@@ -463,7 +463,7 @@ description. See [PR #803](https://github.com/block/buzz/pull/803).
 
 ## Common Gotchas
 
-1. **Kind `39000` for channel metadata, not `41`** — kind 41 is NIP-01 (unused). All kinds defined in `buzz-core/src/kind.rs`.
+1. **Kind `39000` for channel metadata, not `41`** — kind 41 is NIP-01 (unused). All kinds defined in `kura-core/src/kind.rs`.
 2. **Relay queries must specify `kinds`** — omitting `kinds` triggers the p-gate (403). Always include explicit kind filters.
 3. **`messages search` chooses its own supported kinds** — do not add a `--kinds` option; the current command does not accept one. This differs from raw relay filters, which still need explicit kinds.
 4. **Worktrees: `cd` in the same command** — shell CWD doesn't persist between tool calls. Use `cd /path && cargo build` as one command.

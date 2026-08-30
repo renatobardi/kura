@@ -30,7 +30,7 @@ does not describe database schema compatibility and does not relax Kura's rule
 that migrations remain backwards compatible.
 
 The manual pre-merge workflow publishes only to
-`ghcr.io/block/buzz-staging-dev`. Those preview images are intentionally
+`ghcr.io/block/kura-staging-dev`. Those preview images are intentionally
 ineligible: they use a different package, may name non-main source, and do not
 receive the canonical deployment-eligibility predicate.
 
@@ -40,7 +40,7 @@ The relay health listener exposes intrinsic build identity at `/_status`:
 
 ```json
 {
-  "service": "buzz-relay",
+  "service": "kura-relay",
   "version": "0.2.1",
   "uptime_seconds": 123,
   "build": {

@@ -488,7 +488,7 @@
 - chore(hooks): run desktop typecheck in pre-push ([#5110](https://github.com/block/buzz/pull/5110)) ([`c777d4fb9af4c3f66009ee3216650d9ea30310d7`](https://github.com/block/buzz/commit/c777d4fb9af4c3f66009ee3216650d9ea30310d7))
 - ci: prove the relay-driven mesh lifecycle — discover, join, infer, deny — with real nodes ([#3862](https://github.com/block/buzz/pull/3862)) ([`38bf642fcfa7a9fc1e06d6cf87d66ae94da29341`](https://github.com/block/buzz/commit/38bf642fcfa7a9fc1e06d6cf87d66ae94da29341))
 - fix(mobile): merge relay recounts with locally seen thread replies ([#4633](https://github.com/block/buzz/pull/4633)) ([`06b60e682d5dd78e6cdcb8e93fe96c7ec4391e2a`](https://github.com/block/buzz/commit/06b60e682d5dd78e6cdcb8e93fe96c7ec4391e2a))
-- relay: fuzz WebSocket 1012 restart-close timing on graceful drain (BUZZ_DRAIN_JITTER_MS) ([#4542](https://github.com/block/buzz/pull/4542)) ([`e14fff74d00623acd30945eec5be366e25b0cf09`](https://github.com/block/buzz/commit/e14fff74d00623acd30945eec5be366e25b0cf09))
+- relay: fuzz WebSocket 1012 restart-close timing on graceful drain (KURA_DRAIN_JITTER_MS) ([#4542](https://github.com/block/buzz/pull/4542)) ([`e14fff74d00623acd30945eec5be366e25b0cf09`](https://github.com/block/buzz/commit/e14fff74d00623acd30945eec5be366e25b0cf09))
 - feat(mobile): sync themes per community ([#3767](https://github.com/block/buzz/pull/3767)) ([`05150c11883b9064cb5187c39568d41a35d4a780`](https://github.com/block/buzz/commit/05150c11883b9064cb5187c39568d41a35d4a780))
 - Fix mobile message timeline bounce ([#4862](https://github.com/block/buzz/pull/4862)) ([`0c6842931b46c5c12f0f05ecc37af03de502a644`](https://github.com/block/buzz/commit/0c6842931b46c5c12f0f05ecc37af03de502a644))
 - Polish mobile bottom sheets and profile cards ([#4911](https://github.com/block/buzz/pull/4911)) ([`27b51144f3002fb2b70229ff8171d940d79b7da7`](https://github.com/block/buzz/commit/27b51144f3002fb2b70229ff8171d940d79b7da7))
@@ -1179,7 +1179,7 @@
 - chore(desktop): remove dead archive-migration and keyring load_readonly helpers ([#1701](https://github.com/block/buzz/pull/1701)) ([`389a956e0`](https://github.com/block/buzz/commit/389a956e02e85b1a3379df384a14c6d9c449d3c6))
 - fix(desktop): stop losing imported identity on every launch ([#1568](https://github.com/block/buzz/pull/1568)) ([`e15f06857`](https://github.com/block/buzz/commit/e15f0685718bcba6d0947a8286ab2deeab0137ef))
 - fix(desktop): use augmented PATH for readiness probes ([#1613](https://github.com/block/buzz/pull/1613)) ([`94ec2c2bc`](https://github.com/block/buzz/commit/94ec2c2bc6f5505dbbbd4783c41f3bb20d5a642c))
-- fix(desktop): isolate dev keyring from production and make BUZZ_SHARE_IDENTITY keyring-aware ([#1680](https://github.com/block/buzz/pull/1680)) ([`e5d215e3c`](https://github.com/block/buzz/commit/e5d215e3c2f4939fe4d0e1f09c8f9a265f818385))
+- fix(desktop): isolate dev keyring from production and make KURA_SHARE_IDENTITY keyring-aware ([#1680](https://github.com/block/buzz/pull/1680)) ([`e5d215e3c`](https://github.com/block/buzz/commit/e5d215e3c2f4939fe4d0e1f09c8f9a265f818385))
 - fix(desktop): migrate Databricks V1→V2 records at boot and fix readiness gate ([#1686](https://github.com/block/buzz/pull/1686)) ([`1f2afce29`](https://github.com/block/buzz/commit/1f2afce29d46ec09f63d467af4cacdd479a9a336))
 - B5 residue: inbound-event security hardening + persona→agent copy sweep ([#1688](https://github.com/block/buzz/pull/1688)) ([`f0e65589a`](https://github.com/block/buzz/commit/f0e65589a9a68cd19457e1196b8eb4db68217a3b))
 - fix(desktop): paginate complete channel directory ([#1690](https://github.com/block/buzz/pull/1690)) ([`b41cf3ffc`](https://github.com/block/buzz/commit/b41cf3ffc6d232dc1199f7563bd3c4da8571bfe1))
@@ -1284,7 +1284,7 @@
 ## v0.3.44
 
 - fix(desktop): keep thread-summary badges mounted through scrollback prepends ([#1533](https://github.com/block/buzz/pull/1533)) ([`6abf614fd`](https://github.com/block/buzz/commit/6abf614fd4eb512cf2e4175f17dc09892a8b472d))
-- refactor(shell): drop bundled PortableGit, add BUZZ_SHELL override + dialect hint ([#1536](https://github.com/block/buzz/pull/1536)) ([`cfa208983`](https://github.com/block/buzz/commit/cfa20898313080b7a106ae0e092d8ed6815daeb0))
+- refactor(shell): drop bundled PortableGit, add KURA_SHELL override + dialect hint ([#1536](https://github.com/block/buzz/pull/1536)) ([`cfa208983`](https://github.com/block/buzz/commit/cfa20898313080b7a106ae0e092d8ed6815daeb0))
 - feat(nips,relay,acp): NIP-AM durable encrypted agent turn metrics (kind 44200) ([#1441](https://github.com/block/buzz/pull/1441)) ([`71265ca36`](https://github.com/block/buzz/commit/71265ca36105dbf62453a99c998c3f3dd134a304))
 
 
@@ -1474,7 +1474,7 @@
 - perf(desktop): debounce channel-list refetch + profile get_channels ([#1310](https://github.com/block/buzz/pull/1310)) ([`c6e3e947`](https://github.com/block/buzz/commit/c6e3e947abc2592eea08c7601adc76afe0c14c95))
 - feat(desktop): move agent management into profile sidebar ([#1274](https://github.com/block/buzz/pull/1274)) ([`8d40150c`](https://github.com/block/buzz/commit/8d40150c8377df08dbaed61de987ca69d45d15e0))
 - feat(desktop): re-land virtualized timeline to fix macOS beachball ([#1250](https://github.com/block/buzz/pull/1250)) ([`8c3d0c92`](https://github.com/block/buzz/commit/8c3d0c92e83f1b482dbd93f2bd0d307988c91788))
-- feat(acp): add BUZZ_ACP_ALLOWED_RESPOND_TO and BUZZ_ALLOWED_CHANNEL_ADD_POLICIES gates ([#1304](https://github.com/block/buzz/pull/1304)) ([`1a61d783`](https://github.com/block/buzz/commit/1a61d783ad072eefd03bb070be66ec2cf889dbde))
+- feat(acp): add KURA_ACP_ALLOWED_RESPOND_TO and KURA_ALLOWED_CHANNEL_ADD_POLICIES gates ([#1304](https://github.com/block/buzz/pull/1304)) ([`1a61d783`](https://github.com/block/buzz/commit/1a61d783ad072eefd03bb070be66ec2cf889dbde))
 - fix(read-state): enforce byte-budget eviction in currentContexts() ([#1305](https://github.com/block/buzz/pull/1305)) ([`6b056461`](https://github.com/block/buzz/commit/6b0564618bafd3737778511b291e3b80ab7fc43e))
 - feat(media): transcode HEIC/HEIF to JPEG on desktop upload ([#1257](https://github.com/block/buzz/pull/1257)) ([`d32f3c0a`](https://github.com/block/buzz/commit/d32f3c0a58dc3a3ce52b72cc0a8899228f17d69e))
 - Bring mobile sidebar unread and DM parity ([#1303](https://github.com/block/buzz/pull/1303)) ([`1843a057`](https://github.com/block/buzz/commit/1843a057477129e392518dcc62a9814717a67c0b))
@@ -1789,7 +1789,7 @@
 - feat(desktop): open profile panel from MembersSidebar rows ([#962](https://github.com/block/buzz/pull/962)) ([`dcb2639b3`](https://github.com/block/buzz/commit/dcb2639b355c988ca6c5529640cfd55c957edd05))
 - feat(desktop): per-event notification sounds and alert controls ([#968](https://github.com/block/buzz/pull/968)) ([`4e4dc723e`](https://github.com/block/buzz/commit/4e4dc723e4cc1969efe9a8cc8d6e0e95a8e2d695))
 - fix(desktop): make header chrome zoom-correct and tidy split-pane ([#941](https://github.com/block/buzz/pull/941)) ([`1ca16c898`](https://github.com/block/buzz/commit/1ca16c898c7ccd5c9a4f78768e697b411367c975))
-- fix(desktop): rename SPROUT_ env vars to BUZZ_ for child agent processes ([#971](https://github.com/block/buzz/pull/971)) ([`8c8312932`](https://github.com/block/buzz/commit/8c8312932af9dced17fe1225d899885ec603b08b))
+- fix(desktop): rename SPROUT_ env vars to KURA_ for child agent processes ([#971](https://github.com/block/buzz/pull/971)) ([`8c8312932`](https://github.com/block/buzz/commit/8c8312932af9dced17fe1225d899885ec603b08b))
 - fix(justfile): complete buzz rename in dev and staging recipes ([#966](https://github.com/block/buzz/pull/966)) ([`31b0665cf`](https://github.com/block/buzz/commit/31b0665cff7cb4735397696bd7ce03a17404d54a))
 - refactor: rename sprout backend to buzz ([#958](https://github.com/block/buzz/pull/958)) ([`d99ad131f`](https://github.com/block/buzz/commit/d99ad131f176040549b041e297b813ef9705663e))
 - fix(desktop): reap orphaned agent processes across instances ([#954](https://github.com/block/buzz/pull/954)) ([`53e3f0948`](https://github.com/block/buzz/commit/53e3f09485838fbff242c883ff412dd39d03ec27))

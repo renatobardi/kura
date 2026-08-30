@@ -1,6 +1,6 @@
-export const BUZZ_RELEASES_URL =
+export const KURA_RELEASES_URL =
   "https://github.com/renatobardi/kura/releases/latest";
-const BUZZ_RELEASES_API_URL =
+const KURA_RELEASES_API_URL =
   "https://api.github.com/repos/renatobardi/kura/releases?per_page=10";
 const CACHE_KEY = "buzz.latestDownload.v1";
 const CACHE_TTL_MS = 60 * 60 * 1000;
@@ -162,15 +162,15 @@ export async function resolveBuzzDownloadUrlForPlatform(
   }
 
   try {
-    const response = await fetch(BUZZ_RELEASES_API_URL, {
+    const response = await fetch(KURA_RELEASES_API_URL, {
       headers: { Accept: "application/vnd.github+json" },
     });
-    if (!response.ok) return BUZZ_RELEASES_URL;
+    if (!response.ok) return KURA_RELEASES_URL;
     const url = selectBuzzDownloadUrl(
       (await response.json()) as GitHubRelease[],
       platform,
     );
-    if (!url) return BUZZ_RELEASES_URL;
+    if (!url) return KURA_RELEASES_URL;
     try {
       sessionStorage.setItem(
         CACHE_KEY,
@@ -185,7 +185,7 @@ export async function resolveBuzzDownloadUrlForPlatform(
     }
     return url;
   } catch {
-    return BUZZ_RELEASES_URL;
+    return KURA_RELEASES_URL;
   }
 }
 

@@ -32,7 +32,7 @@ test("first-time project empty state opens project creation", async ({
 }) => {
   await enableProjectsFeature(page);
   await page.addInitScript(() => {
-    window.__BUZZ_E2E_EMPTY_PROJECTS__ = true;
+    window.__KURA_E2E_EMPTY_PROJECTS__ = true;
   });
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });

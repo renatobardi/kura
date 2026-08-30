@@ -121,7 +121,7 @@ export function formatModelDiscoveryErrorStatus(
   if (
     message.includes("DATABRICKS_HOST required") ||
     message.includes("DATABRICKS_MODEL required") ||
-    message.includes("BUZZ_AGENT_PROVIDER is required")
+    message.includes("KURA_AGENT_PROVIDER is required")
   ) {
     return null;
   }
@@ -157,7 +157,7 @@ function formatDatabricksAuthStatus(
   if (message.includes("Databricks sign-in is required")) {
     return {
       message:
-        "Databricks sign-in is required. Open the model picker to sign in, or run `buzz-agent auth databricks` in a terminal.",
+        "Databricks sign-in is required. Open the model picker to sign in, or run `kura-agent auth databricks` in a terminal.",
       tone: "muted",
     };
   }
@@ -168,7 +168,7 @@ function formatDatabricksAuthStatus(
   ) {
     return {
       message:
-        "Databricks sign-in didn't complete. Open the model picker to retry, or run `buzz-agent auth databricks` in a terminal.",
+        "Databricks sign-in didn't complete. Open the model picker to retry, or run `kura-agent auth databricks` in a terminal.",
       tone: "warning",
     };
   }

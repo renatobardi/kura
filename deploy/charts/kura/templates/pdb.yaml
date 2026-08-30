@@ -1,0 +1,18 @@
+{{- include "kura.validate" . -}}
+{{- if and .Values.podDisruptionBudget.enabled (gt (include "kura.minimumReplicas" . | int) 1) -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "kura.fullname" . }}
+  labels:
+    {{- include "kura.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "kura.relaySelectorLabels" . | nindent 6 }}
+  {{- if .Values.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  {{- else if .Values.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+{{- end }}

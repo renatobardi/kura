@@ -2,9 +2,9 @@
  * Promote certain machine-readable `lastError` strings to user-facing copy.
  *
  * The error classification seam flows like this:
- *   buzz-agent — classifies LLM failures into `AgentError` variants with
+ *   kura-agent — classifies LLM failures into `AgentError` variants with
  *                  JSON-RPC codes (`-32001` auth, `-32002` model-not-found,
- *                  `-32000` generic), defined in `crates/buzz-agent/src/types.rs`.
+ *                  `-32000` generic), defined in `crates/kura-agent/src/types.rs`.
  *   buzz-acp   — preserves the code structurally in
  *                  `AcpError::AgentError { code, message }`, whose Display is
  *                  `"Agent reported error (code N): message"`, and includes
@@ -105,7 +105,7 @@ export function friendlyAgentLastError(
   }
 
   // Legacy string fallback for records written before codes existed.
-  // Match either the unwrapped buzz-agent prefix or the buzz-acp v0 wrap.
+  // Match either the unwrapped kura-agent prefix or the buzz-acp v0 wrap.
   if (
     trimmed.startsWith("Agent reported error: llm auth:") ||
     trimmed.startsWith("llm auth:")

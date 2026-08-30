@@ -166,7 +166,7 @@ def test_prompt_hash_and_identity_override_are_fail_closed(tmp_path):
         )
 
     endpoint = EndpointLaunchConfig(
-        "anthropic", "ANTHROPIC_API_KEY", {"BUZZ_ACP_MCP_COMMAND": "evil"}
+        "anthropic", "ANTHROPIC_API_KEY", {"KURA_ACP_MCP_COMMAND": "evil"}
     )
     with pytest.raises(RuntimeLaunchError, match="identity"):
         runtime(tmp_path)._reject_identity_overrides(endpoint)
@@ -232,22 +232,22 @@ async def test_collects_task_declared_channel_membership(tmp_path, monkeypatch):
 
 async def test_install_stack_uploads_the_pinned_stack(tmp_path):
     binaries = {}
-    for name in ("buzz-acp", "buzz-agent", "buzz-dev-mcp"):
+    for name in ("kura-acp", "kura-agent", "kura-dev-mcp"):
         path = tmp_path / name
         path.write_text("#!binary")
         binaries[name] = str(path)
     rt = runtime(
         tmp_path,
-        buzz_acp_binary=binaries["buzz-acp"],
-        buzz_agent_binary=binaries["buzz-agent"],
-        buzz_dev_mcp_binary=binaries["buzz-dev-mcp"],
+        buzz_acp_binary=binaries["kura-acp"],
+        buzz_agent_binary=binaries["kura-agent"],
+        buzz_dev_mcp_binary=binaries["kura-dev-mcp"],
     )
     environment = Environment()
     await rt._install_stack(environment)
     assert {target for _, target in environment.uploads} == {
-        f"{REMOTE_BIN}/buzz-acp",
-        f"{REMOTE_BIN}/buzz-agent",
-        f"{REMOTE_BIN}/buzz-dev-mcp",
+        f"{REMOTE_BIN}/kura-acp",
+        f"{REMOTE_BIN}/kura-agent",
+        f"{REMOTE_BIN}/kura-dev-mcp",
     }
     assert any("chmod 0755" in cmd for cmd, _ in environment.commands)
 
@@ -315,7 +315,7 @@ async def test_launch_wires_the_desktop_environment(tmp_path, configured, expect
     orch = credential("orch-1", "orchestrator", "orch-model")
     trial = trial_handle((orch,))
     environment = Environment(
-        responses={"buzz-acp": ExecResult(stdout="4242\n", stderr="", return_code=0)}
+        responses={"kura-acp": ExecResult(stdout="4242\n", stderr="", return_code=0)}
     )
     agent = await runtime(tmp_path)._launch_agent(
         environment=environment,
@@ -326,25 +326,25 @@ async def test_launch_wires_the_desktop_environment(tmp_path, configured, expect
     )
     assert agent.pid == 4242
     command, env = environment.commands[-1]
-    assert f"{REMOTE_BIN}/buzz-acp" in command
-    # The real product wiring: acp spawns buzz-agent, which gets buzz-dev-mcp.
-    assert env["BUZZ_ACP_AGENT_COMMAND"] == f"{REMOTE_BIN}/buzz-agent"
-    assert env["BUZZ_ACP_MCP_COMMAND"] == f"{REMOTE_BIN}/buzz-dev-mcp"
-    assert env["BUZZ_RELAY_URL"] == trial.relay_ws_url
-    assert env["BUZZ_PRIVATE_KEY"] == orch.nostr_secret_key
+    assert f"{REMOTE_BIN}/kura-acp" in command
+    # The real product wiring: acp spawns kura-agent, which gets kura-dev-mcp.
+    assert env["KURA_ACP_AGENT_COMMAND"] == f"{REMOTE_BIN}/kura-agent"
+    assert env["KURA_ACP_MCP_COMMAND"] == f"{REMOTE_BIN}/kura-dev-mcp"
+    assert env["KURA_RELAY_URL"] == trial.relay_ws_url
+    assert env["KURA_PRIVATE_KEY"] == orch.nostr_secret_key
     assert env["NOSTR_PRIVATE_KEY"] == orch.nostr_secret_key
-    assert env["BUZZ_AGENT_NO_HINTS"] == "1"
-    assert env["BUZZ_AGENT_MAX_ROUNDS"] == expected
-    assert env["BUZZ_ACP_SYSTEM_PROMPT_FILE"].endswith("orch-1.system-prompt.md")
+    assert env["KURA_AGENT_NO_HINTS"] == "1"
+    assert env["KURA_AGENT_MAX_ROUNDS"] == expected
+    assert env["KURA_ACP_SYSTEM_PROMPT_FILE"].endswith("orch-1.system-prompt.md")
     # The composed prompt was uploaded into the container.
     assert any(
-        target == env["BUZZ_ACP_SYSTEM_PROMPT_FILE"]
+        target == env["KURA_ACP_SYSTEM_PROMPT_FILE"]
         for _, target in environment.uploads
     )
 
 
 def test_runtime_validates_construction_bounds(tmp_path):
-    # 0 is legal and means unbounded (BUZZ_AGENT_MAX_ROUNDS=0); the trial
+    # 0 is legal and means unbounded (KURA_AGENT_MAX_ROUNDS=0); the trial
     # budget is the clock. Only negatives are rejected.
     runtime(tmp_path, max_agent_rounds=0)
     with pytest.raises(ValueError, match="unbounded"):
@@ -715,7 +715,7 @@ async def test_collect_evidence_uploads_verifier_artifact(tmp_path, monkeypatch)
         completion_message_id=reply_id,
     )
     assert environment.uploads[-1][1] == REMOTE_EVIDENCE
-    evidence = json.loads((trial_dir / "buzz-evidence.json").read_text())
+    evidence = json.loads((trial_dir / "kura-evidence.json").read_text())
     assert evidence["messages"][-1]["reply_to_event_id"] == root_id
     assert (trial_dir / "transcript.json").is_file()
 
@@ -741,8 +741,8 @@ async def test_failed_evidence_snapshot_records_the_reason(tmp_path, monkeypatch
     )
     # The caller only sees a bool, so the cause has to survive as an artifact —
     # otherwise a failed export is indistinguishable from a quiet relay.
-    assert "relay unreachable" in (trial_dir / "buzz-evidence-error.txt").read_text()
-    assert not (trial_dir / "buzz-evidence.json").exists()
+    assert "relay unreachable" in (trial_dir / "kura-evidence-error.txt").read_text()
+    assert not (trial_dir / "kura-evidence.json").exists()
 
 
 def test_runtime_logging_keeps_readiness_and_turn_completion_signals(tmp_path):
@@ -819,7 +819,7 @@ async def test_thinking_effort_reaches_the_agent(tmp_path, pinned, expected):
         )
     orch = credential("orch-1", "orchestrator", "orch-model")
     environment = Environment(
-        responses={"buzz-acp": ExecResult(stdout="4242\n", stderr="", return_code=0)}
+        responses={"kura-acp": ExecResult(stdout="4242\n", stderr="", return_code=0)}
     )
     await runtime(tmp_path)._launch_agent(
         environment=environment,
@@ -829,4 +829,4 @@ async def test_thinking_effort_reaches_the_agent(tmp_path, pinned, expected):
         trial_dir=tmp_path,
     )
     _, env = environment.commands[-1]
-    assert env["BUZZ_AGENT_THINKING_EFFORT"] == expected
+    assert env["KURA_AGENT_THINKING_EFFORT"] == expected

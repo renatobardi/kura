@@ -1,29 +1,29 @@
-name: buzz-prod
+name: kura-prod
 
 services:
   relay:
-    image: ${BUZZ_IMAGE:-ghcr.io/block/buzz:main}
+    image: ${KURA_IMAGE:-ghcr.io/block/kura:main}
     env_file:
       - .env
     environment:
-      BUZZ_BIND_ADDR: 0.0.0.0:3000
-      BUZZ_HEALTH_PORT: "8080"
-      BUZZ_METRICS_PORT: "9102"
-      DATABASE_URL: postgres://${POSTGRES_USER:-buzz}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-buzz}
+      KURA_BIND_ADDR: 0.0.0.0:3000
+      KURA_HEALTH_PORT: "8080"
+      KURA_METRICS_PORT: "9102"
+      DATABASE_URL: postgres://${POSTGRES_USER:-kura}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-kura}
       REDIS_URL: redis://:${REDIS_PASSWORD:?set REDIS_PASSWORD}@redis:6379
-      BUZZ_S3_ENDPOINT: http://minio:9000
+      KURA_S3_ENDPOINT: http://minio:9000
       # Docker DNS resolves `minio`, not arbitrary `<bucket>.minio` hosts.
-      BUZZ_S3_ADDRESSING_STYLE: path
-      BUZZ_S3_ACCESS_KEY: ${BUZZ_S3_ACCESS_KEY:?set BUZZ_S3_ACCESS_KEY}
-      BUZZ_S3_SECRET_KEY: ${BUZZ_S3_SECRET_KEY:?set BUZZ_S3_SECRET_KEY}
-      BUZZ_S3_BUCKET: ${BUZZ_S3_BUCKET:-buzz-media}
-      BUZZ_GIT_REPO_PATH: /data/git
-      BUZZ_AUTO_MIGRATE: ${BUZZ_AUTO_MIGRATE:-false}
-      BUZZ_GIT_CONFORMANCE_PROBE: ${BUZZ_GIT_CONFORMANCE_PROBE:-true}
+      KURA_S3_ADDRESSING_STYLE: path
+      KURA_S3_ACCESS_KEY: ${KURA_S3_ACCESS_KEY:?set KURA_S3_ACCESS_KEY}
+      KURA_S3_SECRET_KEY: ${KURA_S3_SECRET_KEY:?set KURA_S3_SECRET_KEY}
+      KURA_S3_BUCKET: ${KURA_S3_BUCKET:-kura-media}
+      KURA_GIT_REPO_PATH: /data/git
+      KURA_AUTO_MIGRATE: ${KURA_AUTO_MIGRATE:-false}
+      KURA_GIT_CONFORMANCE_PROBE: ${KURA_GIT_CONFORMANCE_PROBE:-true}
     ports:
-      - "${BUZZ_HTTP_PORT:-3000}:3000"
+      - "${KURA_HTTP_PORT:-3000}:3000"
     volumes:
-      - buzz-git-data:/data/git
+      - kura-git-data:/data/git
     depends_on:
       postgres:
         condition: service_healthy
@@ -46,17 +46,17 @@ services:
       start_period: 30s
     restart: unless-stopped
     networks:
-      - buzz-net
+      - kura-net
 
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-buzz}
-      POSTGRES_USER: ${POSTGRES_USER:-buzz}
+      POSTGRES_DB: ${POSTGRES_DB:-kura}
+      POSTGRES_USER: ${POSTGRES_USER:-kura}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - buzz-postgres-data:/var/lib/postgresql/data
+      - kura-postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -65,7 +65,7 @@ services:
       start_period: 10s
     restart: unless-stopped
     networks:
-      - buzz-net
+      - kura-net
 
   redis:
     image: redis:7-alpine
@@ -73,7 +73,7 @@ services:
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD}
     volumes:
-      - buzz-redis-data:/data
+      - kura-redis-data:/data
     healthcheck:
       test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" ping | grep -q PONG"]
       interval: 5s
@@ -82,16 +82,16 @@ services:
       start_period: 5s
     restart: unless-stopped
     networks:
-      - buzz-net
+      - kura-net
 
   minio:
     image: minio/minio:RELEASE.2025-09-07T16-13-09Z
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: ${BUZZ_S3_ACCESS_KEY:?set BUZZ_S3_ACCESS_KEY}
-      MINIO_ROOT_PASSWORD: ${BUZZ_S3_SECRET_KEY:?set BUZZ_S3_SECRET_KEY}
+      MINIO_ROOT_USER: ${KURA_S3_ACCESS_KEY:?set KURA_S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${KURA_S3_SECRET_KEY:?set KURA_S3_SECRET_KEY}
     volumes:
-      - buzz-minio-data:/data
+      - kura-minio-data:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:9000/minio/health/live"]
       interval: 5s
@@ -100,7 +100,7 @@ services:
       start_period: 10s
     restart: unless-stopped
     networks:
-      - buzz-net
+      - kura-net
 
   minio-init:
     image: minio/mc:RELEASE.2025-08-13T08-35-41Z
@@ -108,35 +108,35 @@ services:
       minio:
         condition: service_healthy
     environment:
-      BUZZ_S3_ACCESS_KEY: ${BUZZ_S3_ACCESS_KEY:?set BUZZ_S3_ACCESS_KEY}
-      BUZZ_S3_SECRET_KEY: ${BUZZ_S3_SECRET_KEY:?set BUZZ_S3_SECRET_KEY}
-      BUZZ_S3_BUCKET: ${BUZZ_S3_BUCKET:-buzz-media}
+      KURA_S3_ACCESS_KEY: ${KURA_S3_ACCESS_KEY:?set KURA_S3_ACCESS_KEY}
+      KURA_S3_SECRET_KEY: ${KURA_S3_SECRET_KEY:?set KURA_S3_SECRET_KEY}
+      KURA_S3_BUCKET: ${KURA_S3_BUCKET:-kura-media}
     entrypoint: >
       /bin/sh -euc '
-        mc alias set local http://minio:9000 "$${BUZZ_S3_ACCESS_KEY}" "$${BUZZ_S3_SECRET_KEY}"
-        mc mb --ignore-existing "local/$${BUZZ_S3_BUCKET}"
-        mc anonymous set none "local/$${BUZZ_S3_BUCKET}"
+        mc alias set local http://minio:9000 "$${KURA_S3_ACCESS_KEY}" "$${KURA_S3_SECRET_KEY}"
+        mc mb --ignore-existing "local/$${KURA_S3_BUCKET}"
+        mc anonymous set none "local/$${KURA_S3_BUCKET}"
       '
     restart: "no"
     networks:
-      - buzz-net
+      - kura-net
 
 volumes:
-  buzz-postgres-data:
+  kura-postgres-data:
     labels:
-      com.buzz.volume: postgres
-  buzz-redis-data:
+      com.kura.volume: postgres
+  kura-redis-data:
     labels:
-      com.buzz.volume: redis
-  buzz-minio-data:
+      com.kura.volume: redis
+  kura-minio-data:
     labels:
-      com.buzz.volume: minio
-  buzz-git-data:
+      com.kura.volume: minio
+  kura-git-data:
     labels:
-      com.buzz.volume: git
+      com.kura.volume: git
 
 networks:
-  buzz-net:
+  kura-net:
     driver: bridge
     labels:
-      com.buzz.network: production
+      com.kura.network: production

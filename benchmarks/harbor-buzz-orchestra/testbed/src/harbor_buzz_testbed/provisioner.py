@@ -58,7 +58,7 @@ def provisioner_from_dict(config: dict[str, object]) -> BuzzTrialProvisioner:
 class BuzzTrialProvisioner:
     """Implements the TrialHandle v1.1 contract against a live Buzz relay.
 
-    Guarantees (contract PLANS/HARBOR_BUZZ_TRIALHANDLE_CONTRACT.md):
+    Guarantees (contract PLANS/HARBOR_KURA_TRIALHANDLE_CONTRACT.md):
     - create_trial is synchronous and idempotent per (run_id, trial_id);
       concurrency-safe via a Postgres advisory lock on the trial key.
     - One private channel per trial; membership is exactly the trial's
@@ -245,7 +245,7 @@ class BuzzTrialProvisioner:
         """Derive an owner-scoped stable identity for reusable task fixtures."""
         order = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
         digest = hashlib.sha256(
-            b"buzz-benchmark-directory-v1\0"
+            b"kura-benchmark-directory-v1\0"
             + bytes.fromhex(self._config.owner_secret_key)
             + b"\0"
             + identity_id.encode()
