@@ -370,7 +370,13 @@
 
   .buzz-onboarding-neutral-theme.buzz-startup-shell.buzz-onboarding-security-theme {
     background-color: #151412;
-    background-image: linear-gradient(to bottom, #151412 0%, #1f1d1a 100%);
+    /* Flat sumi ground with the same 24px dot lattice as the light shell. */
+    background-image:
+      radial-gradient(circle, rgb(236 231 220 / 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, #151412 0%, #1f1d1a 100%);
+    background-size:
+      24px 24px,
+      auto;
   }
 
   .buzz-onboarding-key-text {
