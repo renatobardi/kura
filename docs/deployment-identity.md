@@ -5,8 +5,8 @@ attestations:
 
 - SLSA build provenance maps the immutable image digest to the source commit
   and Docker workflow run.
-- The Buzz deployment-eligibility predicate records the successful same-SHA
-  CI run and the exact Buzz Helm chart version from that source commit.
+- The Kura deployment-eligibility predicate records the successful same-SHA
+  CI run and the exact Kura Helm chart version from that source commit.
 
 The Docker workflow creates tagged multi-architecture manifests only after the
 same full source SHA has a successful `CI` push run on `main` or `release`.
@@ -26,7 +26,7 @@ gh attestation verify \
 ```
 
 The predicate's `helm_chart.compatible_version` is image-to-chart metadata. It
-does not describe database schema compatibility and does not relax Buzz's rule
+does not describe database schema compatibility and does not relax Kura's rule
 that migrations remain backwards compatible.
 
 The manual pre-merge workflow publishes only to
@@ -56,7 +56,7 @@ claiming provenance they do not have.
 
 ## Helm digest pinning
 
-Buzz chart `0.1.8` and newer accept an immutable image digest:
+Kura chart `0.1.8` and newer accept an immutable image digest:
 
 ```yaml
 image:

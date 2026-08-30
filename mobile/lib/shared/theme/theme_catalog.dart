@@ -25,10 +25,17 @@ class ThemeColors {
   bool get isDark => bg.computeLuminance() < 0.5;
 
   /// Human-readable display name: 'catppuccin-mocha' → 'Catppuccin Mocha'.
-  String get displayName => name
-      .split('-')
-      .map((w) => w.isNotEmpty ? '${w[0].toUpperCase()}${w.substring(1)}' : w)
-      .join(' ');
+  ///
+  /// The first-party theme ids ('buzz' / 'buzz-dark', kept for phase 1) are
+  /// shown to users as 'Kura' / 'Kura Dark'.
+  String get displayName {
+    if (name == 'buzz') return 'Kura';
+    if (name == 'buzz-dark') return 'Kura Dark';
+    return name
+        .split('-')
+        .map((w) => w.isNotEmpty ? '${w[0].toUpperCase()}${w.substring(1)}' : w)
+        .join(' ');
+  }
 }
 
 /// Known light theme names — used to show sun/moon icons before loading.
@@ -80,24 +87,23 @@ const themeCatalog = <ThemeColors>[
     added: Color(0xFF70BF56),
     deleted: Color(0xFFF26D78),
   ),
-  // Buzz and Buzz Dark are first-party: they borrow the GitHub Light / GitHub
-  // Dark palettes wholesale and are distinguished only by the branded gradient
-  // painted across the app's top section (see buzz_theme.dart).
+  // Kura and Kura Dark are first-party: washi/sumi palette with a single shu
+  // (vermilion) accent. See buzz_theme.dart for identifiers (kept for phase 1).
   ThemeColors(
     name: 'buzz',
-    bg: Color(0xFFFFFFFF),
-    fg: Color(0xFF24292E),
-    comment: Color(0xFF6A737D),
-    added: Color(0xFF28A745),
-    deleted: Color(0xFFD73A49),
+    bg: Color(0xFFF7F4EE),
+    fg: Color(0xFF1C1A17),
+    comment: Color(0xFF5C564D),
+    added: Color(0xFF6F7D4A),
+    deleted: Color(0xFFB4432B),
   ),
   ThemeColors(
     name: 'buzz-dark',
-    bg: Color(0xFF24292E),
-    fg: Color(0xFFE1E4E8),
-    comment: Color(0xFF6A737D),
-    added: Color(0xFF34D058),
-    deleted: Color(0xFFEA4A5A),
+    bg: Color(0xFF151412),
+    fg: Color(0xFFECE7DC),
+    comment: Color(0xFF9D968A),
+    added: Color(0xFF9AA86E),
+    deleted: Color(0xFFD1583D),
   ),
   ThemeColors(
     name: 'catppuccin-frappe',

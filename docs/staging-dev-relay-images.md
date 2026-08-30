@@ -1,6 +1,6 @@
 # Staging dev relay images
 
-Use the **Staging dev relay image** GitHub Actions workflow to publish a pre-merge Buzz relay runtime image for bb-block staging.
+Use the **Staging dev relay image** GitHub Actions workflow to publish a pre-merge Kura relay runtime image for bb-block staging.
 
 1. Run `.github/workflows/staging-dev-relay-image.yml` from the default branch.
 2. Enter a `target_ref` from `block/buzz` (`my-branch`, `refs/heads/my-branch`, `my-tag`, or `refs/tags/my-tag`).
