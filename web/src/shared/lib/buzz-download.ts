@@ -1,4 +1,5 @@
-export const BUZZ_RELEASES_URL = "https://github.com/renatobardi/kura/releases/latest";
+export const BUZZ_RELEASES_URL =
+  "https://github.com/renatobardi/kura/releases/latest";
 const BUZZ_RELEASES_API_URL =
   "https://api.github.com/repos/renatobardi/kura/releases?per_page=10";
 const CACHE_KEY = "buzz.latestDownload.v1";

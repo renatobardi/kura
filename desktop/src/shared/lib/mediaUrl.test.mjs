@@ -327,7 +327,9 @@ test("rewriteRelayUrl: matches relay origin case-insensitively (uppercase saved 
         if (command === "get_relay_http_url") {
           // Saved community URLs keep the user's casing; the relay always
           // emits lowercased media URLs (normalize_host in buzz-core).
-          return Promise.resolve("https://PENDING-SEED.communities.kura.oute.pro");
+          return Promise.resolve(
+            "https://PENDING-SEED.communities.kura.oute.pro",
+          );
         }
         return Promise.reject(new Error(`Unexpected command: ${command}`));
       },

@@ -14,15 +14,78 @@ export function ThemeGrainientBackground() {
               height="28"
               patternUnits="userSpaceOnUse"
             >
-              <circle cx="28" cy="28" r="25" fill="none" stroke="currentColor" strokeWidth="1" />
-              <circle cx="28" cy="28" r="18" fill="none" stroke="currentColor" strokeWidth="1" />
-              <circle cx="28" cy="28" r="11" fill="none" stroke="currentColor" strokeWidth="1" />
-              <circle cx="0" cy="14" r="25" fill="none" stroke="currentColor" strokeWidth="1" />
-              <circle cx="0" cy="14" r="18" fill="none" stroke="currentColor" strokeWidth="1" />
-              <circle cx="0" cy="14" r="11" fill="none" stroke="currentColor" strokeWidth="1" />
-              <circle cx="56" cy="14" r="25" fill="none" stroke="currentColor" strokeWidth="1" />
-              <circle cx="56" cy="14" r="18" fill="none" stroke="currentColor" strokeWidth="1" />
-              <circle cx="56" cy="14" r="11" fill="none" stroke="currentColor" strokeWidth="1" />
+              <circle
+                cx="28"
+                cy="28"
+                r="25"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+              <circle
+                cx="28"
+                cy="28"
+                r="18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+              <circle
+                cx="28"
+                cy="28"
+                r="11"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+              <circle
+                cx="0"
+                cy="14"
+                r="25"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+              <circle
+                cx="0"
+                cy="14"
+                r="18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+              <circle
+                cx="0"
+                cy="14"
+                r="11"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+              <circle
+                cx="56"
+                cy="14"
+                r="25"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+              <circle
+                cx="56"
+                cy="14"
+                r="18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+              <circle
+                cx="56"
+                cy="14"
+                r="11"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#kura-seigaiha)" />

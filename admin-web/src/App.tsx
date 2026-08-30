@@ -830,7 +830,9 @@ function date(value: string) {
 }
 
 function BuzzMark() {
-  return <img src="/favicon.svg" alt="" aria-hidden="true" width={24} height={24} />;
+  return (
+    <img src="/favicon.svg" alt="" aria-hidden="true" width={24} height={24} />
+  );
 }
 
 function ReportIcon() {

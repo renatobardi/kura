@@ -248,7 +248,9 @@ test("invite asks Safari users to choose their Mac download", async ({
   await chooser.getByRole("link", { name: /Newer Mac/ }).click();
   const openedPage = await openedPagePromise;
   await expect(chooser).toBeHidden();
-  await expect(openedPage).toHaveURL("https://github.com/renatobardi/kura/releases/latest");
+  await expect(openedPage).toHaveURL(
+    "https://github.com/renatobardi/kura/releases/latest",
+  );
   await expect(page).toHaveURL(/\/invite\/demo-code$/);
   await openedPage.close();
 
@@ -343,7 +345,10 @@ test("invite download falls back for mobile and non-desktop devices", async ({
     await expect(
       page.getByRole("link", { name: "Download it now" }),
       device.name,
-    ).toHaveAttribute("href", "https://github.com/renatobardi/kura/releases/latest");
+    ).toHaveAttribute(
+      "href",
+      "https://github.com/renatobardi/kura/releases/latest",
+    );
     await context.close();
   }
 });
