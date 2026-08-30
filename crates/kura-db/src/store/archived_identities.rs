@@ -5,9 +5,9 @@
 //! relay access, or repository permissions.
 //! All pubkey and event ID values are lowercase hex strings.
 
+use chrono::{DateTime, Utc};
 use kura_core::CommunityId;
 use kura_datastore_tracing::datastore_span;
-use chrono::{DateTime, Utc};
 use sqlx::{PgPool, Row as _};
 
 use crate::error::Result;

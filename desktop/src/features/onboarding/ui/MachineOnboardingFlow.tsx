@@ -319,7 +319,8 @@ export function MachineOnboardingFlow({
                 </span>
               </div>
               <p className="mt-2 max-w-[560px] text-center text-2xl font-normal leading-none text-foreground">
-                One storehouse for people<br />
+                One storehouse for people
+                <br />
                 and agents.
               </p>
               {error ? (

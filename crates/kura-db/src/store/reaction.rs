@@ -2,8 +2,8 @@
 //!
 //! One reaction per user per emoji per event. Soft-delete via removed_at.
 
-use kura_datastore_tracing::datastore_span;
 use chrono::{DateTime, Utc};
+use kura_datastore_tracing::datastore_span;
 use nostr::Event;
 use sqlx::{PgPool, Postgres, Row, Transaction};
 use uuid::Uuid;

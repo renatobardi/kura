@@ -10,9 +10,9 @@
 //! one-byte peer prefix. `try_send` is used throughout: real-time audio
 //! tolerates drops, never queues.
 
-use kura_core::CommunityId;
 use bytes::Bytes;
 use dashmap::DashMap;
+use kura_core::CommunityId;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use tokio::sync::{broadcast, mpsc};

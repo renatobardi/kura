@@ -3,9 +3,9 @@
 //! This store is distinct from NIP-43 relay membership. Membership backfill
 //! orchestration remains with the relay-membership invariant owner.
 
+use chrono::{DateTime, Utc};
 use kura_core::CommunityId;
 use kura_datastore_tracing::datastore_span;
-use chrono::{DateTime, Utc};
 use sqlx::Row;
 
 use crate::error::Result;

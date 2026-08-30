@@ -3,8 +3,8 @@ pub(crate) mod observability;
 pub mod replica_fence;
 
 use crate::{deletion, event, DbError, EventQuery, Result};
-use kura_datastore_tracing::datastore_span;
 use chrono::{DateTime, Utc};
+use kura_datastore_tracing::datastore_span;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{PgPool, QueryBuilder};
 use std::time::Duration;

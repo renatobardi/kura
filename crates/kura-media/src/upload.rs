@@ -1,7 +1,7 @@
 //! Upload pipeline — validate, store, thumbnail, sidecar.
 
-use kura_core::tenant::TenantContext;
 use bytes::Bytes;
+use kura_core::tenant::TenantContext;
 use sha2::{Digest, Sha256};
 use tokio::io::AsyncWriteExt;
 

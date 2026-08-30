@@ -749,8 +749,8 @@ fn test_community() -> CommunityId {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use kura_core::StoredEvent;
     use chrono::Utc;
+    use kura_core::StoredEvent;
     use nostr::{EventBuilder, Keys, Kind, Tag};
     use std::sync::Arc;
     use std::time::{Duration, Instant};

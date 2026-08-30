@@ -9,8 +9,8 @@
 //!
 //! Lane ownership: relay admin API (Duncan).
 
-use kura_datastore_tracing::datastore_span;
 use chrono::{DateTime, Utc};
+use kura_datastore_tracing::datastore_span;
 use sqlx::{PgPool, Postgres, Row as _, Transaction};
 
 use crate::error::{DbError, Result};

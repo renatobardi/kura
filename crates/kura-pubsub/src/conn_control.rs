@@ -14,8 +14,8 @@
 //! The DB ban row remains the durable backstop: even if a disconnect message is
 //! dropped, the next auth attempt is refused at the auth seam.
 
-use kura_core::{CommunityId, TenantContext};
 use futures_util::StreamExt;
+use kura_core::{CommunityId, TenantContext};
 use serde::{Deserialize, Serialize};
 use tokio::sync::broadcast;
 use uuid::Uuid;

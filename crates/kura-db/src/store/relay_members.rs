@@ -6,9 +6,9 @@
 //! community B (NIP-43 admission confinement). `pubkey` values are 64-char
 //! lowercase hex strings.
 
+use chrono::{DateTime, Utc};
 use kura_core::StoredEvent;
 use kura_datastore_tracing::datastore_span;
-use chrono::{DateTime, Utc};
 use sqlx::{PgPool, Row as _};
 use uuid::Uuid;
 

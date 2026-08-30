@@ -4,8 +4,8 @@
 //! TTL is 3x the 60s heartbeat interval so a single missed heartbeat doesn't
 //! cause presence flap. Clean disconnect deletes immediately.
 
-use kura_core::TenantContext;
 use deadpool_redis::Pool;
+use kura_core::TenantContext;
 use nostr::PublicKey;
 use std::collections::HashMap;
 

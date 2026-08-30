@@ -1,8 +1,8 @@
 //! Replaceable-event persistence and coordinate locking.
 
+use chrono::{DateTime, Utc};
 use kura_core::{CommunityId, StoredEvent};
 use kura_datastore_tracing::datastore_span;
-use chrono::{DateTime, Utc};
 use sqlx::{Acquire, Postgres, Transaction};
 use uuid::Uuid;
 

@@ -5,6 +5,7 @@ use std::sync::Arc;
 
 use tracing::{debug, warn};
 
+use hex;
 use kura_core::filter::filters_match;
 use kura_core::kind::{
     is_unshared_gated_event, AUTHOR_ONLY_KINDS, KIND_AGENT_ENGRAM, KIND_AGENT_TURN_METRIC,
@@ -13,7 +14,6 @@ use kura_core::kind::{
 use kura_core::tenant::TenantContext;
 use kura_db::EventQuery;
 use kura_pubsub::EventTopic;
-use hex;
 use nostr::Filter;
 
 use kura_auth::Scope;

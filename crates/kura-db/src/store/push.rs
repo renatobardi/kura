@@ -3,8 +3,8 @@
 //! Every operation requires a server-resolved [`CommunityId`]. Client-provided
 //! origins never select rows in this module.
 
-use kura_core::CommunityId;
 use chrono::{DateTime, Utc};
+use kura_core::CommunityId;
 use serde_json::Value;
 use sha2::{Digest as _, Sha256};
 use sqlx::{PgPool, Row as _};

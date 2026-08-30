@@ -38,12 +38,12 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use dashmap::DashMap;
 use kura_core::CommunityId;
 use kura_relay_mesh::{
     FencedHeader, GoodbyeReason, MeshDatagram, MeshError, MeshStream, MeshStreamFrame, Profile,
     RelayPeerTransport, RuntimeId, StreamHello, StreamRole,
 };
-use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use tokio::task::JoinHandle;
 use tokio_util::sync::CancellationToken;

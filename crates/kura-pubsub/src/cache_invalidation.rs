@@ -11,8 +11,8 @@
 //! universal delivery-enforcement point, so dropping the stale key is
 //! sufficient: the next read re-fetches authoritative state from the DB.
 
-use kura_core::{CommunityId, TenantContext};
 use futures_util::StreamExt;
+use kura_core::{CommunityId, TenantContext};
 use serde::{Deserialize, Serialize};
 use tokio::sync::broadcast;
 use uuid::Uuid;

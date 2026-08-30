@@ -1,5 +1,5 @@
-use kura_core::CommunityId;
 use chrono::{DateTime, Utc};
+use kura_core::CommunityId;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

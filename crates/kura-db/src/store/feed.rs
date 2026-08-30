@@ -28,8 +28,8 @@
 /// before the query is issued so the SQL `LIMIT` clause always reflects this cap.
 pub const FEED_MAX_LIMIT: i64 = 100;
 
-use kura_datastore_tracing::datastore_span;
 use chrono::{DateTime, Utc};
+use kura_datastore_tracing::datastore_span;
 use sqlx::postgres::PgRow;
 use sqlx::{PgPool, QueryBuilder};
 use uuid::Uuid;

@@ -2052,7 +2052,7 @@ mod tests {
     use uuid::Uuid;
 
     use super::{
-        kura_auto_migrate_enabled, dropped_in_memory_keys, idle_timeout_secs,
+        dropped_in_memory_keys, idle_timeout_secs, kura_auto_migrate_enabled,
         refresh_legacy_active_gauge_recency, relay_keypair_from_config,
         run_periodic_until_cancelled, EmissionScope, InMemoryMetricKey,
     };

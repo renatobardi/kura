@@ -1059,8 +1059,8 @@ mod tests {
         channel_id_from_event, cmd_get_thread, event_mention_pubkeys, find_root_from_tags,
         format_events, match_profiles_by_name, merge_message_mentions, missing_members,
         normalize_explicit_mentions, parse_member_pubkeys, resolve_names_to_pubkeys,
-        resolve_thread_target, thread_ref_from_event, thread_ref_from_parent_tags, KuraClient,
-        CliError, Uuid,
+        resolve_thread_target, thread_ref_from_event, thread_ref_from_parent_tags, CliError,
+        KuraClient, Uuid,
     };
     use kura_sdk::mentions::{
         extract_at_mentions_with_known, extract_at_names, match_names_to_profiles, MentionProfile,

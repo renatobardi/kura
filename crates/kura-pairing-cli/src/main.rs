@@ -15,6 +15,8 @@
 use std::io::{self, BufRead, Write};
 use std::time::Duration;
 
+use clap::{Parser, Subcommand};
+use futures_util::{SinkExt, StreamExt};
 use kura_core::kind::KIND_PAIRING;
 use kura_core::pairing::session::PairingSession;
 use kura_core::pairing::{
@@ -23,8 +25,6 @@ use kura_core::pairing::{
     types::PayloadType,
     PairingError,
 };
-use clap::{Parser, Subcommand};
-use futures_util::{SinkExt, StreamExt};
 use nostr::{Event, EventBuilder, Keys, RelayUrl, SecretKey, ToBech32};
 use tokio::time::timeout;
 use tokio_tungstenite::{connect_async, tungstenite::Message};

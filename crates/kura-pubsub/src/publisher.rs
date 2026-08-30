@@ -1,7 +1,7 @@
 //! Event publishing — PUBLISH to Redis via pool connection.
 
-use kura_core::TenantContext;
 use deadpool_redis::Pool;
+use kura_core::TenantContext;
 use nostr::JsonUtil;
 use uuid::Uuid;
 

@@ -14,8 +14,8 @@
 //! Lane ownership: L1 (Max). Signatures below are the contract; changes go
 //! through the integration thread.
 
-use kura_datastore_tracing::datastore_span;
 use chrono::{DateTime, Utc};
+use kura_datastore_tracing::datastore_span;
 use sqlx::{PgPool, Row as _};
 use uuid::Uuid;
 

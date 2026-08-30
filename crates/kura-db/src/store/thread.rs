@@ -4,8 +4,8 @@
 //! nested threads. The `thread_metadata` table is populated when events are
 //! ingested and updated as replies arrive or are deleted.
 
-use kura_core::StoredEvent;
 use chrono::{DateTime, Utc};
+use kura_core::StoredEvent;
 use sqlx::{PgPool, Row};
 use uuid::Uuid;
 

@@ -1,9 +1,9 @@
 use std::collections::{HashMap, HashSet};
 
+use chrono::DateTime;
 use kura_core::kind::{
     KIND_MANAGED_AGENT, KIND_PRESENCE_SNAPSHOT, KIND_PRESENCE_UPDATE, KIND_TEAM,
 };
-use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

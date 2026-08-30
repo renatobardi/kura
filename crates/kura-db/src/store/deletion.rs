@@ -9,8 +9,8 @@ use std::fmt;
 use std::str::FromStr;
 use std::time::Duration;
 
-use kura_core::CommunityId;
 use chrono::{DateTime, Utc};
+use kura_core::CommunityId;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use sqlx::{AssertSqlSafe, PgConnection, PgPool, Postgres, Row, Transaction};

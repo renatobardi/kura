@@ -116,11 +116,11 @@ const GATED_OBSERVER_QUEUE_CAP: usize = 256;
 
 use std::time::Instant;
 
+use futures_util::{SinkExt, StreamExt};
 use kura_core::kind::{
     KIND_AGENT_OBSERVER_FRAME, KIND_MEMBER_ADDED_NOTIFICATION, KIND_MEMBER_REMOVED_NOTIFICATION,
     KIND_TYPING_INDICATOR,
 };
-use futures_util::{SinkExt, StreamExt};
 use nostr::{Event, EventBuilder, Keys, Kind, RelayUrl, Tag};
 use serde_json::{json, Value};
 use tokio::sync::mpsc;

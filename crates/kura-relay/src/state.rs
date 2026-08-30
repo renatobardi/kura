@@ -15,6 +15,7 @@ use tokio::task::JoinHandle;
 use tokio_util::sync::CancellationToken;
 use uuid::Uuid;
 
+use deadpool_redis;
 use kura_audit::AuditService;
 use kura_auth::{AuthService, Nip98ReplayGuard};
 use kura_core::tenant::TenantContext;
@@ -27,7 +28,6 @@ use kura_pubsub::rate_limiter::RedisRateLimiter;
 use kura_pubsub::{PubSubManager, RedisNip98ReplayGuard};
 use kura_search::SearchService;
 use kura_workflow::WorkflowEngine;
-use deadpool_redis;
 
 use crate::audio::AudioRoomManager;
 use crate::config::Config;

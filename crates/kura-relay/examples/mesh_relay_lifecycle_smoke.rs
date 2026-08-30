@@ -58,8 +58,8 @@ use std::process::{Child, ChildStdout, Command, ExitStatus, Stdio};
 use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
-use kura_test_client::KuraTestClient;
 use ed25519_dalek::{Signature, Verifier, VerifyingKey};
+use kura_test_client::KuraTestClient;
 use mesh_llm_host_runtime::crypto::{load_keystore, save_keystore, OwnerKeypair};
 use mesh_llm_sdk::{client, serve, MeshDiscoveryMode, TrustPolicy};
 use nostr::{Alphabet, Event, EventBuilder, Filter, Keys, Kind, SingleLetterTag, Tag};

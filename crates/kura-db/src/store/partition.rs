@@ -2,8 +2,8 @@
 //!
 //! Call `ensure_future_partitions` on startup and monthly via cron.
 
-use kura_datastore_tracing::datastore_span;
 use chrono::{Datelike, TimeZone, Utc};
+use kura_datastore_tracing::datastore_span;
 use sqlx::{PgPool, Row};
 use tracing::info;
 

@@ -1,9 +1,9 @@
 //! Event-reminder delivery query, claim, and release persistence.
 
+use chrono::{DateTime, Utc};
 use kura_core::kind::KIND_EVENT_REMINDER;
 use kura_core::CommunityId;
 use kura_datastore_tracing::datastore_span;
-use chrono::{DateTime, Utc};
 use sqlx::{PgPool, Row};
 use uuid::Uuid;
 

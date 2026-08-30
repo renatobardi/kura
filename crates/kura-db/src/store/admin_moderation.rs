@@ -4,8 +4,8 @@
 //! [`CommunityId`](kura_core::CommunityId). Keep ordinary moderation reads in
 //! [`crate::moderation`] tenant-fenced.
 
-use kura_datastore_tracing::datastore_span;
 use chrono::{DateTime, Utc};
+use kura_datastore_tracing::datastore_span;
 use serde::Serialize;
 use sqlx::{PgPool, Row as _};
 use uuid::Uuid;

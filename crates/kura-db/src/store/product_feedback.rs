@@ -3,8 +3,8 @@
 //! Feedback retains its source [`CommunityId`] as provenance, but is not a
 //! community moderation concern and is never inserted into the events table.
 
-use kura_datastore_tracing::datastore_span;
 use chrono::{DateTime, Utc};
+use kura_datastore_tracing::datastore_span;
 use serde::Serialize;
 use sqlx::{PgPool, Row as _};
 use uuid::Uuid;
