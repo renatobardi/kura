@@ -126,7 +126,8 @@ String _normalizeBareLink(String segment, Match match) {
   final matched = match[0]!;
   var url = matched;
   var trailing = '';
-  final isBuzzUrl = matched.startsWith('kura://') || matched.startsWith('buzz://');
+  final isBuzzUrl =
+      matched.startsWith('kura://') || matched.startsWith('buzz://');
   final start = match.start;
 
   if (isBuzzUrl) {
