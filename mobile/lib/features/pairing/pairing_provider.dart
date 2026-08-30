@@ -894,7 +894,9 @@ class PairingNotifier extends Notifier<PairingState> {
   Community _parseLegacyInput(String raw) {
     var payload = raw.trim();
 
-    if (payload.startsWith('buzz://')) {
+    if (payload.startsWith('kura://')) {
+      payload = payload.substring('kura://'.length);
+    } else if (payload.startsWith('buzz://')) {
       payload = payload.substring('buzz://'.length);
     }
 

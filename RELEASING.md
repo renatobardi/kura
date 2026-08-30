@@ -1,6 +1,6 @@
-# Releasing Buzz
+# Releasing Kura
 
-Buzz has three independent release lanes. Desktop and relay use release PRs.
+Kura has three independent release lanes. Desktop and relay use release PRs.
 Mobile uses immutable release-candidate tags cut directly from remote `main`:
 
 | Lane | Entry point | Artifact |
@@ -100,7 +100,7 @@ Every push to `main` continues to publish the rolling relay `:main` and
    GitHub App. It never uses the operator's checked-out commit and never moves
    an existing candidate.
 2. **Build the exact tag.** Enter the candidate tag as `mobile_ref` in the
-   private Buzz mobile Buildkite pipeline. OSS CI deliberately cannot trigger
+   private Kura mobile Buildkite pipeline. OSS CI deliberately cannot trigger
    that private pipeline. The tag supplies both source commit and release
    version. Flutter receives clean marketing version `X.Y.Z`; Buildkite's
    monotonically increasing build number supplies the platform build number.

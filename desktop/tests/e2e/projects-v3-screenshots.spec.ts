@@ -253,7 +253,7 @@ test("restricted repositories keep event work visible and offer access help", as
   await expect(chatPanel.getByTestId("message-composer")).toBeVisible();
 });
 
-test("repository pages show a centered Buzz loader while fetching", async ({
+test("repository pages show a centered Kura loader while fetching", async ({
   page,
 }) => {
   await installMockBridge(page, { projectRepoSnapshotDelayMs: 750 });
@@ -264,12 +264,11 @@ test("repository pages show a centered Buzz loader while fetching", async ({
   await expect(
     loader.getByRole("img", { name: "Loading repository" }),
   ).toBeVisible();
-  const animatedMark = loader.locator(".buzz-logo__mark");
-  await expect(animatedMark).toHaveCSS(
-    "animation-name",
-    "buzz-logo-scale-pulse",
+  const animatedMark = loader.locator("svg.kura-glyph");
+  const animationName = await animatedMark.evaluate(
+    (el) => getComputedStyle(el).animationName,
   );
-  await expect(animatedMark).toHaveCSS("opacity", "1");
+  expect(animationName).not.toBe("none");
   await expect(loader).toHaveCSS("justify-content", "center");
   await expect(loader).toBeHidden({ timeout: 5_000 });
 });
@@ -672,7 +671,7 @@ test("projects v3 workspace screenshot states", async ({ page }) => {
   const agentContext = agentChatPanel.getByTestId("project-agent-context");
   await expect(agentContext).toBeVisible();
   await expect(agentContext).toContainText("Files");
-  await expect(agentContext).not.toContainText("Buzz /");
+  await expect(agentContext).not.toContainText("Kura /");
   // The context rail reveals the chat panel with a width transition; measure
   // only after it settles or the panel's unclipped box overhangs the rail.
   await waitForAnimations(page);

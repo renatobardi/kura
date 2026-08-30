@@ -594,10 +594,10 @@ test("shows profile save feedback as a toast", async ({ page }) => {
 });
 
 test("nests the avatar edit button in a clipped notch", async ({ page }) => {
-  // Under the Buzz default theme the settings nav overrides `--sidebar-active`
+  // Under the Kura default theme the settings nav overrides `--sidebar-active`
   // (white pill on the gradient) while the avatar edit button deliberately
   // keeps the root accent-driven token, so the shared-token comparison below
-  // only holds outside the Buzz theme.
+  // only holds outside the Kura theme.
   await page.addInitScript(() => {
     window.localStorage.setItem("buzz-theme", "github-light");
   });
@@ -2416,8 +2416,8 @@ test("opens settings with the keyboard shortcut and updates theme", async ({
   ).toBeVisible();
   await page.getByTestId("settings-nav-appearance").click();
 
-  // Default is Buzz in System mode; Playwright's default color scheme is
-  // light, so the app boots with the light Buzz theme.
+  // Default is Kura in System mode; Playwright's default color scheme is
+  // light, so the app boots with the light Kura theme.
   await expect
     .poll(() =>
       page.evaluate(() => document.documentElement.classList.contains("light")),

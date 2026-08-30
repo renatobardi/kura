@@ -25,7 +25,7 @@ const dom = new JSDOM("<!doctype html><html><body></body></html>", {
 });
 
 const CHANNEL_ID = "9a1657ac-f7aa-5db0-b632-d8bbeb6dfb50";
-const CHANNEL_HREF = `buzz://channel/${CHANNEL_ID}`;
+const CHANNEL_HREF = `kura://channel/${CHANNEL_ID}`;
 const MESSAGE_LINK_CHANNELS = [{ id: CHANNEL_ID, name: "general" }];
 
 before(() => {
@@ -90,7 +90,7 @@ async function mountComposerEditor() {
   });
   // Tiptap emits `create` from a `setTimeout(…, 0)`, and Link's `onCreate` is
   // what teaches linkify the `buzz` protocol. Paste before that lands and a
-  // `buzz://` assertion passes for the wrong reason.
+  // `kura://` assertion passes for the wrong reason.
   await waitFor(() =>
     assert.ok(editor?.isInitialized, "composer editor never emitted `create`"),
   );
@@ -184,7 +184,7 @@ test("mixed paragraph and code-block selection is replaced, never part-linked", 
   assert.ok(!editor.state.doc.textContent.includes("ordinary"));
 });
 
-test("mixed selection paste of a Buzz link becomes a chip, not a part-link", async () => {
+test("mixed selection paste of a Kura link becomes a chip, not a part-link", async () => {
   const editor = await mountComposerEditor();
   seedDocument(
     editor,

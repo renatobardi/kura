@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'accent_colors.dart';
 import 'app_colors.dart';
 
-/// Name of the first-party Buzz theme. Buzz reuses the GitHub Light palette for
-/// every base color; the one thing that sets it apart is a branded gradient
-/// painted across the app's top section. Mirrors desktop, where the same
-/// gradient fills the sidebar canvas — see `data-buzz-sidebar` in
-/// `desktop/src/shared/styles/globals/theme.css`.
+/// Name of the first-party Kura theme (id kept as `buzz` for phase 1). Uses
+/// the washi/sumi palette; the top section renders as a flat fill (no
+/// gradient, per identity guidelines) via [buzzTopSectionGradient].
 const buzzThemeName = 'buzz';
 
 /// Name of the dark counterpart, which reuses the GitHub Dark palette and the
@@ -71,11 +69,14 @@ int effectiveAccentIndex(String themeName, String storedAccent) {
   return accentIndexForWireValue(storedAccent) ?? defaultAccentIndex;
 }
 
-/// Gradient stops, matching desktop's `--buzz-gradient-*` custom properties.
-const _lightTop = Color(0xFFE6E6B6);
-const _lightBottom = Color(0xFFC4D0DA);
-const _darkTop = Color(0xFF4A4616);
-const _darkBottom = Color(0xFF0A1423);
+/// Flat top-section fill for the Kura theme (washi/sumi) — no gradient, per
+/// identity guidelines. Kept as matching top/bottom stops so the existing
+/// [LinearGradient] plumbing in [buzzTopSectionGradient] renders as a solid
+/// fill without touching call sites.
+const _lightTop = Color(0xFFF7F4EE);
+const _lightBottom = Color(0xFFF7F4EE);
+const _darkTop = Color(0xFF151412);
+const _darkBottom = Color(0xFF151412);
 
 /// The Buzz gradient for the app's top section, or null when [themeName] is not
 /// a Buzz theme — in which case the section keeps its default frosted fill.

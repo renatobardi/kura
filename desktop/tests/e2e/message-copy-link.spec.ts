@@ -120,7 +120,7 @@ test("message action rail copies the same canonical thread link as More", async 
   await copyLink.hover();
   await expect(page.getByRole("tooltip", { name: "Copy link" })).toBeVisible();
 
-  const expectedLink = `buzz://message?channel=${GENERAL_CHANNEL_ID}&id=${replyId}&thread=${rootId}`;
+  const expectedLink = `kura://message?channel=${GENERAL_CHANNEL_ID}&id=${replyId}&thread=${rootId}`;
   await copyLink.click();
   await expect
     .poll(async () => (await latestClipboardWrite(page))?.payload.text)

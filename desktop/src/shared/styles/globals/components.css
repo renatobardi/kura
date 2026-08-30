@@ -302,19 +302,19 @@
   }
 
   .buzz-onboarding-neutral-theme {
-    /* Landing "chartreuse" — the welcome background; reused for the CTA label. */
-    --buzz-welcome-chartreuse: #d7d72e;
+    /* Landing washi (was chartreuse) — the welcome background; reused for the CTA label. */
+    --buzz-welcome-chartreuse: #f7f4ee;
     /* Bottom stop of the onboarding shell gradient; also the docked-footer
        scrim color so content scrolling under the CTA fades into the page. */
-    --buzz-onboarding-shell-bottom: #d7e7f6;
+    --buzz-onboarding-shell-bottom: #ece7dc;
     /* Label color for the primary onboarding CTA (light blue on the dark pill). */
-    --buzz-onboarding-cta-label: #d7e6f0;
+    --buzz-onboarding-cta-label: #f7f4ee;
     /* Olive ink for the backup step's private key and its "never share" caption,
        reading against the fuzzy-white key frame. */
-    --buzz-onboarding-backup-ink: #717106;
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
-    --primary: 0 0% 9%;
+    --buzz-onboarding-backup-ink: #b4432b;
+    --background: 40 36% 95.1%;
+    --foreground: 36 10% 10%;
+    --primary: 10 61% 44%;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -329,11 +329,11 @@
     --buzz-onboarding-emoji-picker-color: 23, 23, 23;
     --buzz-onboarding-emoji-picker-input: 255, 255, 255;
     --buzz-onboarding-avatar-dialog-bg: 255 255 255;
-    --buzz-onboarding-avatar-accent-bg: 240 240 205;
-    --buzz-onboarding-avatar-accent-fg: 113 113 6;
+    --buzz-onboarding-avatar-accent-bg: 251 234 229;
+    --buzz-onboarding-avatar-accent-fg: 180 67 43;
     --buzz-onboarding-avatar-action-bg: 23 23 23;
-    --buzz-onboarding-avatar-action-fg: 240 240 205;
-    --buzz-onboarding-avatar-control-fg: 113 113 6;
+    --buzz-onboarding-avatar-action-fg: 247 244 238;
+    --buzz-onboarding-avatar-control-fg: 180 67 43;
     --buzz-onboarding-avatar-dialog-shadow: 0 0 0;
   }
 
@@ -345,15 +345,15 @@
    */
   .buzz-onboarding-security-theme {
     color-scheme: dark;
-    --buzz-onboarding-shell-bottom: #082b49;
+    --buzz-onboarding-shell-bottom: #151412;
     --buzz-onboarding-cta-label: #f5f5f5;
-    --background: 222 45% 4%;
-    --foreground: 0 0% 96%;
-    --card: 220 14% 11%;
-    --card-foreground: 0 0% 96%;
-    --popover: 220 14% 9%;
-    --popover-foreground: 0 0% 96%;
-    --primary: 0 0% 16%;
+    --background: 40 8% 8%;
+    --foreground: 41 30% 89%;
+    --card: 36 9% 11%;
+    --card-foreground: 41 30% 89%;
+    --popover: 36 9% 11%;
+    --popover-foreground: 41 30% 89%;
+    --primary: 11 62% 53%;
     --primary-foreground: 0 0% 96%;
     --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 96%;
@@ -369,19 +369,13 @@
   }
 
   .buzz-onboarding-neutral-theme.buzz-startup-shell.buzz-onboarding-security-theme {
-    background-color: #010103;
+    background-color: #151412;
+    /* Flat sumi ground with the same 24px dot lattice as the light shell. */
     background-image:
-      radial-gradient(circle, rgb(143 211 255 / 0.11) 1px, transparent 1px),
-      radial-gradient(
-        ellipse at 50% 58%,
-        rgb(28 112 196 / 0.24) 0%,
-        rgb(18 76 138 / 0.1) 38%,
-        transparent 66%
-      ),
-      linear-gradient(to bottom, #010103 0%, #040914 46%, #082b49 100%);
+      radial-gradient(circle, rgb(236 231 220 / 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, #151412 0%, #1f1d1a 100%);
     background-size:
       24px 24px,
-      auto,
       auto;
   }
 
@@ -409,11 +403,11 @@
     --buzz-onboarding-emoji-picker-color: 250, 250, 250;
     --buzz-onboarding-emoji-picker-input: 10, 10, 10;
     --buzz-onboarding-avatar-dialog-bg: 24 24 20;
-    --buzz-onboarding-avatar-accent-bg: 211 211 163;
-    --buzz-onboarding-avatar-accent-fg: 24 24 20;
-    --buzz-onboarding-avatar-action-bg: 113 113 6;
-    --buzz-onboarding-avatar-action-fg: 240 240 205;
-    --buzz-onboarding-avatar-control-fg: 224 224 176;
+    --buzz-onboarding-avatar-accent-bg: 60 41 34;
+    --buzz-onboarding-avatar-accent-fg: 236 231 220;
+    --buzz-onboarding-avatar-action-bg: 209 88 61;
+    --buzz-onboarding-avatar-action-fg: 21 20 18;
+    --buzz-onboarding-avatar-control-fg: 60 41 34;
     --buzz-onboarding-avatar-dialog-shadow: 0 0 0;
   }
 
@@ -422,9 +416,9 @@
     .buzz-onboarding-neutral-theme[data-system-color-scheme="light"]:not(
       .buzz-startup-shell
     ) {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
-    --primary: 0 0% 9%;
+    --background: 40 36% 95.1%;
+    --foreground: 36 10% 10%;
+    --primary: 10 61% 44%;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -439,11 +433,11 @@
     --buzz-onboarding-emoji-picker-color: 23, 23, 23;
     --buzz-onboarding-emoji-picker-input: 255, 255, 255;
     --buzz-onboarding-avatar-dialog-bg: 255 255 255;
-    --buzz-onboarding-avatar-accent-bg: 240 240 205;
-    --buzz-onboarding-avatar-accent-fg: 113 113 6;
+    --buzz-onboarding-avatar-accent-bg: 251 234 229;
+    --buzz-onboarding-avatar-accent-fg: 180 67 43;
     --buzz-onboarding-avatar-action-bg: 23 23 23;
-    --buzz-onboarding-avatar-action-fg: 240 240 205;
-    --buzz-onboarding-avatar-control-fg: 113 113 6;
+    --buzz-onboarding-avatar-action-fg: 247 244 238;
+    --buzz-onboarding-avatar-control-fg: 180 67 43;
     --buzz-onboarding-avatar-dialog-shadow: 0 0 0;
   }
 
@@ -467,11 +461,11 @@
     --buzz-onboarding-emoji-picker-color: 250, 250, 250;
     --buzz-onboarding-emoji-picker-input: 10, 10, 10;
     --buzz-onboarding-avatar-dialog-bg: 24 24 20;
-    --buzz-onboarding-avatar-accent-bg: 211 211 163;
-    --buzz-onboarding-avatar-accent-fg: 24 24 20;
-    --buzz-onboarding-avatar-action-bg: 113 113 6;
-    --buzz-onboarding-avatar-action-fg: 240 240 205;
-    --buzz-onboarding-avatar-control-fg: 224 224 176;
+    --buzz-onboarding-avatar-accent-bg: 60 41 34;
+    --buzz-onboarding-avatar-accent-fg: 236 231 220;
+    --buzz-onboarding-avatar-action-bg: 209 88 61;
+    --buzz-onboarding-avatar-action-fg: 21 20 18;
+    --buzz-onboarding-avatar-control-fg: 60 41 34;
     --buzz-onboarding-avatar-dialog-shadow: 0 0 0;
   }
 

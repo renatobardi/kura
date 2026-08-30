@@ -109,6 +109,9 @@ const _modeTokens = <String>{
 /// mode-specific tokens so `github-light` reads as "Github" and stands for both
 /// halves. Mirrors desktop's `pairedThemeLabel`.
 String pairedThemeLabel(String lightName) {
+  // The first-party pair keeps its `buzz` id through phase 1 but is the Kura
+  // theme to users.
+  if (lightName == 'buzz' || lightName == 'buzz-dark') return 'Kura';
   final stripped = lightName
       .split('-')
       .where((token) => !_modeTokens.contains(token))

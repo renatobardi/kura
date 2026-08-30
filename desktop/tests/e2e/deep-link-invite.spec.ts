@@ -29,7 +29,7 @@ const PENDING_CONNECT_LINK = {
 const PENDING_ADD_COMMUNITY_LINK = {
   id: "dl-add-community-1",
   kind: "add-community" as const,
-  relayUrl: "wss://acme.communities.buzz.xyz",
+  relayUrl: "wss://acme.communities.kura.oute.pro",
   code: null,
   name: "Acme Team",
 };
@@ -37,7 +37,7 @@ const PENDING_ADD_COMMUNITY_LINK = {
 const SECOND_PENDING_ADD_COMMUNITY_LINK = {
   id: "dl-add-community-2",
   kind: "add-community" as const,
-  relayUrl: "wss://beta.communities.buzz.xyz",
+  relayUrl: "wss://beta.communities.kura.oute.pro",
   code: null,
   name: "Beta Team",
 };
@@ -302,7 +302,7 @@ test("deleted public starter channels do not strand community onboarding", async
   );
   await page.goto("/");
 
-  await page.getByRole("button", { name: "Take me to Buzz" }).click();
+  await page.getByRole("button", { name: "Take me to Kura" }).click();
 
   await expect(page.getByTestId("community-onboarding-flow")).toHaveCount(0);
   await expect(page).toHaveURL(/#\/channels\/[^/]+$/);
@@ -357,12 +357,12 @@ test("required Welcome creation failure keeps community onboarding open", async 
   );
   await page.goto("/");
 
-  await page.getByRole("button", { name: "Take me to Buzz" }).click();
+  await page.getByRole("button", { name: "Take me to Kura" }).click();
 
   await expect(page.getByTestId("community-onboarding-flow")).toBeVisible();
   await expect(page.getByText(`${welcomeError} Try again.`)).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Take me to Buzz" }),
+    page.getByRole("button", { name: "Take me to Kura" }),
   ).toBeEnabled();
   await expect(page.getByTestId("chat-title")).toHaveCount(0);
 });

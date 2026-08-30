@@ -7,9 +7,9 @@ request, discussion, or other public channel.**
 
 Use GitHub's private vulnerability reporting form instead:
 
-**[Report a vulnerability privately](https://github.com/block/buzz/security/advisories/new)**
+**Open a private security advisory on [github.com/renatobardi/kura](https://github.com/renatobardi/kura/security/advisories/new)**
 
-Submitting the form starts a private security advisory with the Buzz
+Submitting the form starts a private security advisory with the Kura
 maintainers. Use that advisory for vulnerability details, follow-up questions,
 and coordinated remediation. Include as much detail as possible:
 
@@ -18,8 +18,9 @@ and coordinated remediation. Include as much detail as possible:
 - The affected version(s) or commit range
 - Any suggested mitigations you've identified
 
-If GitHub's private reporting form is unavailable to you, email
-**buzz@block.xyz** and do not include vulnerability details in a public issue.
+If GitHub's private reporting form is unavailable to you, open a private
+security advisory on [github.com/renatobardi/kura](https://github.com/renatobardi/kura) and do not include
+vulnerability details in a public issue.
 
 You will receive an acknowledgment within **48 hours**. We aim to provide a
 full response — including a timeline for a fix — within **7 days** of initial
@@ -42,7 +43,7 @@ We will credit reporters in release notes unless you prefer to remain anonymous.
 | `main` (latest) | ✅ Active |
 | Previous releases | ⚠️ Best-effort; upgrade recommended |
 
-Buzz is pre-1.0. We do not maintain long-term support branches at this stage.
+Kura is pre-1.0. We do not maintain long-term support branches at this stage.
 All security fixes land on `main` first.
 
 ---
@@ -84,7 +85,7 @@ for SOX-grade compliance and eDiscovery.
 
 ### Desktop Secret Storage — OS Keyring
 
-The Buzz desktop app stores nsec private keys in the operating system keyring
+The Kura desktop app stores nsec private keys in the operating system keyring
 rather than in plaintext files: macOS Keychain, Windows Credential Manager, or
 the Linux Secret Service (`gnome-keyring` / `kwallet` via D-Bus). This covers
 both the human identity key and every managed-agent key.

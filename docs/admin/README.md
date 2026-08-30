@@ -1,6 +1,6 @@
 # Deployment moderation dashboard
 
-Buzz can expose a private, deployment-wide moderation dashboard from the existing
+Kura can expose a private, deployment-wide moderation dashboard from the existing
 relay process. It shows open moderation reports and recent product feedback.
 
 Configure `BUZZ_ADMIN_HOST` to activate the dashboard. A private ingress limits
@@ -230,7 +230,7 @@ relay path.
 
 ## Operator migration
 
-**Upgrading from a pre-auth release (Buzz prior to the introduction of this
+**Upgrading from a pre-auth release (Kura prior to the introduction of this
 `BUZZ_ADMIN_HOST` requirement):** any deployed relay with `BUZZ_ADMIN_HOST` set
 boots in `nip98` mode after upgrade unless `BUZZ_ADMIN_AUTH=disabled` is set.
 Choose the mode that fits your deployment:

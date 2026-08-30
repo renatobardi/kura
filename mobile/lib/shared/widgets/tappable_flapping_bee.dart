@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'flapping_bee.dart';
 
-/// The Buzz mark with wings that flutter twice when the user taps it.
+/// The Kura seal, pressed once when the user taps it.
 ///
 /// The geometry and wing tuck match the desktop loading bee. When reduced
 /// motion is enabled, the mark stays static.
@@ -37,8 +37,8 @@ class TappableFlappingBee extends HookConsumerWidget {
 
     return Semantics(
       button: true,
-      label: 'Buzz bee',
-      hint: 'Tap to make its wings flutter',
+      label: 'Kura seal',
+      hint: 'Tap to press the seal',
       onTap: flutterWings,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,

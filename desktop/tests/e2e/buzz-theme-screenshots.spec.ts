@@ -361,8 +361,8 @@ async function expectAppliedBuzzTheme(
       storedTheme,
       isDark,
       buzzTheme: themeName,
-      gradientTop: isDark ? "#4a4616" : "#e6e6b6",
-      gradientBottom: isDark ? "#0a1423" : "#c4d0da",
+      gradientTop: isDark ? "#1f1d1a" : "#f7f4ee",
+      gradientBottom: isDark ? "#151412" : "#ece7dc",
     });
 }
 
@@ -411,7 +411,7 @@ test("buzz dark sidebar gradient", async ({ page }) => {
   await expectIconlessSectionTitleAligned(page, "dm-list");
   await expect(page.locator("[data-buzz-content-surface]")).toHaveCSS(
     "background-color",
-    "rgb(26, 26, 26)",
+    "rgb(22, 21, 19)",
   );
   await waitForAnimations(page);
   await page
@@ -758,7 +758,7 @@ test("app font size and conversation density apply independently", async ({
   await expect(comfortable).toHaveAttribute("aria-pressed", "true");
   await expect(defaultSize).toHaveAttribute("aria-pressed", "true");
   await expect(densityDescription).toHaveText(
-    "Spacing in conversations and Markdown content across Buzz",
+    "Spacing in conversations and Markdown content across Kura",
   );
   await expect(fontSizeDescription).toHaveText(
     "Applies across conversations and interface text",
@@ -1163,28 +1163,28 @@ test("app font size and conversation density apply independently", async ({
   });
 });
 
-test("appearance picker — system tab (Buzz follows OS)", async ({ page }) => {
+test("appearance picker — system tab (Kura follows OS)", async ({ page }) => {
   await seedTheme(page, "buzz");
   await installMockBridge(page);
   const panel = await openAppearance(page, "system");
   await panel.screenshot({ path: `${SHOTS}/03-picker-system.png` });
 });
 
-test("appearance picker — light tab (Buzz)", async ({ page }) => {
+test("appearance picker — light tab (Kura)", async ({ page }) => {
   await seedTheme(page, "buzz");
   await installMockBridge(page);
   const panel = await openAppearance(page, "light");
   await panel.screenshot({ path: `${SHOTS}/04-picker-light.png` });
 });
 
-test("appearance picker — dark tab (Buzz Dark)", async ({ page }) => {
+test("appearance picker — dark tab (Kura Dark)", async ({ page }) => {
   await seedTheme(page, "buzz-dark");
   await installMockBridge(page);
   const panel = await openAppearance(page, "dark");
   await panel.screenshot({ path: `${SHOTS}/05-picker-dark.png` });
 });
 
-test("settings nav uses Buzz active pill + hover (light)", async ({ page }) => {
+test("settings nav uses Kura active pill + hover (light)", async ({ page }) => {
   await seedTheme(page, "buzz");
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -1197,7 +1197,7 @@ test("settings nav uses Buzz active pill + hover (light)", async ({ page }) => {
   await expect(profileRow).toHaveAttribute("data-active", "true");
   await expect(profileRow).toHaveCSS("font-weight", "600");
   const selectedLabelBox = await profileLabel.boundingBox();
-  // Appearance is the active section here; its nav row should carry the Buzz
+  // Appearance is the active section here; its nav row should carry the Kura
   // white active pill (data-active=true), matching the Left Nav treatment.
   await page.getByTestId("settings-nav-appearance").click();
   await expect(profileRow).toHaveCSS("font-weight", "400");
@@ -1215,7 +1215,7 @@ test("settings nav uses Buzz active pill + hover (light)", async ({ page }) => {
   await sidebar.screenshot({ path: `${SHOTS}/06-settings-nav-light.png` });
 });
 
-test("settings nav uses Buzz active pill + hover (dark)", async ({ page }) => {
+test("settings nav uses Kura active pill + hover (dark)", async ({ page }) => {
   await seedTheme(page, "buzz-dark");
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -1227,7 +1227,7 @@ test("settings nav uses Buzz active pill + hover (dark)", async ({ page }) => {
   await expectBuzzSettingsPalette(page, "dark");
   await expect(page.getByTestId("settings-content-surface")).toHaveCSS(
     "background-color",
-    "rgb(26, 26, 26)",
+    "rgb(22, 21, 19)",
   );
   await waitForAnimations(page);
   await sidebar.screenshot({ path: `${SHOTS}/07-settings-nav-dark.png` });
@@ -1391,7 +1391,7 @@ for (const { mode, theme } of [
   { mode: "light" as const, theme: "github-light" },
   { mode: "dark" as const, theme: "github-dark" },
 ]) {
-  test(`${theme} ignores the Buzz prominent preference`, async ({ page }) => {
+  test(`${theme} ignores the Kura prominent preference`, async ({ page }) => {
     await seedTheme(page, theme);
     await page.addInitScript(
       ({ key }) => window.localStorage.setItem(key, "true"),
@@ -1524,11 +1524,11 @@ test("settings content uses the same inset surface as the main app", async ({
   });
 });
 
-test("appearance hides accent picker under Buzz", async ({ page }) => {
+test("appearance hides accent picker under Kura", async ({ page }) => {
   await seedTheme(page, "buzz");
   await installMockBridge(page);
   const panel = await openAppearance(page, "light");
-  // The accent picker is hidden while a Buzz theme is active. Its neutral
+  // The accent picker is hidden while a Kura theme is active. Its neutral
   // swatch testid must not be present.
   await expect(page.getByTestId("accent-color-neutral")).toHaveCount(0);
   await panel.screenshot({ path: `${SHOTS}/10-appearance-no-accent.png` });
@@ -1679,7 +1679,7 @@ test("glass background is unavailable on Linux", async ({ page }) => {
     });
     Object.defineProperty(navigator, "userAgent", {
       configurable: true,
-      get: () => "Buzz Desktop Linux",
+      get: () => "Kura Desktop Linux",
     });
   }, GLASS_BACKGROUND_STORAGE_KEY);
   await installMockBridge(page);
@@ -1711,7 +1711,7 @@ test("glass background is unavailable on Linux", async ({ page }) => {
     .toBe("true");
 });
 
-test("non-Buzz glass preserves the selected theme sidebar tint", async ({
+test("non-Kura glass preserves the selected theme sidebar tint", async ({
   page,
 }) => {
   await seedTheme(page, "rose-pine-dawn");
@@ -1756,10 +1756,10 @@ test("non-Buzz glass preserves the selected theme sidebar tint", async ({
   expect(tint.actual).toBe(tint.expected);
 });
 
-test("accent picker reveals/hides when toggling Buzz", async ({ page }) => {
-  // Start on a non-Buzz theme so the accent picker is present, then select the
-  // Buzz tile — the picker should animate out and unmount. Reselecting a
-  // non-Buzz tile brings it back. Asserts the presence toggle (the motion
+test("accent picker reveals/hides when toggling Kura", async ({ page }) => {
+  // Start on a non-Kura theme so the accent picker is present, then select the
+  // Kura tile — the picker should animate out and unmount. Reselecting a
+  // non-Kura tile brings it back. Asserts the presence toggle (the motion
   // wrapper) works end to end.
   await seedTheme(page, "github-light");
   await page.addInitScript(() => {
@@ -1784,7 +1784,7 @@ test("accent picker reveals/hides when toggling Buzz", async ({ page }) => {
     "glass-background-row",
   ]);
 
-  // Switch to Buzz — picker should leave (allow the exit animation to settle).
+  // Switch to Kura — picker should leave (allow the exit animation to settle).
   await page.getByTestId("theme-style-trigger").click();
   await page.getByTestId("theme-option-buzz").click();
   await expect(page.getByTestId("theme-style-trigger")).toHaveAttribute(
@@ -1793,7 +1793,7 @@ test("accent picker reveals/hides when toggling Buzz", async ({ page }) => {
   );
   await expect(page.getByTestId("accent-color-neutral")).toHaveCount(0);
 
-  // Back to a non-Buzz theme — picker returns.
+  // Back to a non-Kura theme — picker returns.
   await page.getByTestId("theme-option-github-light").click();
   await expect(page.getByTestId("accent-color-neutral")).toBeVisible();
   await expect(page.getByTestId("theme-style-trigger")).toHaveAttribute(
@@ -1816,12 +1816,12 @@ test("accent picker reveals/hides when toggling Buzz", async ({ page }) => {
     "overflow-x",
     "auto",
   );
-  await expect(page.getByTestId("accent-color-blue")).toHaveAttribute(
+  await expect(page.getByTestId("accent-color-kura")).toHaveAttribute(
     "aria-pressed",
     "true",
   );
   await expect(
-    page.getByTestId("accent-color-blue").getByTestId("accent-color-selection"),
+    page.getByTestId("accent-color-kura").getByTestId("accent-color-selection"),
   ).toBeVisible();
   await waitForAnimations(page);
   await page.getByTestId("settings-theme").screenshot({
@@ -1835,7 +1835,7 @@ test("accent picker reveals/hides when toggling Buzz", async ({ page }) => {
   });
 });
 
-test("Buzz light and dark modes apply live without a reload", async ({
+test("Kura light and dark modes apply live without a reload", async ({
   page,
 }) => {
   await seedTheme(page, "buzz");
@@ -1859,7 +1859,7 @@ test("Buzz light and dark modes apply live without a reload", async ({
   await expectAppliedBuzzTheme(page, "buzz");
 });
 
-test("Buzz follows native system theme changes without a reload", async ({
+test("Kura follows native system theme changes without a reload", async ({
   page,
 }) => {
   await seedTheme(page, "buzz");
