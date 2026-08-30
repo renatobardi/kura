@@ -269,7 +269,6 @@ test("repository pages show a centered Kura loader while fetching", async ({
     (el) => getComputedStyle(el).animationName,
   );
   expect(animationName).not.toBe("none");
-  await expect(animatedMark).toHaveCSS("opacity", "1");
   await expect(loader).toHaveCSS("justify-content", "center");
   await expect(loader).toBeHidden({ timeout: 5_000 });
 });

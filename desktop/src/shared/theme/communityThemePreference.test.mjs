@@ -56,7 +56,7 @@ test("local preferences are isolated by pubkey and normalized relay", () => {
     followSystem: false,
   };
   const aliceB = { ...DEFAULT_COMMUNITY_THEME, theme: "catppuccin-latte" };
-  const bobA = { ...DEFAULT_COMMUNITY_THEME, accent: "#ef4444" };
+  const bobA = { ...DEFAULT_COMMUNITY_THEME, accent: "#f97316" };
   assert.equal(
     writeCommunityThemePreference("alice", "WSS://A.EXAMPLE/", aliceA),
     true,
@@ -90,7 +90,7 @@ test("local preferences are isolated by pubkey and normalized relay", () => {
 test("dirty outbox survives restart and clears only its exact revision", () => {
   globalThis.window = { localStorage: localStorageStub() };
   const first = { ...DEFAULT_COMMUNITY_THEME, theme: "houston" };
-  const second = { ...DEFAULT_COMMUNITY_THEME, accent: "#ef4444" };
+  const second = { ...DEFAULT_COMMUNITY_THEME, accent: "#f97316" };
 
   assert.equal(
     writeCommunityThemeOutbox("alice", "WSS://A.EXAMPLE/", first),

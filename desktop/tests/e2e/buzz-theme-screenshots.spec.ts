@@ -1816,12 +1816,12 @@ test("accent picker reveals/hides when toggling Kura", async ({ page }) => {
     "overflow-x",
     "auto",
   );
-  await expect(page.getByTestId("accent-color-blue")).toHaveAttribute(
+  await expect(page.getByTestId("accent-color-kura")).toHaveAttribute(
     "aria-pressed",
     "true",
   );
   await expect(
-    page.getByTestId("accent-color-blue").getByTestId("accent-color-selection"),
+    page.getByTestId("accent-color-kura").getByTestId("accent-color-selection"),
   ).toBeVisible();
   await waitForAnimations(page);
   await page.getByTestId("settings-theme").screenshot({
