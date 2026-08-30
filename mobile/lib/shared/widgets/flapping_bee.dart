@@ -2,32 +2,31 @@ import 'dart:math' show min;
 
 import 'package:flutter/material.dart';
 
-/// The Buzz mark at a caller-controlled wing position.
+/// The Kura mark: a vermilion hanko seal carrying the kanji 蔵.
 ///
-/// The geometry matches the desktop loading bee. Callers drive the wings
-/// themselves, which lets one painter serve both the tap-to-flutter mark
-/// ([TappableFlappingBee]) and the pull-to-refresh indicator
-/// ([BeeRefreshIndicator]).
+/// The class keeps the historical `FlappingBee` name and parameters so the
+/// tap-to-press mark ([TappableFlappingBee]) and the pull-to-refresh
+/// indicator ([BeeRefreshIndicator]) keep driving it unchanged; the file and
+/// class are renamed in the phase-2 internals rebrand.
 class FlappingBee extends StatelessWidget {
-  /// The rendered width of the complete bee mark.
+  /// The rendered width of the mark.
   ///
-  /// Height follows from the mark's 466:309 aspect ratio.
+  /// Height follows the legacy 466:309 box so existing layouts keep their
+  /// footprint; the seal itself is square and centered inside that box.
   final double width;
 
-  /// The color used for the bee silhouette, wings, and pupils.
+  /// The color used for the seal body.
   final Color color;
 
-  /// How far the wings are tucked toward the body, from 0 to 1.
+  /// How hard the seal is pressed, from 0 to 1.
   ///
-  /// 0 renders the wings fully spread; 1 renders them at their innermost
-  /// tuck. Callers animate this to flap the wings.
+  /// 0 renders the seal at rest; 1 renders it slightly compressed. Callers
+  /// animate this for the tap and pull-to-refresh treatments.
   final double flapAmount;
 
-  /// How far the pupils have grown, from 0 to 1, or null for cutout eyes.
+  /// How far the glyph has faded in, from 0 to 1, or null for the full glyph.
   ///
-  /// Only the pull-to-refresh treatment sets this. Leaving it null preserves
-  /// the mark's ordinary cutout eyes; a non-null value fills them in, with 1
-  /// drawing the pupils at full size.
+  /// Only the pull-to-refresh treatment sets this.
   final double? eyeProgress;
 
   const FlappingBee({
@@ -43,115 +42,69 @@ class FlappingBee extends StatelessWidget {
     return RepaintBoundary(
       child: CustomPaint(
         size: Size(width, width * 309 / 466),
-        painter: _FlappingBeePainter(
+        painter: _KuraSealPainter(
           color: color,
-          flapAmount: flapAmount,
-          eyeProgress: eyeProgress,
+          pressAmount: flapAmount,
+          glyphProgress: eyeProgress,
         ),
       ),
     );
   }
 }
 
-class _FlappingBeePainter extends CustomPainter {
+class _KuraSealPainter extends CustomPainter {
   final Color color;
-  final double flapAmount;
-  final double? eyeProgress;
+  final double pressAmount;
+  final double? glyphProgress;
 
-  const _FlappingBeePainter({
+  const _KuraSealPainter({
     required this.color,
-    required this.flapAmount,
-    this.eyeProgress,
+    required this.pressAmount,
+    this.glyphProgress,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final scale = min(size.width / 466, size.height / 309);
-    final renderedWidth = 466 * scale;
-    final renderedHeight = 309 * scale;
-
-    canvas
-      ..save()
-      ..translate(
-        (size.width - renderedWidth) / 2,
-        (size.height - renderedHeight) / 2,
-      )
-      ..scale(scale);
-
-    final wingRadiusX = 91.7 * (1 - (0.38 * flapAmount));
-    final wingTranslation = 30 * flapAmount;
-    final leftWing = Path()
-      ..addOval(
-        Rect.fromCenter(
-          center: Offset(91.7 + wingTranslation, 154.5),
-          width: wingRadiusX * 2,
-          height: 183.4,
-        ),
-      );
-    final rightWing = Path()
-      ..addOval(
-        Rect.fromCenter(
-          center: Offset(374.3 - wingTranslation, 154.5),
-          width: wingRadiusX * 2,
-          height: 183.4,
-        ),
-      );
-    final body = Path()
-      ..addRRect(
-        RRect.fromRectAndRadius(
-          const Rect.fromLTWH(128, 0, 210, 309),
-          const Radius.circular(34),
-        ),
-      );
-    final cutouts = Path()
-      ..addOval(
-        Rect.fromCenter(
-          center: const Offset(193.3, 84.4),
-          width: 54,
-          height: 54,
-        ),
-      )
-      ..addOval(
-        Rect.fromCenter(center: const Offset(276, 84.4), width: 54, height: 54),
-      )
-      ..addRRect(
-        RRect.fromRectAndRadius(
-          const Rect.fromLTWH(166.3, 157.2, 136.9, 38.3),
-          const Radius.circular(5),
-        ),
-      )
-      ..addRRect(
-        RRect.fromRectAndRadius(
-          const Rect.fromLTWH(166.9, 235.1, 136.2, 37.6),
-          const Radius.circular(5),
-        ),
-      );
-    final wings = Path.combine(PathOperation.union, leftWing, rightWing);
-    final silhouette = Path.combine(PathOperation.union, wings, body);
-    final finishedMark = Path.combine(
-      PathOperation.difference,
-      silhouette,
-      cutouts,
+    final side = min(size.width, size.height) * (1 - 0.06 * pressAmount);
+    final rect = Rect.fromCenter(
+      center: Offset(size.width / 2, size.height / 2),
+      width: side,
+      height: side,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(rect, Radius.circular(side * 0.18)),
+      Paint()..color = color,
     );
 
-    canvas.drawPath(finishedMark, Paint()..color = color);
-
-    if (eyeProgress case final progress?) {
-      // The eye cutouts are 54px wide. A full pupil must reach their 27px
-      // radius so the emoji-eye overlay never exposes the background beneath.
-      final pupilRadius = 27 * progress.clamp(0.0, 1.0);
-      final pupilPaint = Paint()..color = color;
-      canvas
-        ..drawCircle(const Offset(193.3, 84.4), pupilRadius, pupilPaint)
-        ..drawCircle(const Offset(276, 84.4), pupilRadius, pupilPaint);
-    }
-
-    canvas.restore();
+    final glyphAlpha = (glyphProgress ?? 1.0).clamp(0.0, 1.0);
+    final brightness = ThemeData.estimateBrightnessForColor(color);
+    final glyphColor = brightness == Brightness.dark
+        ? const Color(0xFFF7F4EE)
+        : const Color(0xFF1C1A17);
+    final painter = TextPainter(
+      text: TextSpan(
+        text: '蔵',
+        style: TextStyle(
+          color: glyphColor.withValues(alpha: glyphAlpha),
+          fontSize: side * 0.62,
+          fontWeight: FontWeight.w500,
+          height: 1,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    painter.paint(
+      canvas,
+      Offset(
+        rect.center.dx - painter.width / 2,
+        rect.center.dy - painter.height / 2,
+      ),
+    );
   }
 
   @override
-  bool shouldRepaint(_FlappingBeePainter oldDelegate) =>
+  bool shouldRepaint(_KuraSealPainter oldDelegate) =>
       color != oldDelegate.color ||
-      flapAmount != oldDelegate.flapAmount ||
-      eyeProgress != oldDelegate.eyeProgress;
+      pressAmount != oldDelegate.pressAmount ||
+      glyphProgress != oldDelegate.glyphProgress;
 }
