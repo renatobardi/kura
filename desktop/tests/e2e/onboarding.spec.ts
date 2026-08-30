@@ -1189,7 +1189,7 @@ test("first-community owner can connect an existing hosted community", async ({
         {
           id: "owned-community",
           name: "North Star",
-          normalized_host: "north-star.communities.buzz.xyz",
+          normalized_host: "north-star.communities.kura.oute.pro",
         },
       ],
     },
@@ -1220,7 +1220,7 @@ test("first-community owner can connect an existing hosted community", async ({
         window.localStorage.getItem("buzz-community-onboarding-transaction.v1"),
       ),
     )
-    .toContain("wss://north-star.communities.buzz.xyz");
+    .toContain("wss://north-star.communities.kura.oute.pro");
   await page.getByTestId("community-profile-back").click();
   await expect(
     page.getByRole("heading", { name: "Choose a community" }),
@@ -1309,7 +1309,7 @@ test("first-community owner can create and connect a hosted community", async ({
         window.localStorage.getItem("buzz-community-onboarding-transaction.v1"),
       ),
     )
-    .toContain("wss://bee-lab.communities.buzz.xyz");
+    .toContain("wss://bee-lab.communities.kura.oute.pro");
 });
 
 test("hosted community address line stays within the card for a long name", async ({
@@ -1678,7 +1678,7 @@ test("first-community direct join reaches profile", async ({ page }) => {
   await page.getByRole("button", { name: /Join a community/ }).click();
   await page
     .getByTestId("invite-redeem-input")
-    .fill("wss://onboarding.communities.buzz.xyz");
+    .fill("wss://onboarding.communities.kura.oute.pro");
   await page.getByTestId("invite-redeem-submit").click();
 
   await expect(
@@ -1727,7 +1727,7 @@ test("community onboarding reuses an existing relay profile", async ({
           id: "txn-existing-profile",
           source: "add-community",
           stage: "profile",
-          relayUrl: "wss://onboarding.communities.buzz.xyz",
+          relayUrl: "wss://onboarding.communities.kura.oute.pro",
           communityName: "Onboarding",
           communityId: "e2e-default-community",
           createdAt: timestamp,
@@ -1744,7 +1744,7 @@ test("community onboarding reuses an existing relay profile", async ({
     page,
     { profileHasEvent: true },
     {
-      relayWsUrl: "wss://onboarding.communities.buzz.xyz",
+      relayWsUrl: "wss://onboarding.communities.kura.oute.pro",
       skipOnboardingSeed: true,
     },
   );
@@ -1808,7 +1808,7 @@ test("first-community direct join cancel returns to request access", async ({
   await page.getByRole("button", { name: /Join a community/ }).click();
   await page
     .getByTestId("invite-redeem-input")
-    .fill("wss://onboarding.communities.buzz.xyz");
+    .fill("wss://onboarding.communities.kura.oute.pro");
   await page.getByTestId("invite-redeem-submit").click();
   await expect(page.getByText("Connecting securely…")).toBeVisible();
   await page.getByRole("button", { name: "Cancel" }).click();
@@ -1866,7 +1866,7 @@ test("canceling a join to an existing inactive community preserves it", async ({
     },
     {
       pubkey: BLANK_TYLER_IDENTITY.pubkey,
-      relayUrl: "wss://onboarding.communities.buzz.xyz",
+      relayUrl: "wss://onboarding.communities.kura.oute.pro",
     },
   );
   await installMockBridge(
@@ -1888,7 +1888,7 @@ test("canceling a join to an existing inactive community preserves it", async ({
         id: "existing-community-join",
         source: "add-community",
         stage: "connecting",
-        relayUrl: "wss://onboarding.communities.buzz.xyz",
+        relayUrl: "wss://onboarding.communities.kura.oute.pro",
         communityName: "Existing",
         createdAt: timestamp,
         updatedAt: timestamp,

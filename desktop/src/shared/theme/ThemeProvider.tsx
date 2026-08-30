@@ -43,6 +43,7 @@ const GLASS_VIBRANCY_MATERIAL = "sidebar";
 
 export const ACCENT_COLORS = [
   { name: "Neutral", value: NEUTRAL_ACCENT },
+  { name: "Kura", value: "#b4432b" },
   { name: "Blue", value: "#3b82f6" },
   { name: "Cyan", value: "#06b6d4" },
   { name: "Green", value: "#22c55e" },
@@ -54,7 +55,7 @@ export const ACCENT_COLORS = [
   { name: "Indigo", value: "#6366f1" },
 ] as const;
 
-const DEFAULT_ACCENT = "#3b82f6";
+const DEFAULT_ACCENT = "#b4432b";
 
 type ThemeContextValue = {
   themeName: string;

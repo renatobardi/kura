@@ -26,6 +26,7 @@ import {
 } from "./EncryptedBackupCreator";
 import { IdentityKeyHelpDialog } from "./IdentityKeyHelpDialog";
 import { IdentityRecoveryPairing } from "./IdentityRecoveryPairing";
+import { KuraMark } from "@/shared/ui/kura-logo/KuraMark";
 import { LandingBees } from "./LandingBees";
 import {
   NostrKeyImportForm,
@@ -311,11 +312,12 @@ export function MachineOnboardingFlow({
               direction={transitionDirection}
               transitionKey={`machine-identity-${transitionDirection}`}
             >
-              <img
-                alt="Kura"
-                className="w-full max-w-[600px]"
-                src="/landing/buzz-wordmark.png"
-              />
+              <div className="flex animate-in flex-col items-center gap-4 fade-in duration-500">
+                <KuraMark className="h-24 w-24" />
+                <span className="text-6xl font-medium tracking-[-0.04em] text-foreground">
+                  kura
+                </span>
+              </div>
               <p className="mt-2 max-w-[560px] text-center text-2xl font-normal leading-none text-foreground">
                 Your people, your agents, your projects —<br />
                 all in one place.

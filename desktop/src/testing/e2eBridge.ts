@@ -12062,7 +12062,7 @@ export function maybeInstallE2eTauriMocks() {
       case "check_builderlab_community_name":
         return {
           available: true,
-          normalized_host: `${(payload as { name?: string })?.name ?? "community"}.communities.buzz.xyz`,
+          normalized_host: `${(payload as { name?: string })?.name ?? "community"}.communities.kura.oute.pro`,
         };
       case "create_builderlab_community": {
         const name = (payload as { name?: string })?.name ?? "community";
@@ -12070,7 +12070,7 @@ export function maybeInstallE2eTauriMocks() {
           community: activeConfig?.mock?.builderlabCreatedCommunity ?? {
             id: `hosted-${name}`,
             name,
-            normalized_host: `${name}.communities.buzz.xyz`,
+            normalized_host: `${name}.communities.kura.oute.pro`,
           },
         };
       }

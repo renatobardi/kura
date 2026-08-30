@@ -264,11 +264,11 @@ test("repository pages show a centered Kura loader while fetching", async ({
   await expect(
     loader.getByRole("img", { name: "Loading repository" }),
   ).toBeVisible();
-  const animatedMark = loader.locator(".buzz-logo__mark");
-  await expect(animatedMark).toHaveCSS(
-    "animation-name",
-    "buzz-logo-scale-pulse",
+  const animatedMark = loader.locator("svg.kura-glyph");
+  const animationName = await animatedMark.evaluate(
+    (el) => getComputedStyle(el).animationName,
   );
+  expect(animationName).not.toBe("none");
   await expect(animatedMark).toHaveCSS("opacity", "1");
   await expect(loader).toHaveCSS("justify-content", "center");
   await expect(loader).toBeHidden({ timeout: 5_000 });

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ChevronDown, Plus, Upload } from "lucide-react";
+import { KuraGlyph } from "@/shared/ui/kura-logo/KuraMark";
 
 import { isCatalogPersonaSelected } from "@/features/agents/lib/catalog";
 import { isCatalogPersona } from "@/features/agents/lib/personaCatalogRelay";
@@ -24,7 +25,6 @@ import { Dialog } from "@/shared/ui/dialog";
 import { ChooserDialogContent } from "@/shared/ui/chooser-dialog-content";
 import { Skeleton } from "@/shared/ui/skeleton";
 
-import agentOutlineUrl from "../assets/agent-outline.svg";
 import { AgentDefinitionMetadata } from "./AgentDefinitionMetadata";
 import { PersonaAddedBy } from "./PersonaAddedBy";
 import { resolveCatalogOwnerLabel } from "./catalogOwnerLabel";
@@ -650,12 +650,10 @@ function CatalogEmptyState() {
       className="flex flex-col items-center px-2 py-6 text-center"
       data-testid="community-catalog-empty-state"
     >
-      <img
-        alt=""
+      <KuraGlyph
         aria-hidden="true"
-        className="h-24 w-24 dark:opacity-60"
+        className="h-16 w-16 text-muted-foreground/40"
         data-testid="community-catalog-empty-artwork"
-        src={agentOutlineUrl}
       />
       <p className="mt-3 text-sm font-semibold text-sidebar-foreground">
         Nothing shared yet
