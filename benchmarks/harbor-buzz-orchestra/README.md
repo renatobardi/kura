@@ -1,7 +1,7 @@
-# Harbor Buzz Orchestra
+# Harbor Kura Orchestra
 
 A stock-Harbor custom agent that runs a manifest-defined team through the real
-Buzz stack. Harbor sees one `BuzzOrchestraAgent`; behind that adapter, one
+Kura stack. Harbor sees one `BuzzOrchestraAgent`; behind that adapter, one
 orchestrator and N workers coordinate over the production relay/Postgres.
 Each agent runs *inside* the Harbor task container as the same
 `kura-acp` → `kura-agent` → `kura-dev-mcp` process tree the desktop app
@@ -57,15 +57,15 @@ is not an orchestration requirement. Some TB graders install dependencies from
 public package registries at verification time — run benchmarks off networks
 that block those installs (e.g. corporate VPNs).
 
-Each trial gets fresh keys and a private Buzz channel. The provisioner archives
+Each trial gets fresh keys and a private Kura channel. The provisioner archives
 rather than deletes that channel, leaving the relay/Postgres event timeline
 and the per-agent acp/agent logs (downloaded into the trial's `kura/`
 artifacts) available for analysis.
 
-### Buzz-native tasks
+### Kura-native tasks
 
 The local [`benchmarks/kura-dataset`](../kura-dataset) suite — a sibling
-directory of this harness, not a subdirectory of it — scores Buzz product
+directory of this harness, not a subdirectory of it — scores Kura product
 behavior alongside task correctness. It covers direct thread replies, callback
 user mentions, targeted reads of named paths, exact channel membership,
 multiline delivery, non-waking narrative names, batched reports, cross-thread
@@ -80,14 +80,14 @@ just benchmark \
   --n-concurrent 1
 ```
 
-Buzz-native tasks declare one of two evaluation layers in `task.toml`.
+Kura-native tasks declare one of two evaluation layers in `task.toml`.
 **Regression** tasks are deterministic product/prompt regression checks and
 default to k=1. **Workflow** tasks exercise multi-step collaboration
 capabilities and default to k=3 (not 5). Run a layer by metadata with
 `--path benchmarks/kura-dataset --layer regression` or `--layer workflow`;
 task identities stay unchanged.
 
-When the Buzz dataset root is passed without `--layer` or `--attempts`, the
+When the Kura dataset root is passed without `--layer` or `--attempts`, the
 wrapper starts two sequential Harbor jobs so each layer gets its own default.
 A direct task path infers its layer's default. An explicit `--attempts`/`-k`
 overrides the defaults and permits one mixed-layer job. Terminal-Bench and
@@ -128,7 +128,7 @@ only public actor metadata and event IDs; their signing credentials never enter
 the task container or verifier artifact.
 
 Each task ships its own `README.md` documenting its reward dimensions and, for
-the tasks whose graded Buzz behavior is deliberately absent from
+the tasks whose graded Kura behavior is deliberately absent from
 `instruction.md` (`reply-to-thread`, `user-mention`), why that omission is the
 point. Read it before editing a task's instruction or verifier.
 
@@ -143,8 +143,8 @@ schema, and defaults to leaderboard-eligible settings (Terminal-Bench 2.1,
 ```bash
 just benchmark                                   # full TB 2.1, k=5
 just benchmark --path <TASK_DIR> -k 1            # one local task, one attempt
-just benchmark --path benchmarks/kura-dataset --layer regression   # Buzz k=1
-just benchmark --path benchmarks/kura-dataset --layer workflow     # Buzz k=3
+just benchmark --path benchmarks/kura-dataset --layer regression   # Kura k=1
+just benchmark --path benchmarks/kura-dataset --layer workflow     # Kura k=3
 just benchmark -i "cobol*" --attempts 3          # dataset subset
 just benchmark --gui                             # watch the run live
 ```
@@ -152,7 +152,7 @@ just benchmark --gui                             # watch the run live
 One pinned user identity fronts the whole benchmark environment: it owns
 every trial channel (named after the task) and posts every task prompt, and
 trial channels are kept rather than archived. `--gui` adds that user to the
-relay membership list and opens the Buzz desktop app logged in as them, so
+relay membership list and opens the Kura desktop app logged in as them, so
 channels fill the sidebar as the run progresses — watch, don't type; a human
 message mid-trial would taint the run. `just benchmark-down` stops the stack.
 

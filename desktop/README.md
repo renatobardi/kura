@@ -1,4 +1,4 @@
-# Buzz
+# Kura Desktop
 
 Desktop chat shell with:
 

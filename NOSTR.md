@@ -1,6 +1,6 @@
 # Using Third-Party Nostr Clients with Kura
 
-Kura is a Nostr relay that speaks NIP-29 (relay-based groups) natively. Third-party Nostr clients connect directly to `buzz-relay` using NIP-29 and NIP-42 authentication. The old NIP-28 compatibility proxy has been removed.
+Kura is a Nostr relay that speaks NIP-29 (relay-based groups) natively. Third-party Nostr clients connect directly to `kura-relay` using NIP-29 and NIP-42 authentication. The old NIP-28 compatibility proxy has been removed.
 
 ## Community scope
 
@@ -219,7 +219,7 @@ is bootstrapped automatically from `RELAY_OWNER_PUBKEY` on startup.
 
 ### CLI: Managing Members
 
-Use `buzz-admin` — the operator CLI shipped in the relay image — to manage relay membership.
+Use `kura-admin` — the operator CLI shipped in the relay image — to manage relay membership.
 In a Docker Compose deployment, use `run.sh`:
 
 ```bash
@@ -236,13 +236,13 @@ In a Docker Compose deployment, use `run.sh`:
 ./run.sh list-members
 ```
 
-Or invoke `buzz-admin` directly inside the container:
+Or invoke `kura-admin` directly inside the container:
 
 ```bash
-docker compose exec relay buzz-admin add-member --pubkey npub1abc...
-docker compose exec relay buzz-admin add-member --pubkey npub1abc... --role admin
-docker compose exec relay buzz-admin remove-member --pubkey npub1abc...
-docker compose exec relay buzz-admin list-members
+docker compose exec relay kura-admin add-member --pubkey npub1abc...
+docker compose exec relay kura-admin add-member --pubkey npub1abc... --role admin
+docker compose exec relay kura-admin remove-member --pubkey npub1abc...
+docker compose exec relay kura-admin list-members
 ```
 
 **Exit codes:**

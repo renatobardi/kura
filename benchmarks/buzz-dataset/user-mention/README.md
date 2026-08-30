@@ -5,7 +5,7 @@
 Answers a one-line licensing calculation ([instruction.md](instruction.md)).
 The arithmetic is incidental — this task measures whether the agent hands the
 turn back with an **event-level mention** of the requesting human, so the user
-gets a real Buzz notification instead of a message they have to notice.
+gets a real Kura notification instead of a message they have to notice.
 
 > **The instruction deliberately says nothing about mentioning anyone.** The
 > mention is the behavior under test and must come from `buzz-acp`'s production

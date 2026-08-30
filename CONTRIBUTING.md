@@ -186,10 +186,10 @@ just reset   # Wipe all dev state and recreate it; installed Kura is preserved
 ```
 
 Development desktop state uses separate bundle identifiers
-(`xyz.block.buzz.app.dev` and per-worktree variants), a separate keyring service
-(`buzz-desktop-dev`), and `~/.buzz-dev`. `just reset` removes those dev-only
+(`pro.oute.kura.app.dev` and per-worktree variants), a separate keyring service
+(`kura-desktop-dev`), and `~/.kura-dev`. `just reset` removes those dev-only
 locations and the local Docker volumes. It does not touch the installed app's
-`xyz.block.buzz.app` data, `buzz-desktop` keyring service, or `~/.buzz` nest.
+`pro.oute.kura.app` data, `kura-desktop` keyring service, or `~/.kura` nest.
 
 ---
 
@@ -217,7 +217,7 @@ already running.
 
 ### End-to-End Tests
 
-End-to-end tests live in `crates/buzz-test-client/tests/`:
+End-to-end tests live in `crates/kura-test-client/tests/`:
 
 - `e2e_relay.rs` — WebSocket relay tests
 - `e2e_mcp.rs` — MCP tool tests
@@ -228,7 +228,7 @@ End-to-end tests live in `crates/buzz-test-client/tests/`:
 Run them with (requires running infrastructure):
 
 ```bash
-cargo test -p buzz-test-client -- --ignored
+cargo test -p kura-test-client -- --ignored
 ```
 
 See `TESTING.md` for the full multi-agent E2E testing guide.
@@ -383,7 +383,7 @@ design principles:
 **The relay is the single source of truth.** All state flows through the
 event store. Crates communicate through the database and Redis pub/sub — not
 through direct function calls across crate boundaries (with the exception
-of `buzz-core` types, which are shared everywhere).
+of `kura-core` types, which are shared everywhere).
 
 **Event kinds are the only switch.** Every action in the system — a message,
 a reaction, a workflow step, a canvas update — is a Nostr event with a kind
@@ -414,7 +414,7 @@ for team access setup, onboarding, and the full repo inventory. See
 
 ## How to Add a New Event Kind
 
-1. **Define the kind constant** in `buzz-core/src/kind.rs`:
+1. **Define the kind constant** in `kura-core/src/kind.rs`:
 
    ```rust
    /// My new event kind — description of what it represents.
@@ -425,7 +425,7 @@ for team access setup, onboarding, and the full repo inventory. See
    Check the `ALL_KINDS` array for collisions. Each sub-range is documented
    with comments in the file.
 
-2. **Define the payload type** in the appropriate module in `buzz-core/src/`
+2. **Define the payload type** in the appropriate module in `kura-core/src/`
    (e.g., alongside `event.rs`) if the content field is structured JSON:
 
    ```rust
@@ -437,7 +437,7 @@ for team access setup, onboarding, and the full repo inventory. See
    ```
 
 3. **Register the kind's required scope** in
-   `crates/buzz-relay/src/handlers/ingest.rs` inside
+   `crates/kura-relay/src/handlers/ingest.rs` inside
    `required_scope_for_kind()`. This controls which auth scope a caller
    needs to submit the event:
 
@@ -446,7 +446,7 @@ for team access setup, onboarding, and the full repo inventory. See
    ```
 
 4. **Handle post-storage side effects** by adding a match arm in
-   `crates/buzz-relay/src/handlers/side_effects.rs` inside
+   `crates/kura-relay/src/handlers/side_effects.rs` inside
    `handle_side_effects()`:
 
    ```rust
@@ -457,11 +457,11 @@ for team access setup, onboarding, and the full repo inventory. See
    notifications, cache invalidation, or derived data. If the new kind
    also needs an HTTP bridge surface (for example, a protocol helper that
    cannot practically use WebSocket), add a handler in
-   `crates/buzz-relay/src/api/` and register it in
-   `crates/buzz-relay/src/router.rs`.
+   `crates/kura-relay/src/api/` and register it in
+   `crates/kura-relay/src/router.rs`.
 
 5. **Persist to the database** — if the event needs to be queryable, add a
-   handler in `buzz-db/src/` (e.g., `buzz-db/src/my_feature.rs`) with
+   handler in `kura-db/src/` (e.g., `kura-db/src/my_feature.rs`) with
    the appropriate `INSERT` and `SELECT` queries.
 
 6. **Index for search** (if applicable) — Postgres FTS indexes persisted
@@ -474,7 +474,7 @@ for team access setup, onboarding, and the full repo inventory. See
    needed unless you need custom audit metadata.
 
 8. **Write tests** — add a unit test for payload serialization in
-   `buzz-core` and an integration test in `buzz-test-client` that sends
+   `kura-core` and an integration test in `kura-test-client` that sends
    the new event kind and verifies the expected behavior.
 
 9. **Document** — `kind.rs` is the authoritative registry of all kind numbers.
@@ -493,23 +493,23 @@ health probes.
 If an HTTP endpoint is still necessary:
 
 1. **Define the handler** in the appropriate module under
-   `crates/buzz-relay/src/api/`. Resolve the request tenant before any auth or
+   `crates/kura-relay/src/api/`. Resolve the request tenant before any auth or
    data lookup, use NIP-98 when the endpoint accepts user credentials, and keep
    community scoping explicit.
 
-2. **Register the route** in `crates/buzz-relay/src/router.rs` using the
+2. **Register the route** in `crates/kura-relay/src/router.rs` using the
    narrowest path possible. Do not add new `/api/*` compatibility routes unless
    the product decision explicitly calls for one.
 
-3. **Add database queries** in `buzz-db/src/` only when the endpoint cannot be
+3. **Add database queries** in `kura-db/src/` only when the endpoint cannot be
    expressed through the existing event query paths.
 
 4. **Handle errors** using the `api_error()`, `internal_error()`, and
-   `not_found()` helpers in `buzz-relay/src/api/mod.rs`. Return
+   `not_found()` helpers in `kura-relay/src/api/mod.rs`. Return
    `(StatusCode, Json<Value>)` tuples.
 
-5. **Write tests** with the `buzz-test-client` harness in
-   `crates/buzz-test-client/tests/`, covering auth, community scoping, and the
+5. **Write tests** with the `kura-test-client` harness in
+   `crates/kura-test-client/tests/`, covering auth, community scoping, and the
    relevant success path.
 
 6. **Document** any public endpoint in `ARCHITECTURE.md` and user-facing docs.

@@ -1,8 +1,8 @@
 # buzz-dataset
 
-Harbor tasks that score **Buzz product behavior**, not just task correctness.
+Harbor tasks that score **Kura product behavior**, not just task correctness.
 Each task poses an ordinary-looking question; what is graded is how the agent
-answers it through Buzz — where the reply lands, who it notifies, what it was
+answers it through Kura — where the reply lands, who it notifies, what it was
 willing to read.
 
 | Task | Layer | Behavior under test |
@@ -28,8 +28,8 @@ Every task declares `metadata.evaluation_layer` in `task.toml`:
 
 | Layer | Question | Default trials | Typical cadence |
 | --- | --- | ---: | --- |
-| Regression | Did Buzz preserve a known product contract? | k=1 | Targeted PR, nightly, or pre-release |
-| Workflow | How capable is the agent at realistic Buzz work? | k=3 | Nightly or weekly on a fixed condition |
+| Regression | Did Kura preserve a known product contract? | k=1 | Targeted PR, nightly, or pre-release |
+| Workflow | How capable is the agent at realistic Kura work? | k=3 | Nightly or weekly on a fixed condition |
 
 Report regression results per behavior, not as an average capability score.
 Use workflow pass rates and trends as the benchmark headline.
@@ -47,7 +47,7 @@ harness, which launches the real `buzz-acp` → `buzz-agent` → `buzz-dev-mcp`
 stack inside the task container and exports the relay snapshot each verifier
 grades. Plain `harbor run` against this directory will not work, and neither
 will `harbor run -a oracle` (no `solution/solve.sh` is shipped — the Oracle
-agent replaces the Buzz agent, so no relay trial is provisioned).
+agent replaces the Kura agent, so no relay trial is provisioned).
 
 From the repo root:
 

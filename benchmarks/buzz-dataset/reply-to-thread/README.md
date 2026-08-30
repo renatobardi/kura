@@ -18,7 +18,7 @@ top-level channel message.
 `python:3.12-slim-bookworm`, no extra packages: the agent never runs in this
 container's shell. `BuzzOrchestraAgent` launches the real `buzz-acp` /
 `buzz-agent` stack against a dedicated relay, and the agent works entirely
-through Buzz. Agent timeout 300s; the manifest's `trial_budget` is the
+through Kura. Agent timeout 300s; the manifest's `trial_budget` is the
 effective clock.
 
 ## Verifier
