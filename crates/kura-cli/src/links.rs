@@ -33,8 +33,7 @@ pub fn parse_message_link(input: &str) -> Result<MessageLink, CliError> {
     let url = url::Url::parse(input.trim())
         .map_err(|_| CliError::Usage("invalid Kura message link".into()))?;
 
-    // `kura://` is canonical; `kura://` links from older clients keep parsing.
-    if (url.scheme() != "kura" && url.scheme() != "kura")
+    if url.scheme() != "kura"
         || url.host_str() != Some("message")
         || !matches!(url.path(), "" | "/")
         || !url.username().is_empty()
