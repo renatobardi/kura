@@ -931,7 +931,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [changes]
-    if: github.event_name == 'push' || needs.changes.outputs.mobile == 'true'
+    if: github.event_name == 'push'
     permissions:
       contents: read
     steps:
@@ -990,7 +990,7 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 10
     needs: [changes]
-    if: needs.changes.outputs.mobile == 'true'
+    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: Build
