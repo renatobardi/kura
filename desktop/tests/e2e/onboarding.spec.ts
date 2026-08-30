@@ -2052,7 +2052,7 @@ test("connected first-community profile keeps Back bottom-left and balances the 
     };
   });
   expect(dialogStyles.backgroundColor).toBe("rgb(255, 255, 255)");
-  expect(dialogStyles.color).toBe("rgb(23, 23, 23)");
+  expect(dialogStyles.color).toBe("rgb(28, 26, 23)");
   expect(dialogStyles.boxShadow).not.toBe("none");
   const dialogOverlay = page.getByTestId("dialog-overlay");
   const overlayStyles = await dialogOverlay.evaluate((element) => {
@@ -2177,7 +2177,7 @@ test("connected first-community profile keeps Back bottom-left and balances the 
   });
   expect(saveStyles).toEqual({
     backgroundColor: "rgb(23, 23, 23)",
-    color: "rgb(240, 240, 205)",
+    color: "rgb(247, 244, 238)",
   });
   const defaultDialogHeight = imageDialogHeight;
   await page.getByRole("tab", { name: "Emoji" }).click();
@@ -2229,7 +2229,7 @@ test("connected first-community profile keeps Back bottom-left and balances the 
   });
   expect(captureButtonStyles).toMatchObject({
     backgroundColor: "rgb(23, 23, 23)",
-    color: "rgb(240, 240, 205)",
+    color: "rgb(247, 244, 238)",
     height: "38px",
   });
   expect(captureButtonStyles.borderRadius).toBeGreaterThan(1_000);
