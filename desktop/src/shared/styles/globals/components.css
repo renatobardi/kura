@@ -302,19 +302,19 @@
   }
 
   .buzz-onboarding-neutral-theme {
-    /* Landing "chartreuse" — the welcome background; reused for the CTA label. */
-    --buzz-welcome-chartreuse: #d7d72e;
+    /* Landing washi (was chartreuse) — the welcome background; reused for the CTA label. */
+    --buzz-welcome-chartreuse: #f7f4ee;
     /* Bottom stop of the onboarding shell gradient; also the docked-footer
        scrim color so content scrolling under the CTA fades into the page. */
-    --buzz-onboarding-shell-bottom: #d7e7f6;
+    --buzz-onboarding-shell-bottom: #ece7dc;
     /* Label color for the primary onboarding CTA (light blue on the dark pill). */
-    --buzz-onboarding-cta-label: #d7e6f0;
+    --buzz-onboarding-cta-label: #f7f4ee;
     /* Olive ink for the backup step's private key and its "never share" caption,
        reading against the fuzzy-white key frame. */
-    --buzz-onboarding-backup-ink: #717106;
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
-    --primary: 0 0% 9%;
+    --buzz-onboarding-backup-ink: #b4432b;
+    --background: 40 36% 95.1%;
+    --foreground: 36 10% 10%;
+    --primary: 10 61% 44%;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -329,11 +329,11 @@
     --buzz-onboarding-emoji-picker-color: 23, 23, 23;
     --buzz-onboarding-emoji-picker-input: 255, 255, 255;
     --buzz-onboarding-avatar-dialog-bg: 255 255 255;
-    --buzz-onboarding-avatar-accent-bg: 240 240 205;
-    --buzz-onboarding-avatar-accent-fg: 113 113 6;
+    --buzz-onboarding-avatar-accent-bg: 251 234 229;
+    --buzz-onboarding-avatar-accent-fg: 180 67 43;
     --buzz-onboarding-avatar-action-bg: 23 23 23;
-    --buzz-onboarding-avatar-action-fg: 240 240 205;
-    --buzz-onboarding-avatar-control-fg: 113 113 6;
+    --buzz-onboarding-avatar-action-fg: 247 244 238;
+    --buzz-onboarding-avatar-control-fg: 180 67 43;
     --buzz-onboarding-avatar-dialog-shadow: 0 0 0;
   }
 
@@ -411,8 +411,8 @@
     --buzz-onboarding-avatar-dialog-bg: 24 24 20;
     --buzz-onboarding-avatar-accent-bg: 211 211 163;
     --buzz-onboarding-avatar-accent-fg: 24 24 20;
-    --buzz-onboarding-avatar-action-bg: 113 113 6;
-    --buzz-onboarding-avatar-action-fg: 240 240 205;
+    --buzz-onboarding-avatar-action-bg: 180 67 43;
+    --buzz-onboarding-avatar-action-fg: 247 244 238;
     --buzz-onboarding-avatar-control-fg: 224 224 176;
     --buzz-onboarding-avatar-dialog-shadow: 0 0 0;
   }
@@ -422,9 +422,9 @@
     .buzz-onboarding-neutral-theme[data-system-color-scheme="light"]:not(
       .buzz-startup-shell
     ) {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
-    --primary: 0 0% 9%;
+    --background: 40 36% 95.1%;
+    --foreground: 36 10% 10%;
+    --primary: 10 61% 44%;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -439,11 +439,11 @@
     --buzz-onboarding-emoji-picker-color: 23, 23, 23;
     --buzz-onboarding-emoji-picker-input: 255, 255, 255;
     --buzz-onboarding-avatar-dialog-bg: 255 255 255;
-    --buzz-onboarding-avatar-accent-bg: 240 240 205;
-    --buzz-onboarding-avatar-accent-fg: 113 113 6;
+    --buzz-onboarding-avatar-accent-bg: 251 234 229;
+    --buzz-onboarding-avatar-accent-fg: 180 67 43;
     --buzz-onboarding-avatar-action-bg: 23 23 23;
-    --buzz-onboarding-avatar-action-fg: 240 240 205;
-    --buzz-onboarding-avatar-control-fg: 113 113 6;
+    --buzz-onboarding-avatar-action-fg: 247 244 238;
+    --buzz-onboarding-avatar-control-fg: 180 67 43;
     --buzz-onboarding-avatar-dialog-shadow: 0 0 0;
   }
 
@@ -469,8 +469,8 @@
     --buzz-onboarding-avatar-dialog-bg: 24 24 20;
     --buzz-onboarding-avatar-accent-bg: 211 211 163;
     --buzz-onboarding-avatar-accent-fg: 24 24 20;
-    --buzz-onboarding-avatar-action-bg: 113 113 6;
-    --buzz-onboarding-avatar-action-fg: 240 240 205;
+    --buzz-onboarding-avatar-action-bg: 180 67 43;
+    --buzz-onboarding-avatar-action-fg: 247 244 238;
     --buzz-onboarding-avatar-control-fg: 224 224 176;
     --buzz-onboarding-avatar-dialog-shadow: 0 0 0;
   }

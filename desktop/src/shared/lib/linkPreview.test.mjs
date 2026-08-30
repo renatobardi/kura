@@ -87,7 +87,7 @@ test("parseSupportedLinkPreview ignores unsupported GitHub URLs", () => {
 const BUZZ_OWNER =
   "71d67180ba17e749ee825fc8819c9c6ee7003617e1c126504f9b658070ab9224";
 
-test("parseSupportedLinkPreview parses Buzz relay git clone URLs", () => {
+test("parseSupportedLinkPreview parses Kura relay git clone URLs", () => {
   // Must pass the active relay origin for host validation.
   assert.deepEqual(
     parseSupportedLinkPreview(
@@ -96,8 +96,8 @@ test("parseSupportedLinkPreview parses Buzz relay git clone URLs", () => {
     ),
     {
       kind: "buzz-repository",
-      href: `buzz://repo?owner=${BUZZ_OWNER}&d=buzz-world-galaxy`,
-      provider: "Buzz",
+      href: `kura://repo?owner=${BUZZ_OWNER}&d=buzz-world-galaxy`,
+      provider: "Kura",
       title: "buzz-world-galaxy",
       typeLabel: "repo",
     },
@@ -119,15 +119,15 @@ test("parseSupportedLinkPreview strips .git suffix from clone URLs", () => {
     ),
     {
       kind: "buzz-repository",
-      href: `buzz://repo?owner=${BUZZ_OWNER}&d=buzz-world`,
-      provider: "Buzz",
+      href: `kura://repo?owner=${BUZZ_OWNER}&d=buzz-world`,
+      provider: "Kura",
       title: "buzz-world",
       typeLabel: "repo",
     },
   );
 });
 
-test("parseSupportedLinkPreview rejects malformed Buzz git URLs", () => {
+test("parseSupportedLinkPreview rejects malformed Kura git URLs", () => {
   for (const href of [
     // Owner segment must be a 64-char lowercase hex pubkey.
     "https://relay.example/git/not-a-pubkey/repo",
@@ -157,7 +157,7 @@ test("parseSupportedLinkPreview rejects clone URLs from non-relay hosts", () => 
     )?.kind,
     "generic-link",
   );
-  // github.com sharing the path shape must never become a Buzz repo card.
+  // github.com sharing the path shape must never become a Kura repo card.
   assert.equal(
     parseSupportedLinkPreview(
       `https://github.com/git/${BUZZ_OWNER}/my-repo`,
@@ -178,70 +178,70 @@ test("parseSupportedLinkPreview rejects clone URLs from non-relay hosts", () => 
 const BUZZ_EVENT_ID =
   "c3b589fa5713ba25bad6dc095e2de00a4ac8f50050fdea00fc6444e603be1dd1";
 
-test("parseSupportedLinkPreview parses buzz:// PR and issue deep links", () => {
+test("parseSupportedLinkPreview parses kura:// PR and issue deep links", () => {
   assert.deepEqual(
     parseSupportedLinkPreview(
-      `buzz://pr?id=${BUZZ_EVENT_ID}&owner=${BUZZ_OWNER}&d=buzz-world`,
+      `kura://pr?id=${BUZZ_EVENT_ID}&owner=${BUZZ_OWNER}&d=buzz-world`,
     ),
     {
       kind: "buzz-pull-request",
-      href: `buzz://pr?id=${BUZZ_EVENT_ID}&owner=${BUZZ_OWNER}&d=buzz-world`,
-      provider: "Buzz",
+      href: `kura://pr?id=${BUZZ_EVENT_ID}&owner=${BUZZ_OWNER}&d=buzz-world`,
+      provider: "Kura",
       title: "buzz-world #c3b589fa",
       typeLabel: "Review",
     },
   );
   assert.deepEqual(
     parseSupportedLinkPreview(
-      `buzz://issue?id=${BUZZ_EVENT_ID}&owner=${BUZZ_OWNER}&d=buzz-world`,
+      `kura://issue?id=${BUZZ_EVENT_ID}&owner=${BUZZ_OWNER}&d=buzz-world`,
     )?.typeLabel,
     "Task",
   );
   assert.deepEqual(
-    parseSupportedLinkPreview(`buzz://repo?owner=${BUZZ_OWNER}&d=buzz-world`),
+    parseSupportedLinkPreview(`kura://repo?owner=${BUZZ_OWNER}&d=buzz-world`),
     {
       kind: "buzz-repository",
-      href: `buzz://repo?owner=${BUZZ_OWNER}&d=buzz-world`,
-      provider: "Buzz",
+      href: `kura://repo?owner=${BUZZ_OWNER}&d=buzz-world`,
+      provider: "Kura",
       title: "buzz-world",
       typeLabel: "repo",
     },
   );
 });
 
-test("parseSupportedLinkPreview parses buzz:// project deep links", () => {
+test("parseSupportedLinkPreview parses kura:// project deep links", () => {
   assert.deepEqual(
     parseSupportedLinkPreview(
-      `buzz://project?owner=${BUZZ_OWNER}&d=buzz-world`,
+      `kura://project?owner=${BUZZ_OWNER}&d=buzz-world`,
     ),
     {
       kind: "buzz-project",
-      href: `buzz://project?owner=${BUZZ_OWNER}&d=buzz-world`,
-      provider: "Buzz",
+      href: `kura://project?owner=${BUZZ_OWNER}&d=buzz-world`,
+      provider: "Kura",
       title: "buzz-world",
       typeLabel: "project",
     },
   );
 });
 
-test("parseSupportedLinkPreview rejects malformed buzz:// entity links", () => {
+test("parseSupportedLinkPreview rejects malformed kura:// entity links", () => {
   for (const href of [
-    `buzz://pr?owner=${BUZZ_OWNER}&d=buzz-world`,
-    `buzz://pr?id=short&owner=${BUZZ_OWNER}&d=buzz-world`,
-    `buzz://issue?id=${BUZZ_EVENT_ID}&owner=nope&d=buzz-world`,
-    `buzz://repo?owner=${BUZZ_OWNER}&d=.hidden`,
-    `buzz://project?owner=${BUZZ_OWNER}&d=.hidden`,
+    `kura://pr?owner=${BUZZ_OWNER}&d=buzz-world`,
+    `kura://pr?id=short&owner=${BUZZ_OWNER}&d=buzz-world`,
+    `kura://issue?id=${BUZZ_EVENT_ID}&owner=nope&d=buzz-world`,
+    `kura://repo?owner=${BUZZ_OWNER}&d=.hidden`,
+    `kura://project?owner=${BUZZ_OWNER}&d=.hidden`,
   ]) {
     assert.equal(parseSupportedLinkPreview(href), null, href);
   }
 });
 
-test("extractSupportedLinkPreviews excludes Buzz entity links while keeping external links", () => {
+test("extractSupportedLinkPreviews excludes Kura entity links while keeping external links", () => {
   const entityLinks = [
-    `buzz://project?owner=${BUZZ_OWNER}&d=buzz-world`,
-    `buzz://repo?owner=${BUZZ_OWNER}&d=buzz-world`,
-    `buzz://issue?id=${BUZZ_EVENT_ID}&owner=${BUZZ_OWNER}&d=buzz-world`,
-    `buzz://pr?id=${BUZZ_EVENT_ID}&owner=${BUZZ_OWNER}&d=buzz-world`,
+    `kura://project?owner=${BUZZ_OWNER}&d=buzz-world`,
+    `kura://repo?owner=${BUZZ_OWNER}&d=buzz-world`,
+    `kura://issue?id=${BUZZ_EVENT_ID}&owner=${BUZZ_OWNER}&d=buzz-world`,
+    `kura://pr?id=${BUZZ_EVENT_ID}&owner=${BUZZ_OWNER}&d=buzz-world`,
   ];
 
   assert.deepEqual(
@@ -252,10 +252,10 @@ test("extractSupportedLinkPreviews excludes Buzz entity links while keeping exte
   );
 });
 
-test("extractSupportedLinkPreviews excludes markdown-labeled Buzz entity links", () => {
+test("extractSupportedLinkPreviews excludes markdown-labeled Kura entity links", () => {
   assert.deepEqual(
     extractSupportedLinkPreviews(
-      `[Project](buzz://project?owner=${BUZZ_OWNER}&d=buzz-world)`,
+      `[Project](kura://project?owner=${BUZZ_OWNER}&d=buzz-world)`,
     ),
     [],
   );
@@ -322,7 +322,7 @@ test("extractSupportedLinkPreviews returns unique supported links in order", () 
   );
 });
 
-test("extractSupportedLinkPreviews excludes same-relay Buzz clone URLs", () => {
+test("extractSupportedLinkPreviews excludes same-relay Kura clone URLs", () => {
   assert.deepEqual(
     extractSupportedLinkPreviews(
       `master pushed; clone: https://buzz.block.builderlab.xyz/git/${BUZZ_OWNER}/buzz-world-galaxy and review please.`,
@@ -339,10 +339,10 @@ test("extractSupportedLinkPreviews excludes same-relay Buzz clone URLs", () => {
   );
 });
 
-test("extractSupportedLinkPreviews excludes markdown-labeled Buzz clone URLs", () => {
+test("extractSupportedLinkPreviews excludes markdown-labeled Kura clone URLs", () => {
   assert.deepEqual(
     extractSupportedLinkPreviews(
-      `[Buzz World](https://relay.example/git/${BUZZ_OWNER}/buzz-world-galaxy)`,
+      `[Kura World](https://relay.example/git/${BUZZ_OWNER}/buzz-world-galaxy)`,
       "https://relay.example",
     ),
     [],

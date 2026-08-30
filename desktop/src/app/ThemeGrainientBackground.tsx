@@ -5,7 +5,29 @@ export function ThemeGrainientBackground() {
       className="buzz-setup-grainient"
       data-testid="setup-grainient-background"
     >
-      <div className="buzz-setup-grainient__wash" />
+      <div className="buzz-setup-grainient__wash">
+        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern
+              id="kura-seigaiha"
+              width="56"
+              height="28"
+              patternUnits="userSpaceOnUse"
+            >
+              <circle cx="28" cy="28" r="25" fill="none" stroke="currentColor" strokeWidth="1" />
+              <circle cx="28" cy="28" r="18" fill="none" stroke="currentColor" strokeWidth="1" />
+              <circle cx="28" cy="28" r="11" fill="none" stroke="currentColor" strokeWidth="1" />
+              <circle cx="0" cy="14" r="25" fill="none" stroke="currentColor" strokeWidth="1" />
+              <circle cx="0" cy="14" r="18" fill="none" stroke="currentColor" strokeWidth="1" />
+              <circle cx="0" cy="14" r="11" fill="none" stroke="currentColor" strokeWidth="1" />
+              <circle cx="56" cy="14" r="25" fill="none" stroke="currentColor" strokeWidth="1" />
+              <circle cx="56" cy="14" r="18" fill="none" stroke="currentColor" strokeWidth="1" />
+              <circle cx="56" cy="14" r="11" fill="none" stroke="currentColor" strokeWidth="1" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#kura-seigaiha)" />
+        </svg>
+      </div>
       <div className="buzz-setup-grainient__veil" />
     </div>
   );

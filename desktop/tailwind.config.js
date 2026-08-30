@@ -72,10 +72,25 @@ export default {
       },
       fontFamily: {
         sans: [
-          '"Inter Variable"',
-          "Inter",
+          '"Geist Variable"',
+          "Geist",
           '"Avenir Next"',
           '"Segoe UI"',
+          "sans-serif",
+        ],
+        mono: [
+          '"Geist Mono Variable"',
+          '"Geist Mono"',
+          '"JetBrains Mono"',
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "monospace",
+        ],
+        brand: [
+          '"Zen Kaku Gothic New"',
+          '"Hiragino Sans"',
+          '"Noto Sans JP"',
           "sans-serif",
         ],
       },

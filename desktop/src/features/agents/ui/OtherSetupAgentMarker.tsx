@@ -2,7 +2,7 @@ import { Cloud } from "lucide-react";
 
 import { cn } from "@/shared/lib/cn";
 
-const OTHER_SETUP_LABEL = "From another Buzz setup";
+const OTHER_SETUP_LABEL = "From another Kura setup";
 
 export function OtherSetupAgentMarker({
   className,

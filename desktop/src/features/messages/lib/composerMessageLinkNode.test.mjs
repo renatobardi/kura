@@ -19,22 +19,22 @@ const MarkdownIt = requireFromTiptap("markdown-it");
 
 const CHANNEL_ID = "9a1657ac-f7aa-5db0-b632-d8bbeb6dfb50";
 const MESSAGE_ID = "root-event";
-const HREF = `buzz://message?channel=${CHANNEL_ID}&id=${MESSAGE_ID}`;
-const CHANNEL_HREF = `buzz://channel/${CHANNEL_ID}`;
+const HREF = `kura://message?channel=${CHANNEL_ID}&id=${MESSAGE_ID}`;
+const CHANNEL_HREF = `kura://channel/${CHANNEL_ID}`;
 const CHANNEL_MESSAGE_ID = "a".repeat(64);
-const CHANNEL_MESSAGE_HREF = `buzz://channel/${CHANNEL_ID}/${CHANNEL_MESSAGE_ID}`;
+const CHANNEL_MESSAGE_HREF = `kura://channel/${CHANNEL_ID}/${CHANNEL_MESSAGE_ID}`;
 const OWNER = "a".repeat(64);
-const REPO_HREF = `buzz://repo?owner=${OWNER}&d=buzz-world`;
-const PROJECT_HREF = `buzz://project?owner=${OWNER}&d=buzz-world`;
+const REPO_HREF = `kura://repo?owner=${OWNER}&d=buzz-world`;
+const PROJECT_HREF = `kura://project?owner=${OWNER}&d=buzz-world`;
 const ISSUE_ID = "b".repeat(64);
-const ISSUE_HREF = `buzz://issue?id=${ISSUE_ID}&owner=${OWNER}&d=buzz-world`;
+const ISSUE_HREF = `kura://issue?id=${ISSUE_ID}&owner=${OWNER}&d=buzz-world`;
 const PR_ID = "c".repeat(64);
-const PR_HREF = `buzz://pr?id=${PR_ID}&owner=${OWNER}&d=buzz-world`;
+const PR_HREF = `kura://pr?id=${PR_ID}&owner=${OWNER}&d=buzz-world`;
 
 test("resolves a composer preview and canonicalizes the underlying href", () => {
   assert.deepEqual(
     resolveComposerMessageLinkAttributes(
-      HREF.replace("buzz://", "BUZZ://"),
+      HREF.replace("kura://", "KURA://"),
       (channelId) => (channelId === CHANNEL_ID ? "general" : undefined),
     ),
     { channelName: "general", href: HREF },
@@ -44,7 +44,7 @@ test("resolves a composer preview and canonicalizes the underlying href", () => 
 test("rejects malformed message links", () => {
   assert.equal(
     resolveComposerMessageLinkAttributes(
-      `buzz://message?channel=${CHANNEL_ID}`,
+      `kura://message?channel=${CHANNEL_ID}`,
       () => "general",
     ),
     null,
@@ -64,7 +64,7 @@ test("resolves channel and entity links as composer chips", () => {
     ),
     {
       channelName: "general",
-      href: `buzz://message?channel=${CHANNEL_ID}&id=${CHANNEL_MESSAGE_ID}`,
+      href: `kura://message?channel=${CHANNEL_ID}&id=${CHANNEL_MESSAGE_ID}`,
     },
   );
   assert.deepEqual(
@@ -95,7 +95,7 @@ const EXACT_LINK_PASTE_ACCEPTED_CASES = [
   [
     "channel message",
     CHANNEL_MESSAGE_HREF,
-    `buzz://message?channel=${CHANNEL_ID}&id=${CHANNEL_MESSAGE_ID}`,
+    `kura://message?channel=${CHANNEL_ID}&id=${CHANNEL_MESSAGE_ID}`,
   ],
   ["repo", REPO_HREF, REPO_HREF],
   ["project", PROJECT_HREF, PROJECT_HREF],
@@ -109,13 +109,13 @@ for (const [label, input, expectedHref] of EXACT_LINK_PASTE_ACCEPTED_CASES) {
   });
 }
 
-test("exact link paste canonicalizes Buzz links", () => {
+test("exact link paste canonicalizes Kura links", () => {
   assert.deepEqual(
     exactLinkPaste(
-      `BUZZ://channel/${CHANNEL_ID.toUpperCase()}/${CHANNEL_MESSAGE_ID.toUpperCase()}`,
+      `KURA://channel/${CHANNEL_ID.toUpperCase()}/${CHANNEL_MESSAGE_ID.toUpperCase()}`,
     ),
     {
-      href: `buzz://message?channel=${CHANNEL_ID}&id=${CHANNEL_MESSAGE_ID}`,
+      href: `kura://message?channel=${CHANNEL_ID}&id=${CHANNEL_MESSAGE_ID}`,
     },
   );
 });
@@ -130,7 +130,7 @@ for (const input of [
   "ftp://example.com",
   "not a url",
   `See ${HREF}`,
-  `buzz://channel/${CHANNEL_ID}/not-a-message-id`,
+  `kura://channel/${CHANNEL_ID}/not-a-message-id`,
 ]) {
   test(`exact link paste rejects ${input}`, () => {
     assert.equal(exactLinkPaste(input), null);
@@ -144,9 +144,9 @@ for (const [label, input, expectedHref] of [
   ["exact http", "https://example.com", "https://example.com"],
   ["wrapped http", "<https://example.com>", "https://example.com"],
   [
-    "canonical Buzz link",
+    "canonical Kura link",
     CHANNEL_MESSAGE_HREF,
-    `buzz://message?channel=${CHANNEL_ID}&id=${CHANNEL_MESSAGE_ID}`,
+    `kura://message?channel=${CHANNEL_ID}&id=${CHANNEL_MESSAGE_ID}`,
   ],
   ["scheme-less host", "www.example.com", "http://www.example.com"],
   ["bare host with path", "example.com/docs", "http://example.com/docs"],
@@ -272,7 +272,7 @@ test("paste handler links selected text instead of replacing it", () => {
   assert.deepEqual(view.state.storedMarks, []);
 });
 
-test("paste handler canonicalizes Buzz links over selected text", () => {
+test("paste handler canonicalizes Kura links over selected text", () => {
   const doc = document(paragraph(text("selected")));
   const view = createMockView(stateFromDocument(doc, 1, 9));
   const event = createPasteEvent(CHANNEL_MESSAGE_HREF);
@@ -286,7 +286,7 @@ test("paste handler canonicalizes Buzz links over selected text", () => {
   assert.deepEqual(toPlainJson(view.state.doc).content[0].content[0].marks, [
     {
       attrs: {
-        href: `buzz://message?channel=${CHANNEL_ID}&id=${CHANNEL_MESSAGE_ID}`,
+        href: `kura://message?channel=${CHANNEL_ID}&id=${CHANNEL_MESSAGE_ID}`,
       },
       type: "link",
     },
@@ -531,10 +531,10 @@ test("real markdown-it parsing materializes a restored message link", () => {
   const html = md.renderInline(`See ${HREF}.`);
   assert.match(html, /See <span data-composer-buzz-link=""/);
   assert.match(html, /data-channel-name="general"/);
-  assert.match(html, /data-href="buzz:\/\/message\?channel=.*&amp;id=/);
+  assert.match(html, /data-href="kura:\/\/message\?channel=.*&amp;id=/);
 });
 
-test("real markdown-it parsing materializes mixed Buzz permalink chips", () => {
+test("real markdown-it parsing materializes mixed Kura permalink chips", () => {
   const md = new MarkdownIt();
   registerComposerMessageLinkMarkdownIt(md, {
     resolveChannelName: (channelId) =>
@@ -543,8 +543,8 @@ test("real markdown-it parsing materializes mixed Buzz permalink chips", () => {
 
   const html = md.renderInline(`${HREF} ${CHANNEL_HREF} ${REPO_HREF}`);
   assert.equal((html.match(/data-composer-buzz-link=""/g) ?? []).length, 3);
-  assert.match(html, /data-href="buzz:\/\/channel\/9a1657ac/);
-  assert.match(html, /data-href="buzz:\/\/repo\?owner=a{64}&amp;d=buzz-world/);
+  assert.match(html, /data-href="kura:\/\/channel\/9a1657ac/);
+  assert.match(html, /data-href="kura:\/\/repo\?owner=a{64}&amp;d=buzz-world/);
 });
 
 test("real markdown-it parsing preserves underscores in restored entity links", () => {
@@ -552,22 +552,22 @@ test("real markdown-it parsing preserves underscores in restored entity links", 
   registerComposerMessageLinkMarkdownIt(md, {
     resolveChannelName: () => undefined,
   });
-  const href = `buzz://repo?owner=${OWNER}&d=my_repo`;
+  const href = `kura://repo?owner=${OWNER}&d=my_repo`;
 
   const html = md.renderInline(href);
 
   assert.equal((html.match(/data-composer-buzz-link=""/g) ?? []).length, 1);
-  assert.match(html, /data-href="buzz:\/\/repo\?owner=a{64}&amp;d=my_repo"/);
+  assert.match(html, /data-href="kura:\/\/repo\?owner=a{64}&amp;d=my_repo"/);
   assert.doesNotMatch(html, /<\/span>_repo/);
 });
 
-test("markdown parsing resumes after markdown-it consumes the buzz prefix", () => {
+test("markdown parsing resumes after markdown-it consumes the kura prefix", () => {
   const { rule } = captureMarkdownRule();
   let token = null;
   const state = {
-    pending: "See buzz",
+    pending: "See kura",
     src: `See ${HREF}`,
-    pos: "See buzz".length,
+    pos: "See kura".length,
     push: () => {
       token = { meta: null };
       return token;
@@ -709,6 +709,6 @@ test("markdown rendering stores identity in attributes, not visible id text", ()
 
   assert.match(html, /data-composer-buzz-link=""/);
   assert.match(html, /data-channel-name="general"/);
-  assert.match(html, /data-href="buzz:\/\/message\?channel=.*&amp;id=/);
+  assert.match(html, /data-href="kura:\/\/message\?channel=.*&amp;id=/);
   assert.doesNotMatch(html, />[^<]*root-event/);
 });

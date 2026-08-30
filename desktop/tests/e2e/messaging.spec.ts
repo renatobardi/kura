@@ -139,7 +139,7 @@ test.beforeEach(async ({ page }, testInfo) => {
       : testInfo.title.includes("cardless tweet preview")
         ? {
             linkPreviewMetadata: {
-              title: "Buzz (@buzz) on X",
+              title: "Kura (@buzz) on X",
               siteName: "X (formerly Twitter)",
               description:
                 "This is a real tweet-style description long enough to wrap across several lines while preserving the message-like treatment. It keeps going with enough distinct words to exceed five rendered lines at the preview width, proving that the overflow-aware control appears only when the content is genuinely clipped rather than relying on a brittle character-count guess.",
@@ -156,14 +156,14 @@ test.beforeEach(async ({ page }, testInfo) => {
               // keys and drop the card, which is exactly the bug under test.
               linkPreviewMetadataByHref: {
                 "https://github.com/block/buzz/pull/3767": {
-                  title: "Buzz pull request 3767",
+                  title: "Kura pull request 3767",
                   siteName: "GitHub",
                   description: "Fragment-bearing PR link.",
                   imageDataUrl: null,
                   imageDomain: null,
                 },
                 "https://github.com/block/buzz/pull/3867": {
-                  title: "Buzz pull request 3867",
+                  title: "Kura pull request 3867",
                   siteName: "GitHub",
                   description: "Plain PR link.",
                   imageDataUrl: null,
@@ -226,10 +226,10 @@ test.beforeEach(async ({ page }, testInfo) => {
                     testInfo.title.includes("composer no-image link embeds")
                   ? {
                       linkPreviewMetadata: {
-                        title: "Buzz",
+                        title: "Kura",
                         siteName: "GitHub",
                         description:
-                          "Open-source collaboration for the Buzz app.",
+                          "Open-source collaboration for the Kura app.",
                         imageDataUrl: null,
                         imageDomain: null,
                         faviconDataUrl:
@@ -242,7 +242,7 @@ test.beforeEach(async ({ page }, testInfo) => {
                       )
                     ? {
                         linkPreviewMetadata: {
-                          title: "Buzz pull request",
+                          title: "Kura pull request",
                           siteName: "GitHub",
                           description:
                             "First paragraph line one.\nFirst paragraph line two.\n\nSecond paragraph.",
@@ -265,7 +265,7 @@ test.beforeEach(async ({ page }, testInfo) => {
                         )
                       ? {
                           linkPreviewMetadata: {
-                            title: "Buzz pull request",
+                            title: "Kura pull request",
                             siteName: "GitHub",
                             description: "A sender-authored preview snapshot.",
                             imageDataUrl:
@@ -291,7 +291,7 @@ test.beforeEach(async ({ page }, testInfo) => {
                           )
                         ? {
                             linkPreviewMetadata: {
-                              title: "Buzz pull request",
+                              title: "Kura pull request",
                               siteName: "GitHub",
                               description:
                                 "A sender-authored preview snapshot.",
@@ -313,7 +313,7 @@ test.beforeEach(async ({ page }, testInfo) => {
                           ? {
                               mediaProxyInitiallyUnavailable: true,
                               linkPreviewMetadata: {
-                                title: "Buzz pull request",
+                                title: "Kura pull request",
                                 siteName: "GitHub",
                                 description:
                                   "A sender-authored preview snapshot.",
@@ -328,7 +328,7 @@ test.beforeEach(async ({ page }, testInfo) => {
                               testInfo.title.includes("supported Compact")
                             ? {
                                 linkPreviewMetadata: {
-                                  title: "Buzz pull request",
+                                  title: "Kura pull request",
                                   siteName: "GitHub",
                                   description:
                                     "A sender-authored preview snapshot.",
@@ -1327,7 +1327,7 @@ test("a snapshot media upload failure preserves a metadata-only preview", async 
     "snapshot",
     "1",
     previewUrl,
-    "Buzz pull request",
+    "Kura pull request",
     "GitHub",
     "A sender-authored preview snapshot.",
   ]);
@@ -1534,7 +1534,7 @@ test("composer no-image link embeds keep the attachment footprint", async ({
   await expect(card).toHaveAttribute("data-image-state", "none");
   await expect(card.locator("[data-link-preview-thumbnail]")).toBeVisible();
   await expect(card.locator('[data-slot="attachment-title"]')).toContainText(
-    /github\.com|Buzz/,
+    /github\.com|Kura/,
   );
   await expect(card).toHaveCSS("height", "55px");
 });
@@ -4001,7 +4001,7 @@ test("a refused message deep link retries after the thread edit is canceled", as
   const destinationId = await destination.getAttribute("data-message-id");
   expect(destinationId).not.toBeNull();
   await mainInput.fill(
-    `Retry link buzz://message?channel=9a1657ac-f7aa-5db0-b632-d8bbeb6dfb50&id=${destinationId}`,
+    `Retry link kura://message?channel=9a1657ac-f7aa-5db0-b632-d8bbeb6dfb50&id=${destinationId}`,
   );
   await mainInput.press("Enter");
   const destinationLink = page
@@ -4327,7 +4327,7 @@ for (const targetKind of ["reply", "root"] as const) {
         const targetId = targetKind === "reply" ? reply.id : root.id;
         emit({
           channelName: "general",
-          content: `Same-thread ${targetKind} target buzz://message?channel=9a1657ac-f7aa-5db0-b632-d8bbeb6dfb50&id=${targetId}&thread=${root.id}`,
+          content: `Same-thread ${targetKind} target kura://message?channel=9a1657ac-f7aa-5db0-b632-d8bbeb6dfb50&id=${targetId}&thread=${root.id}`,
         });
         return { sourceReplyId: reply.id, sourceRootId: root.id };
       },
