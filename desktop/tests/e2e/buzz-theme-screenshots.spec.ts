@@ -361,8 +361,8 @@ async function expectAppliedBuzzTheme(
       storedTheme,
       isDark,
       buzzTheme: themeName,
-      gradientTop: isDark ? "#4a4616" : "#e6e6b6",
-      gradientBottom: isDark ? "#0a1423" : "#c4d0da",
+      gradientTop: isDark ? "#1f1d1a" : "#f7f4ee",
+      gradientBottom: isDark ? "#151412" : "#ece7dc",
     });
 }
 
@@ -411,7 +411,7 @@ test("buzz dark sidebar gradient", async ({ page }) => {
   await expectIconlessSectionTitleAligned(page, "dm-list");
   await expect(page.locator("[data-buzz-content-surface]")).toHaveCSS(
     "background-color",
-    "rgb(26, 26, 26)",
+    "rgb(22, 21, 19)",
   );
   await waitForAnimations(page);
   await page
@@ -1227,7 +1227,7 @@ test("settings nav uses Kura active pill + hover (dark)", async ({ page }) => {
   await expectBuzzSettingsPalette(page, "dark");
   await expect(page.getByTestId("settings-content-surface")).toHaveCSS(
     "background-color",
-    "rgb(26, 26, 26)",
+    "rgb(22, 21, 19)",
   );
   await waitForAnimations(page);
   await sidebar.screenshot({ path: `${SHOTS}/07-settings-nav-dark.png` });
