@@ -5,7 +5,7 @@ import {
   type BuzzDownloadPlatform,
   detectBuzzDownloadPlatform,
   resolveBuzzDownloadUrlForPlatform,
-} from "@/shared/lib/buzz-download";
+} from "@/shared/lib/kura-download";
 import { hasNip07Provider } from "@/shared/lib/nostr-signer";
 import { relayWsUrl } from "@/shared/lib/relay-url";
 import { Button } from "@/shared/ui/button";
