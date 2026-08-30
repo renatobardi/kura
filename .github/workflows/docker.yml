@@ -43,21 +43,8 @@ on:
   push:
     branches: [main]
     tags: ["relay-v[0-9]*"]
-  pull_request:
-    paths:
-      - "Dockerfile"
-      - "Dockerfile.push-gateway"
-      - ".dockerignore"
-      - ".github/workflows/docker.yml"
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - "rust-toolchain.toml"
-      - "crates/**"
-      - "web/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
-      - "patches/**"
+  # PR builds were dropped: Docker Hub base-image pulls are rate limited on
+  # GitHub-hosted runners and the image is not needed to review a PR.
   workflow_dispatch:
     inputs:
       version:
