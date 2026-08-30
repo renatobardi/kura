@@ -10,18 +10,16 @@ void main() {
       expect(findTheme(buzzDarkThemeName), isNotNull);
     });
 
-    test('borrow the GitHub palettes', () {
-      final buzz = findTheme(buzzThemeName)!;
-      final github = findTheme('github-light')!;
-      expect(buzz.bg, github.bg);
-      expect(buzz.fg, github.fg);
-      expect(buzz.comment, github.comment);
+    test('use the Kura washi and sumi palettes', () {
+      final kura = findTheme(buzzThemeName)!;
+      expect(kura.bg, const Color(0xFFF7F4EE));
+      expect(kura.fg, const Color(0xFF1C1A17));
+      expect(kura.displayName, 'Kura');
 
-      final buzzDark = findTheme(buzzDarkThemeName)!;
-      final githubDark = findTheme('github-dark')!;
-      expect(buzzDark.bg, githubDark.bg);
-      expect(buzzDark.fg, githubDark.fg);
-      expect(buzzDark.comment, githubDark.comment);
+      final kuraDark = findTheme(buzzDarkThemeName)!;
+      expect(kuraDark.bg, const Color(0xFF151412));
+      expect(kuraDark.fg, const Color(0xFFECE7DC));
+      expect(kuraDark.displayName, 'Kura Dark');
     });
 
     test('are a light/dark pair', () {
@@ -31,13 +29,13 @@ void main() {
       expect(themePairFor(buzzDarkThemeName), buzzThemeName);
     });
 
-    test('appear as a single System-mode option labelled "Buzz"', () {
+    test('appear as a single System-mode option labelled "Kura"', () {
       final paired = themeGroups().paired.map((t) => t.name);
       expect(paired, contains(buzzThemeName));
       expect(paired, isNot(contains(buzzDarkThemeName)));
-      expect(pairedThemeLabel(buzzThemeName), 'Buzz');
-      expect(themeSelectionLabel(buzzThemeName, ThemeMode.system), 'Buzz');
-      expect(themeSelectionLabel(buzzDarkThemeName, ThemeMode.system), 'Buzz');
+      expect(pairedThemeLabel(buzzThemeName), 'Kura');
+      expect(themeSelectionLabel(buzzThemeName, ThemeMode.system), 'Kura');
+      expect(themeSelectionLabel(buzzDarkThemeName, ThemeMode.system), 'Kura');
     });
 
     test('forces neutral rendering without changing the stored accent', () {
