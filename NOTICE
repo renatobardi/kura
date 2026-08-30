@@ -1,0 +1,13 @@
+Kura
+Copyright 2026 Renato Bardi
+
+This product is derived from Buzz (https://github.com/block/buzz),
+Copyright Block, Inc., licensed under the Apache License, Version 2.0.
+Initial import from block/buzz at commit eed74bde2f4797714335ac10c56c0b0244c1def4.
+
+Modifications and additions are Copyright 2026 Renato Bardi and are
+licensed under the Apache License, Version 2.0 (see LICENSE).
+
+"Buzz", the Buzz bee logo and the "Cash Sans" typeface are trademarks
+and/or proprietary assets of Block, Inc. and are NOT part of this
+product; any remaining references are transitional and will be removed.
