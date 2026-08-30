@@ -319,8 +319,8 @@ export function MachineOnboardingFlow({
                 </span>
               </div>
               <p className="mt-2 max-w-[560px] text-center text-2xl font-normal leading-none text-foreground">
-                Your people, your agents, your projects —<br />
-                all in one place.
+                One storehouse for people<br />
+                and agents.
               </p>
               {error ? (
                 <p className="mt-4 text-sm text-destructive">{error}</p>
