@@ -811,6 +811,11 @@ test("assigns distinct agent voices and exposes compact per-agent controls", asy
   });
   expect(new Set(assignedVoices).size).toBe(2);
 
+  // The huddle composer takes focus once it becomes editable; if that lands
+  // after the popover opens it counts as focus-outside and dismisses the
+  // menu. Let the composer settle first so the assertion is not a race.
+  await expect(page.getByTestId("message-input")).toBeFocused();
+
   await page.getByRole("button", { name: "Voice settings for alice" }).click();
   await waitForAnimations(page);
   const voiceMenu = page.locator(

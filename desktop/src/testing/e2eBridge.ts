@@ -6121,7 +6121,7 @@ function buildMockProjectEvents(): RelayEvent[] {
         [
           ["d", "buzz"],
           ["name", "buzz"],
-          ["description", "The complete Buzz community platform."],
+          ["description", "The complete Kura community platform."],
           ["a", `${KIND_REPO_ANNOUNCEMENT}:${projectOwner}:buzz`],
           ["a", `${KIND_REPO_ANNOUNCEMENT}:${ALICE_PUBKEY}:relay-tools`],
           [

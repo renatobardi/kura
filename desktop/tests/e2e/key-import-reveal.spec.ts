@@ -8,7 +8,7 @@ const SAMPLE_NSEC =
 
 // --buzz-onboarding-backup-ink (#717106), the olive key ink shared with the
 // backup step.
-const BACKUP_INK = "rgb(113, 113, 6)";
+const BACKUP_INK = "rgb(180, 67, 43)";
 
 test("key import masks the key with a reveal toggle", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });

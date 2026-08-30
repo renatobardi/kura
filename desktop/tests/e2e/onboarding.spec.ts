@@ -2018,9 +2018,9 @@ test("connected first-community profile keeps Back bottom-left and balances the 
   expect(nameKeyStyles.backgroundColor).toMatch(
     /^(rgba\(255, 255, 255, 0\.95\)|oklab\(.+ \/ 0\.95\))$/,
   );
-  expect(nameKeyStyles.borderColor).toBe("rgba(113, 113, 6, 0.28)");
+  expect(nameKeyStyles.borderColor).toBe("rgba(180, 67, 43, 0.28)");
   expect(nameKeyStyles.boxShadow).toContain(
-    "rgba(113, 113, 6, 0.5) 0px 0px 0px 1px inset",
+    "rgba(180, 67, 43, 0.5) 0px 0px 0px 1px inset",
   );
   expect(nameKeyStyles).toMatchObject({
     borderRadius: "16px",

@@ -158,8 +158,11 @@ test("inserts template variables with keyboard control and restores the caret", 
   await expect(listbox).toBeVisible();
   await expect(listbox.getByRole("option")).toHaveCount(5);
   await waitForAnimations(page);
+  // Full-body pixel snapshot: allow a small ratio so font hinting differences
+  // between runner images do not fail the caret/autocomplete assertion below.
   expect(await page.locator("body").screenshot()).toMatchSnapshot(
     "workflow-template-variable-autocomplete.png",
+    { maxDiffPixelRatio: 0.02 },
   );
 
   await textarea.press("ArrowUp");
