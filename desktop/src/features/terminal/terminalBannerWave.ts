@@ -10,7 +10,7 @@
  * "originates bottom right and travels top left", not plain right-to-left.
  * This SUPERSEDES the original directive: "slow waves of the buzz theme colors
  * moving across the honeycomb lattice right to left, with a separate slow
- * color wave on the `buzz term` going left to right". The wordmark half is
+ * color wave on the `kura term` going left to right". The wordmark half is
  * unchanged by the amendment; only the field's axis moved.
  *
  * Two independent waves, different axes, different periods:

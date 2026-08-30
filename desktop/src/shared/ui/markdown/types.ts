@@ -47,7 +47,7 @@ export type MarkdownRuntime = {
   onOpenEntityLink: (link: ParsedEntityLink) => void;
   onOpenMessageLink: (link: ParsedMessageLink) => void;
   /**
-   * The resolved relay origin (e.g. `https://buzz.block.builderlab.xyz`),
+   * The resolved relay origin (e.g. `https://relay.example.com`),
    * or `null` when not yet resolved. Used by the anchor component to
    * validate that clone-URL rewrites point to the active relay only.
    */
