@@ -1,6 +1,6 @@
 # AGENTS.md — AI Agent Contributor Guide
 
-This guide is for AI agents contributing to the Buzz codebase. It covers
+This guide is for AI agents contributing to the Kura codebase. It covers
 agent-specific context and conventions. For general contributor info (setup,
 code style, PR process, architecture), see [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -27,27 +27,12 @@ and runtime evidence answer different questions.
 
 ## Ecosystem
 
-Buzz spans five repos. This one (`block/buzz`) is the OSS source for the relay, desktop, mobile, and CLI. The others handle internal builds and deployment:
+Kura is a single OSS repo: [renatobardi/kura](https://github.com/renatobardi/kura) holds the relay, desktop app, mobile app, CLI, and agent harness. There is no separate build/release repo, internal CI pipeline, container registry, or cluster deploy — releases are produced by this repo's own CI and published here.
 
-| Repo | Purpose |
-|------|---------|
-| [block/buzz](https://github.com/block/buzz) | OSS source — relay, desktop app, mobile app, CLI, agent harness |
-| [squareup/buzz-releases](https://github.com/squareup/buzz-releases) | Buildkite pipelines producing Block-signed macOS + iOS builds with `-block` desktop version suffix |
-| [squareup/sprout-oss](https://github.com/squareup/sprout-oss) | CI pipeline building the relay Docker image and pushing to internal ECR |
-| [squareup/block-coder-tf-stacks](https://github.com/squareup/block-coder-tf-stacks) | Terraform + ArgoCD deploying the relay to the staging Kubernetes cluster |
-| [squareup/sprout-backend-blox](https://github.com/squareup/sprout-backend-blox) | Desktop backend provider script connecting Blox workstation agents to the relay |
-
-```
-block/buzz (source)
-  ├─► buzz-releases      (desktop + mobile builds → Artifactory, GitHub, Mobile Releases)
-  ├─► sprout-oss         (relay Docker image → ECR)
-  │     └─► block-coder-tf-stacks  (Helm chart → ArgoCD → staging cluster)
-  └─── sprout-backend-blox         (Blox compute provider for Desktop agent launch)
-```
+Container images are published to `ghcr.io/renatobardi/kura`. Deploys are self-hosted (e.g. `docker-compose.yml`, or the Railway one-click deploy referenced in [README.md](README.md)) — bring your own infrastructure rather than relying on an internal staging cluster.
 
 See [RELEASING.md](RELEASING.md) for the desktop release flow and
-[CONTRIBUTING.md § Ecosystem](CONTRIBUTING.md#ecosystem) for contributor
-access information.
+[CONTRIBUTING.md](CONTRIBUTING.md) for contributor access information.
 
 ---
 
@@ -65,7 +50,7 @@ crates/
   kura-audit          # Hash-chain audit log
   kura-media          # Blossom/S3 media storage
   # Agent surface
-  kura-acp            # ACP harness bridging Buzz events to AI agents
+  kura-acp            # ACP harness bridging Kura events to AI agents
   kura-agent          # Minimal ACP-compliant agent (non-streaming, tool-calls-as-output)
   kura-dev-mcp        # Developer MCP server — shell + file-edit tools
   kura-persona        # Agent persona packs
@@ -153,7 +138,7 @@ Additional rules:
 
 ## Key Patterns
 
-**Nostr-first HTTP surface**: Buzz's primary API is NIP-29 over WebSocket. The relay also exposes a narrow HTTP surface: NIP-11/NIP-05 metadata, `POST /events`, `POST /query`, `POST /count`, workflow webhooks at `/hooks/{id}`, Blossom media, git smart HTTP, git policy hooks, and health probes. These HTTP paths all preserve the same host-derived community boundary.
+**Nostr-first HTTP surface**: Kura's primary API is NIP-29 over WebSocket. The relay also exposes a narrow HTTP surface: NIP-11/NIP-05 metadata, `POST /events`, `POST /query`, `POST /count`, workflow webhooks at `/hooks/{id}`, Blossom media, git smart HTTP, git policy hooks, and health probes. These HTTP paths all preserve the same host-derived community boundary.
 
 **Prefer Nostr events over new HTTP endpoints**: For new feature work, model
 the operation as a Nostr event (new kind in `kura-core/src/kind.rs`, handler
@@ -371,9 +356,9 @@ only the current set remains, otherwise reviewers still see the stale images:
 
 ```bash
 # List screenshot comments to find the stale one's id
-gh pr view <pr> --repo block/buzz --json comments \
+gh pr view <pr> --repo renatobardi/kura --json comments \
   --jq '.comments[] | select(.body | test("pr-<pr>--")) | {id, url}'
-gh api -X DELETE repos/block/buzz/issues/comments/<stale-comment-id>
+gh api -X DELETE repos/renatobardi/kura/issues/comments/<stale-comment-id>
 ```
 
 Branch cleanup when fully done: `git push origin --delete agent-screenshots/<username>`.
@@ -457,7 +442,7 @@ not post. This catches the most common screenshot regression.
 
 **PR comments:** Use a body template (3rd arg to `post-screenshots.sh`) with
 `{{filename}}` placeholders. Each screenshot gets a `###` heading + one-line
-description. See [PR #803](https://github.com/block/buzz/pull/803).
+description. See [PR #803](https://github.com/renatobardi/kura/pull/803).
 
 ---
 
@@ -554,6 +539,11 @@ Key files:
 ## Mobile App (Flutter)
 
 The mobile app lives in `mobile/` — a Flutter app using Riverpod + Hooks.
+mobile/ source is out of scope for most agent changes here. The `mobile` and
+`mobile-swift` CI jobs currently run only on push to `main`, not on pull
+requests — see [.github/workflows/ci.yml](.github/workflows/ci.yml) — so a
+mobile-affecting PR still needs local `flutter test` / `just mobile-check`
+before merge.
 
 ### Architecture
 
