@@ -1,0 +1,20 @@
+[package]
+name = "kura-search"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Postgres full-text search for Kura, scoped by community"
+
+[dependencies]
+kura-core   = { workspace = true }
+kura-datastore-tracing = { workspace = true }
+sqlx        = { workspace = true }
+uuid        = { workspace = true }
+thiserror   = { workspace = true }
+tracing     = { workspace = true }
+metrics     = { workspace = true }
+
+[dev-dependencies]
+tokio       = { workspace = true }

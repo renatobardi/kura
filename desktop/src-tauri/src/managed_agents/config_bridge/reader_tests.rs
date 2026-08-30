@@ -72,7 +72,7 @@ fn test_record() -> ManagedAgentRecord {
         auth_tag: None,
         relay_url: "ws://localhost:3000".to_string(),
         avatar_url: None,
-        acp_command: "buzz-acp".to_string(),
+        acp_command: "kura-acp".to_string(),
         agent_command: "goose".to_string(),
         agent_args: vec![],
         mcp_command: "".to_string(),
@@ -204,11 +204,11 @@ fn surface_reports_mcp_specific_config_path() {
 fn goose_mcp_config_path_follows_path_root_override() {
     let record = test_record();
     let runtime = test_runtime();
-    let surface = with_goose_path_root(Some("/tmp/buzz-goose-root"), || {
+    let surface = with_goose_path_root(Some("/tmp/kura-goose-root"), || {
         read_config_surface(&record, Some(runtime), None, &no_tiers(), None)
     });
 
-    let expected_path = Path::new("/tmp/buzz-goose-root")
+    let expected_path = Path::new("/tmp/kura-goose-root")
         .join("config")
         .join("config.yaml");
     assert_eq!(
@@ -252,7 +252,7 @@ fn record_model_overrides_file_model() {
     let surface = read_config_surface(&record, Some(runtime), None, &no_tiers(), None);
     let model = surface.normalized.model.unwrap();
     assert_eq!(model.value.as_deref(), Some("explicit-model"));
-    assert_eq!(model.origin, ConfigOrigin::BuzzExplicit);
+    assert_eq!(model.origin, ConfigOrigin::KuraExplicit);
 }
 
 #[test]
@@ -498,7 +498,7 @@ fn no_false_positive_override_when_persona_edited_mid_life() {
 fn config_file_only_system_prompt_surfaces_as_config_file_origin() {
     // Record/env has no prompt; the config file does. Must surface with
     // ConfigFile origin. Write mechanism is always RespawnWithEnvVar for
-    // system_prompt — the UI writes back via BUZZ_ACP_SYSTEM_PROMPT.
+    // system_prompt — the UI writes back via KURA_ACP_SYSTEM_PROMPT.
     let record = test_record();
     let field = build_system_prompt_field(
         &record,
@@ -511,7 +511,7 @@ fn config_file_only_system_prompt_surfaces_as_config_file_origin() {
     assert!(matches!(
         field.write_via,
         ConfigWriteMechanism::RespawnWithEnvVar { ref env_key }
-            if env_key == "BUZZ_ACP_SYSTEM_PROMPT"
+            if env_key == "KURA_ACP_SYSTEM_PROMPT"
     ));
     assert!(field.overridden_value.is_none());
 }
@@ -523,7 +523,7 @@ fn record_system_prompt_shadows_config_file_prompt_as_secondary() {
     let field =
         build_system_prompt_field(&record, &Some("File prompt.".to_string()), &no_tiers()).unwrap();
     assert_eq!(field.value.as_deref(), Some("Record prompt."));
-    assert_eq!(field.origin, ConfigOrigin::BuzzExplicit);
+    assert_eq!(field.origin, ConfigOrigin::KuraExplicit);
     assert_eq!(field.overridden_value.as_deref(), Some("File prompt."));
     assert_eq!(field.overridden_origin, Some(ConfigOrigin::ConfigFile));
 }
@@ -537,7 +537,7 @@ fn no_system_prompt_from_any_tier_yields_none() {
 #[test]
 fn explicit_record_model_not_retagged_when_already_present() {
     let mut record = test_record();
-    // Record already has its own model — origin stays BuzzExplicit.
+    // Record already has its own model — origin stays KuraExplicit.
     record.model = Some("explicit-model".to_string());
     let runtime = test_runtime();
 
@@ -545,11 +545,11 @@ fn explicit_record_model_not_retagged_when_already_present() {
 
     let model = surface.normalized.model.unwrap();
     assert_eq!(model.value.as_deref(), Some("explicit-model"));
-    assert_eq!(model.origin, ConfigOrigin::BuzzExplicit);
+    assert_eq!(model.origin, ConfigOrigin::KuraExplicit);
 }
 
 #[test]
-fn extra_env_vars_appear_in_advanced_as_buzz_explicit() {
+fn extra_env_vars_appear_in_advanced_as_kura_explicit() {
     let mut record = test_record();
     // Normalized keys — must NOT appear in advanced.
     record
@@ -557,7 +557,7 @@ fn extra_env_vars_appear_in_advanced_as_buzz_explicit() {
         .insert("GOOSE_MODEL".to_string(), "some-model".to_string());
     record
         .env_vars
-        .insert("BUZZ_ACP_SYSTEM_PROMPT".to_string(), "hello".to_string());
+        .insert("KURA_ACP_SYSTEM_PROMPT".to_string(), "hello".to_string());
     // Non-normalized key — MUST appear in advanced.
     record
         .env_vars
@@ -576,7 +576,7 @@ fn extra_env_vars_appear_in_advanced_as_buzz_explicit() {
         "normalized model key must not appear in advanced"
     );
     assert!(
-        !advanced_keys.contains(&"BUZZ_ACP_SYSTEM_PROMPT"),
+        !advanced_keys.contains(&"KURA_ACP_SYSTEM_PROMPT"),
         "normalized system prompt key must not appear in advanced"
     );
 
@@ -586,7 +586,7 @@ fn extra_env_vars_appear_in_advanced_as_buzz_explicit() {
         .find(|f| f.key == "SPROUT_ACP_MEMORY")
         .unwrap();
     assert_eq!(field.value.as_deref(), Some("mem-value"));
-    assert_eq!(field.origin, ConfigOrigin::BuzzExplicit);
+    assert_eq!(field.origin, ConfigOrigin::KuraExplicit);
     assert!(matches!(
         field.write_via,
         ConfigWriteMechanism::RespawnWithEnvVar { ref env_key } if env_key == "SPROUT_ACP_MEMORY"
@@ -612,18 +612,18 @@ fn extra_env_var_skipped_when_already_in_file_config_extra() {
     );
 }
 
-// ── buzz-agent normalized env-var field tests ─────────────────────────────────
+// ── kura-agent normalized env-var field tests ─────────────────────────────────
 //
-// buzz-agent uses env vars (not a config file) for max_output_tokens and
-// context_limit. build_numeric_env_field must surface these as BuzzExplicit
+// kura-agent uses env vars (not a config file) for max_output_tokens and
+// context_limit. build_numeric_env_field must surface these as KuraExplicit
 // when the env var is present in record.env_vars, and must not double-surface
 // them in the advanced tier.
 
-fn buzz_agent_runtime() -> &'static KnownAcpRuntime {
+fn kura_agent_runtime() -> &'static KnownAcpRuntime {
     &KnownAcpRuntime {
-        id: "buzz-agent",
+        id: "kura-agent",
         label: "Kura Agent",
-        commands: &["buzz-agent"],
+        commands: &["kura-agent"],
         aliases: &[],
         avatar_url: "",
         mcp_command: None,
@@ -638,17 +638,17 @@ fn buzz_agent_runtime() -> &'static KnownAcpRuntime {
         adapter_install_hint: "",
         skill_dir: None,
         supports_acp_model_switching: true,
-        model_env_var: Some("BUZZ_AGENT_MODEL"),
-        provider_env_var: Some("BUZZ_AGENT_PROVIDER"),
+        model_env_var: Some("KURA_AGENT_MODEL"),
+        provider_env_var: Some("KURA_AGENT_PROVIDER"),
         provider_locked: false,
         default_env: &[],
         config_file_path: None,
         config_file_format: None,
         supports_acp_native_config: false,
-        thinking_env_var: Some("BUZZ_AGENT_THINKING_EFFORT"),
-        max_tokens_env_var: Some("BUZZ_AGENT_MAX_OUTPUT_TOKENS"),
-        context_limit_env_var: Some("BUZZ_AGENT_MAX_CONTEXT_TOKENS"),
-        max_rounds_env_var: Some("BUZZ_AGENT_MAX_ROUNDS"),
+        thinking_env_var: Some("KURA_AGENT_THINKING_EFFORT"),
+        max_tokens_env_var: Some("KURA_AGENT_MAX_OUTPUT_TOKENS"),
+        context_limit_env_var: Some("KURA_AGENT_MAX_CONTEXT_TOKENS"),
+        max_rounds_env_var: Some("KURA_AGENT_MAX_ROUNDS"),
         required_normalized_fields: &["model", "provider"],
         login_hint: None,
         auth_probe_args: None,
@@ -656,52 +656,52 @@ fn buzz_agent_runtime() -> &'static KnownAcpRuntime {
 }
 
 #[test]
-fn buzz_agent_max_output_tokens_from_env_is_buzz_explicit() {
+fn kura_agent_max_output_tokens_from_env_is_kura_explicit() {
     let mut record = test_record();
     record.env_vars.insert(
-        "BUZZ_AGENT_MAX_OUTPUT_TOKENS".to_string(),
+        "KURA_AGENT_MAX_OUTPUT_TOKENS".to_string(),
         "8192".to_string(),
     );
-    let runtime = buzz_agent_runtime();
+    let runtime = kura_agent_runtime();
 
     let surface = read_config_surface(&record, Some(runtime), None, &no_tiers(), None);
 
     let field = surface.normalized.max_output_tokens.unwrap();
     assert_eq!(field.value.as_deref(), Some("8192"));
-    assert_eq!(field.origin, ConfigOrigin::BuzzExplicit);
+    assert_eq!(field.origin, ConfigOrigin::KuraExplicit);
     assert!(matches!(
         field.write_via,
         ConfigWriteMechanism::RespawnWithEnvVar { ref env_key }
-            if env_key == "BUZZ_AGENT_MAX_OUTPUT_TOKENS"
+            if env_key == "KURA_AGENT_MAX_OUTPUT_TOKENS"
     ));
 }
 
 #[test]
-fn buzz_agent_context_limit_from_env_is_buzz_explicit() {
+fn kura_agent_context_limit_from_env_is_kura_explicit() {
     let mut record = test_record();
     record.env_vars.insert(
-        "BUZZ_AGENT_MAX_CONTEXT_TOKENS".to_string(),
+        "KURA_AGENT_MAX_CONTEXT_TOKENS".to_string(),
         "100000".to_string(),
     );
-    let runtime = buzz_agent_runtime();
+    let runtime = kura_agent_runtime();
 
     let surface = read_config_surface(&record, Some(runtime), None, &no_tiers(), None);
 
     let field = surface.normalized.context_limit.unwrap();
     assert_eq!(field.value.as_deref(), Some("100000"));
-    assert_eq!(field.origin, ConfigOrigin::BuzzExplicit);
+    assert_eq!(field.origin, ConfigOrigin::KuraExplicit);
     assert!(matches!(
         field.write_via,
         ConfigWriteMechanism::RespawnWithEnvVar { ref env_key }
-            if env_key == "BUZZ_AGENT_MAX_CONTEXT_TOKENS"
+            if env_key == "KURA_AGENT_MAX_CONTEXT_TOKENS"
     ));
 }
 
 #[test]
-fn buzz_agent_max_tokens_absent_when_no_env_var_or_file() {
-    // buzz-agent has no config file, and env var is not set.
+fn kura_agent_max_tokens_absent_when_no_env_var_or_file() {
+    // kura-agent has no config file, and env var is not set.
     let record = test_record();
-    let runtime = buzz_agent_runtime();
+    let runtime = kura_agent_runtime();
 
     let surface = read_config_surface(&record, Some(runtime), None, &no_tiers(), None);
 
@@ -716,65 +716,65 @@ fn buzz_agent_max_tokens_absent_when_no_env_var_or_file() {
 }
 
 #[test]
-fn buzz_agent_max_tokens_env_var_not_double_surfaced_in_advanced() {
+fn kura_agent_max_tokens_env_var_not_double_surfaced_in_advanced() {
     let mut record = test_record();
     record.env_vars.insert(
-        "BUZZ_AGENT_MAX_OUTPUT_TOKENS".to_string(),
+        "KURA_AGENT_MAX_OUTPUT_TOKENS".to_string(),
         "4096".to_string(),
     );
     record.env_vars.insert(
-        "BUZZ_AGENT_MAX_CONTEXT_TOKENS".to_string(),
+        "KURA_AGENT_MAX_CONTEXT_TOKENS".to_string(),
         "50000".to_string(),
     );
-    let runtime = buzz_agent_runtime();
+    let runtime = kura_agent_runtime();
 
     let surface = read_config_surface(&record, Some(runtime), None, &no_tiers(), None);
 
     let advanced_keys: Vec<&str> = surface.advanced.iter().map(|f| f.key.as_str()).collect();
     assert!(
-        !advanced_keys.contains(&"BUZZ_AGENT_MAX_OUTPUT_TOKENS"),
+        !advanced_keys.contains(&"KURA_AGENT_MAX_OUTPUT_TOKENS"),
         "max_output_tokens must not appear in advanced when normalized"
     );
     assert!(
-        !advanced_keys.contains(&"BUZZ_AGENT_MAX_CONTEXT_TOKENS"),
+        !advanced_keys.contains(&"KURA_AGENT_MAX_CONTEXT_TOKENS"),
         "context_limit must not appear in advanced when normalized"
     );
 }
 
 #[test]
-fn buzz_agent_thinking_effort_from_env_is_buzz_explicit() {
+fn kura_agent_thinking_effort_from_env_is_kura_explicit() {
     let mut record = test_record();
     record
         .env_vars
-        .insert("BUZZ_AGENT_THINKING_EFFORT".to_string(), "high".to_string());
-    let runtime = buzz_agent_runtime();
+        .insert("KURA_AGENT_THINKING_EFFORT".to_string(), "high".to_string());
+    let runtime = kura_agent_runtime();
 
     let surface = read_config_surface(&record, Some(runtime), None, &no_tiers(), None);
 
     let field = surface.normalized.thinking_effort.unwrap();
     assert_eq!(field.value.as_deref(), Some("high"));
-    assert_eq!(field.origin, ConfigOrigin::BuzzExplicit);
+    assert_eq!(field.origin, ConfigOrigin::KuraExplicit);
     assert!(matches!(
         field.write_via,
         ConfigWriteMechanism::RespawnWithEnvVar { ref env_key }
-            if env_key == "BUZZ_AGENT_THINKING_EFFORT"
+            if env_key == "KURA_AGENT_THINKING_EFFORT"
     ));
 }
 
 #[test]
-fn buzz_agent_thinking_effort_env_var_not_double_surfaced_in_advanced() {
+fn kura_agent_thinking_effort_env_var_not_double_surfaced_in_advanced() {
     let mut record = test_record();
     record.env_vars.insert(
-        "BUZZ_AGENT_THINKING_EFFORT".to_string(),
+        "KURA_AGENT_THINKING_EFFORT".to_string(),
         "medium".to_string(),
     );
-    let runtime = buzz_agent_runtime();
+    let runtime = kura_agent_runtime();
 
     let surface = read_config_surface(&record, Some(runtime), None, &no_tiers(), None);
 
     let advanced_keys: Vec<&str> = surface.advanced.iter().map(|f| f.key.as_str()).collect();
     assert!(
-        !advanced_keys.contains(&"BUZZ_AGENT_THINKING_EFFORT"),
+        !advanced_keys.contains(&"KURA_AGENT_THINKING_EFFORT"),
         "thinking_effort must not appear in advanced when normalized"
     );
 }
@@ -818,19 +818,19 @@ fn missing_optional_provider_stays_hidden() {
 // The plan's acceptance criteria for effort tier resolution.
 // Tier ordering: record env > ACP > persona env > global env > config file.
 
-fn buzz_agent_rt() -> &'static KnownAcpRuntime {
-    crate::managed_agents::discovery::known_acp_runtime_exact("buzz-agent")
-        .expect("buzz-agent must be in catalog")
+fn kura_agent_rt() -> &'static KnownAcpRuntime {
+    crate::managed_agents::discovery::known_acp_runtime_exact("kura-agent")
+        .expect("kura-agent must be in catalog")
 }
 
 /// AC-1: no record effort, global env has effort → GlobalDefault.
-/// Real-world case: global-agent-config has BUZZ_AGENT_THINKING_EFFORT=high,
+/// Real-world case: global-agent-config has KURA_AGENT_THINKING_EFFORT=high,
 /// per-agent record has no env_vars → effort must surface with GlobalDefault origin.
 #[test]
 fn global_effort_surfaces_as_global_default_when_record_has_none() {
     let record = test_record();
-    let runtime = buzz_agent_rt();
-    let tiers = global_env_tiers("BUZZ_AGENT_THINKING_EFFORT", "high");
+    let runtime = kura_agent_rt();
+    let tiers = global_env_tiers("KURA_AGENT_THINKING_EFFORT", "high");
 
     let surface = read_config_surface(&record, Some(runtime), None, &tiers, None);
 
@@ -846,8 +846,8 @@ fn global_effort_surfaces_as_global_default_when_record_has_none() {
 #[test]
 fn persona_effort_shadows_global_and_tags_persona_default() {
     let record = test_record();
-    let runtime = buzz_agent_rt();
-    let tiers = persona_and_global_env_tiers("BUZZ_AGENT_THINKING_EFFORT", "medium", "high");
+    let runtime = kura_agent_rt();
+    let tiers = persona_and_global_env_tiers("KURA_AGENT_THINKING_EFFORT", "medium", "high");
 
     let surface = read_config_surface(&record, Some(runtime), None, &tiers, None);
 
@@ -862,16 +862,16 @@ fn persona_effort_shadows_global_and_tags_persona_default() {
     assert_eq!(effort.overridden_origin, Some(ConfigOrigin::GlobalDefault));
 }
 
-/// AC-3: record-level effort wins over persona and global, stays BuzzExplicit.
+/// AC-3: record-level effort wins over persona and global, stays KuraExplicit.
 #[test]
-fn record_effort_outranks_persona_and_global_keeps_buzz_explicit() {
+fn record_effort_outranks_persona_and_global_keeps_kura_explicit() {
     let mut record = test_record();
     record.env_vars.insert(
-        "BUZZ_AGENT_THINKING_EFFORT".to_string(),
+        "KURA_AGENT_THINKING_EFFORT".to_string(),
         "xhigh".to_string(),
     );
-    let runtime = buzz_agent_rt();
-    let tiers = persona_and_global_env_tiers("BUZZ_AGENT_THINKING_EFFORT", "medium", "high");
+    let runtime = kura_agent_rt();
+    let tiers = persona_and_global_env_tiers("KURA_AGENT_THINKING_EFFORT", "medium", "high");
 
     let surface = read_config_surface(&record, Some(runtime), None, &tiers, None);
 
@@ -880,14 +880,14 @@ fn record_effort_outranks_persona_and_global_keeps_buzz_explicit() {
         .thinking_effort
         .expect("effort must surface from record tier");
     assert_eq!(effort.value.as_deref(), Some("xhigh"));
-    assert_eq!(effort.origin, ConfigOrigin::BuzzExplicit);
+    assert_eq!(effort.origin, ConfigOrigin::KuraExplicit);
 }
 
 /// AC-4: no effort from any tier → thinking_effort field is absent.
 #[test]
 fn no_effort_anywhere_yields_no_thinking_effort_field() {
     let record = test_record();
-    let runtime = buzz_agent_rt();
+    let runtime = kura_agent_rt();
 
     let surface = read_config_surface(&record, Some(runtime), None, &no_tiers(), None);
 
@@ -905,7 +905,7 @@ fn no_effort_anywhere_yields_no_thinking_effort_field() {
 #[test]
 fn acp_effort_wins_over_inherited_global_effort_as_secondary() {
     let record = test_record();
-    let runtime = buzz_agent_rt();
+    let runtime = kura_agent_rt();
     let cache = SessionConfigCache {
         config_options: vec![AcpConfigOptionEntry {
             config_id: "effort".to_string(),
@@ -921,7 +921,7 @@ fn acp_effort_wins_over_inherited_global_effort_as_secondary() {
         goose_native_config: None,
         captured_at: "".to_string(),
     };
-    let tiers = global_env_tiers("BUZZ_AGENT_THINKING_EFFORT", "high");
+    let tiers = global_env_tiers("KURA_AGENT_THINKING_EFFORT", "high");
 
     let surface = read_config_surface(&record, Some(runtime), Some(&cache), &tiers, None);
 
@@ -944,8 +944,8 @@ fn acp_effort_wins_over_inherited_global_effort_as_secondary() {
 #[test]
 fn numeric_max_tokens_inherits_from_global_env() {
     let record = test_record();
-    let runtime = buzz_agent_runtime();
-    let tiers = global_env_tiers("BUZZ_AGENT_MAX_OUTPUT_TOKENS", "16384");
+    let runtime = kura_agent_runtime();
+    let tiers = global_env_tiers("KURA_AGENT_MAX_OUTPUT_TOKENS", "16384");
 
     let surface = read_config_surface(&record, Some(runtime), None, &tiers, None);
 
