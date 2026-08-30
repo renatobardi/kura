@@ -1,10 +1,10 @@
 # Kura Push Gateway deployment
 
-`kura-push-gateway` is the standalone public APNs last hop intended for `push.buzz.xyz`. Build it with `Dockerfile.push-gateway`; do not run it in the relay image or give relays APNs credentials.
+`kura-push-gateway` is the standalone public APNs last hop intended for `push.kura.oute.pro`. Build it with `Dockerfile.push-gateway`; do not run it in the relay image or give relays APNs credentials.
 
 ## Network and health
 
-- Public listener: `KURA_PUSH_BIND_ADDR` (default `0.0.0.0:8080`). Route `https://push.buzz.xyz` to this port.
+- Public listener: `KURA_PUSH_BIND_ADDR` (default `0.0.0.0:8080`). Route `https://push.kura.oute.pro` to this port.
 - Private health listener: `KURA_PUSH_HEALTH_ADDR` (default `0.0.0.0:8081`). Probe `/_liveness` and `/_readiness`; do not expose this port publicly. The chart has no pod-ingress allowance for 8081; Kubernetes node/kubelet-origin probe traffic is exempt from NetworkPolicy. Add a narrowly selected monitoring source only if the target CNI requires pod-origin health scraping.
 - Readiness fails when PostgreSQL authority is unavailable. Graceful shutdown stops accepting new requests before draining in-flight APNs calls.
 
@@ -13,7 +13,7 @@
 | Variable | Purpose |
 |---|---|
 | `DATABASE_URL` | PostgreSQL authority/admission store. Runtime credentials need DML on the six gateway tables, not DDL. |
-| `KURA_PUSH_PUBLIC_DELIVERY_URL` | Exact externally signed URL, normally `https://push.buzz.xyz/v1/deliveries/apns`. |
+| `KURA_PUSH_PUBLIC_DELIVERY_URL` | Exact externally signed URL, normally `https://push.kura.oute.pro/v1/deliveries/apns`. |
 | `KURA_PUSH_MAX_GRANT_LIFETIME_SECONDS` | Maximum delegation capability lifetime (`1..=31536000`). |
 | `KURA_PUSH_MAX_INSTALLATION_LIFETIME_SECONDS` | Maximum encrypted-token installation lifetime (default 90 days, max one year). Clients must renew before expiry. |
 | `KURA_PUSH_APP_ATTEST_ROOT_CERT_PATH` | Read-only mounted Apple App Attest root certificate PEM. |
@@ -24,7 +24,7 @@
 | `KURA_PUSH_GRANT_KEYS` | Capability AEAD keyring, `id:base64-32-bytes[,predecessor...]`; current key first. |
 | `KURA_PUSH_TOKEN_KEYS` | Independent token-custody AEAD keyring in the same format. Never reuse grant keys. |
 
-The canonical `push.buzz.xyz` MVP serves the dogfood application identity
+The canonical `push.kura.oute.pro` MVP serves the dogfood application identity
 (`xyz.block.buzz.dogfood.mobile`). App Attest must cryptographically validate
 the configured application ID before enrollment. Assertions and delivery use
 the server-owned APNs topic, certificate-backed connection pool, and
@@ -91,7 +91,7 @@ Alerting rules ship as an opt-in prometheus-operator `PrometheusRule` (`promethe
 Relay push is an explicit deployment opt-in through `KURA_PUSH_ENABLED=true`;
 the established strict boolean parser rejects unknown values and the default is
 false. When enabled, an absent `KURA_PUSH_GATEWAY_DELIVERY_URL` selects the exact
-canonical URL `https://push.buzz.xyz/v1/deliveries/apns`; operators can provide
+canonical URL `https://push.kura.oute.pro/v1/deliveries/apns`; operators can provide
 another exact HTTPS `/v1/deliveries/apns` URL as an advanced override. An
 explicitly empty URL while enabled is a startup error. Only an enabled relay
 advertises its host-scoped NIP-PL descriptor, accepts leases, and starts the

@@ -24,7 +24,7 @@ Kura is a new product derived from [block/buzz](https://github.com/block/buzz) @
 - web e2e 6/6; admin-web 24/28 = upstream baseline
 
 ### Deliberately deferred to phase 2
-`buzz-*` crate/binary names, `KURA_*` env vars, storage keys, `buzz-media:` protocol, `"Buzz event"` wire prefix (parsers accept both), `push.buzz.xyz`, ghcr image, CI, CHANGELOG, tagline.
+`buzz-*` crate/binary names, `KURA_*` env vars, storage keys, `buzz-media:` protocol, `"Buzz event"` wire prefix (parsers accept both), `push.kura.oute.pro`, ghcr image, CI, CHANGELOG, tagline.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
