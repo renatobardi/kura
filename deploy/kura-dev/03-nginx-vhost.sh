@@ -6,7 +6,7 @@ set -euo pipefail
 CONTAINER="${KURA_LXC_NAME:-kura-dev}"
 DOMAIN="${KURA_DEV_DOMAIN:-dev.kura.oute.pro}"
 
-IP=$(lxc list "$CONTAINER" -c 4 --format csv | awk '{print $1}' | head -1)
+IP=$(lxc exec "$CONTAINER" -- hostname -I | tr " " "\n" | grep -m1 "^10\." || true)
 [ -n "$IP" ] || { echo "ERRO: LXC '$CONTAINER' sem IP"; exit 1; }
 
 PUB_IP=$(curl -s https://api.ipify.org || true)

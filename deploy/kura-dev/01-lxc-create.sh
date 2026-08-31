@@ -18,7 +18,7 @@ fi
 
 echo "==> Aguardando rede do container…"
 for _ in $(seq 1 30); do
-  IP=$(lxc list "$CONTAINER" -c 4 --format csv | awk '{print $1}' | head -1)
+  IP=$(lxc exec "$CONTAINER" -- hostname -I | tr " " "\n" | grep -m1 "^10\." || true)
   [ -n "$IP" ] && break
   sleep 2
 done
