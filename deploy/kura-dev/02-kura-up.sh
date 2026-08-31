@@ -49,7 +49,7 @@ KURA_S3_SECRET_KEY=$S3_SECRET
 KURA_S3_BUCKET=kura-media
 KURA_S3_REGION=us-east-1
 KURA_S3_ADDRESSING_STYLE=path
-KURA_MEDIA_BASE_URL=https://$DOMAIN
+KURA_MEDIA_BASE_URL=https://$DOMAIN/media
 RUST_LOG=kura_relay=info,kura_db=info,kura_auth=info
 EOF
 fi
