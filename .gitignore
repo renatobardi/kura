@@ -47,9 +47,9 @@ node_modules/
 .sqlx/
 
 # SQLite database (created by relay in CWD)
-buzz.db
-buzz.db-wal
-buzz.db-shm
+kura.db
+kura.db-wal
+kura.db-shm
 
 # Docker volumes (if mounted locally)
 mysql-data/

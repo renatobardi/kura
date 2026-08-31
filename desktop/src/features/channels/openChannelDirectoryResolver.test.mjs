@@ -289,8 +289,8 @@ before(async () => {
 beforeEach(() => {
   ipc.reset();
   localStorage.clear();
-  localStorage.setItem("buzz-communities", JSON.stringify([COMMUNITY]));
-  localStorage.setItem("buzz-active-community-id", COMMUNITY.id);
+  localStorage.setItem("kura-communities", JSON.stringify([COMMUNITY]));
+  localStorage.setItem("kura-active-community-id", COMMUNITY.id);
 });
 
 afterEach(() => ipc.reset());
@@ -534,7 +534,7 @@ test("markdown message links resolve private destinations without a directory sc
     );
     assert.notEqual(
       mounted.container.querySelector(
-        "span[data-message-link][data-buzz-link]",
+        "span[data-message-link][data-kura-link]",
       ),
       null,
       `${path} private destination must render an inert message-link pill`,
@@ -587,7 +587,7 @@ test("authored-label channel and message links respect the private-destination g
       `${path} private destination must not render a clickable element`,
     );
     assert.notEqual(
-      mounted.container.querySelector("span[data-buzz-link]"),
+      mounted.container.querySelector("span[data-kura-link]"),
       null,
       `${path} private destination must render an inert node`,
     );

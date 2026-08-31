@@ -1,6 +1,6 @@
 # Relay deployment identity
 
-Canonical relay images from `ghcr.io/block/buzz` carry two signed
+Canonical relay images from `ghcr.io/renatobardi/kura` carry two signed
 attestations:
 
 - SLSA build provenance maps the immutable image digest to the source commit
@@ -18,10 +18,10 @@ Verify a canonical eligible digest with:
 
 ```bash
 gh attestation verify \
-  oci://ghcr.io/block/buzz@sha256:<digest> \
-  --repo block/buzz \
-  --signer-workflow block/buzz/.github/workflows/docker.yml \
-  --predicate-type https://buzz.block.xyz/attestations/deployment-eligibility/v1 \
+  oci://ghcr.io/renatobardi/kura@sha256:<digest> \
+  --repo renatobardi/kura \
+  --signer-workflow renatobardi/kura/.github/workflows/docker.yml \
+  --predicate-type https://kura.block.xyz/attestations/deployment-eligibility/v1 \
   --source-ref refs/heads/main
 ```
 
@@ -30,7 +30,7 @@ does not describe database schema compatibility and does not relax Kura's rule
 that migrations remain backwards compatible.
 
 The manual pre-merge workflow publishes only to
-`ghcr.io/block/buzz-staging-dev`. Those preview images are intentionally
+`ghcr.io/block/kura-staging-dev`. Those preview images are intentionally
 ineligible: they use a different package, may name non-main source, and do not
 receive the canonical deployment-eligibility predicate.
 
@@ -40,13 +40,13 @@ The relay health listener exposes intrinsic build identity at `/_status`:
 
 ```json
 {
-  "service": "buzz-relay",
+  "service": "kura-relay",
   "version": "0.2.1",
   "uptime_seconds": 123,
   "build": {
     "source_sha": "<40-character-source-sha>",
     "id": "github-actions:<run-id>:<attempt>",
-    "url": "https://github.com/block/buzz/actions/runs/<run-id>/attempts/<attempt>"
+    "url": "https://github.com/renatobardi/kura/actions/runs/<run-id>/attempts/<attempt>"
   }
 }
 ```
@@ -60,7 +60,7 @@ Kura chart `0.1.8` and newer accept an immutable image digest:
 
 ```yaml
 image:
-  repository: ghcr.io/block/buzz
+  repository: ghcr.io/renatobardi/kura
   digest: sha256:<64-lowercase-hex-characters>
 ```
 

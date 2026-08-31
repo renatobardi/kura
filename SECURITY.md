@@ -76,7 +76,7 @@ unless the subscriber is a member.
 
 ### Append-Only Audit Log
 
-All events are written to a tamper-evident audit log (`buzz-audit`). Each
+All events are written to a tamper-evident audit log (`kura-audit`). Each
 log entry is chained to the previous one via a SHA-256 hash chain. Because the
 chain is keyless, it is tamper-evident but not tamper-resistant: it detects
 accidental corruption or single-row edits, but an attacker with database write
@@ -98,7 +98,7 @@ plaintext file and does **not** migrate, so a transient outage cannot resurrect
 a rotated key from a leftover file.
 
 When no keyring backend is available (headless Linux with no Secret Service, for
-example), keys fall back to a `0o600` owner-only file. The `BUZZ_PRIVATE_KEY`
+example), keys fall back to a `0o600` owner-only file. The `KURA_PRIVATE_KEY`
 environment variable, when set, always takes precedence over both stores — this
 is how harnessed agents and CI receive their identity.
 

@@ -3,9 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 import { installMockBridge } from "../helpers/bridge";
 import { openSettings } from "../helpers/settings";
 
-const SIDEBAR_WIDTH_STORAGE_KEY = "buzz-sidebar-width";
+const SIDEBAR_WIDTH_STORAGE_KEY = "kura-sidebar-width";
 const COMMUNITY_ONBOARDING_STORAGE_KEY =
-  "buzz-community-onboarding-transaction.v1";
+  "kura-community-onboarding-transaction.v1";
 const DEFAULT_SIDEBAR_WIDTH = 300;
 
 test.beforeEach(async ({ page }) => {
@@ -27,7 +27,7 @@ async function storedSidebarWidth(page: Page) {
 
 async function loadTheme(page: Page, theme: string) {
   await page.addInitScript((selectedTheme) => {
-    window.localStorage.setItem("buzz-theme", selectedTheme);
+    window.localStorage.setItem("kura-theme", selectedTheme);
   }, theme);
   await installMockBridge(page);
   await page.goto("/");
@@ -100,16 +100,27 @@ test("sidebar rows separate hover, selected, and reorder states", async ({
   // row typography.
   await expect(selectedRow).toHaveCSS("font-weight", "400");
 
+  // Measure the spacing between the selected row and whichever row renders
+  // directly below it, rather than a hardcoded neighbor: the live sidebar
+  // sorts alphabetically, so the #kura project channel now sits between
+  // #general and #random and made name-based adjacency assumptions stale.
   const rowGap = await page.evaluate(() => {
     const selected = document.querySelector<HTMLElement>(
       '[data-testid="channel-general"]',
     );
-    const following = document.querySelector<HTMLElement>(
-      '[data-testid="channel-random"]',
-    );
-    if (!selected || !following) return null;
+    if (!selected) return null;
     const selectedBox = selected.getBoundingClientRect();
-    const followingBox = following.getBoundingClientRect();
+    const followingBox = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-testid^="channel-"]'),
+    )
+      .map((row) => row.getBoundingClientRect())
+      .filter(
+        (box) =>
+          Math.abs(box.left - selectedBox.left) < 1 &&
+          box.top >= selectedBox.bottom - 1,
+      )
+      .sort((a, b) => a.top - b.top)[0];
+    if (!followingBox) return null;
     return followingBox.top - selectedBox.bottom;
   });
   expect(rowGap).toBe(4);
@@ -426,7 +437,7 @@ test("channel owner can delete from the context menu", async ({ page }) => {
   await expect(page.getByTestId("stream-list")).not.toContainText("general");
 });
 
-for (const theme of ["buzz", "github-light", "catppuccin-mocha"]) {
+for (const theme of ["kura", "github-light", "catppuccin-mocha"]) {
   test(`uses the continuous sidebar surface in ${theme}`, async ({ page }) => {
     await loadTheme(page, theme);
 
@@ -513,7 +524,7 @@ test("aligns the sidebar search with the channel title outside the Kura theme", 
   const root = page.locator("html");
   const search = page.getByTestId("open-search");
   const channelTitle = page.getByTestId("chat-title");
-  await expect(root).not.toHaveAttribute("data-buzz-sidebar", "");
+  await expect(root).not.toHaveAttribute("data-kura-sidebar", "");
   await expect(search).toBeVisible();
   await expect(channelTitle).toHaveText("general");
 
@@ -538,7 +549,7 @@ test("keeps only search pinned while primary navigation scrolls", async ({
 
   const search = page.getByTestId("open-search");
   const primaryMenu = page.getByTestId("sidebar-primary-menu");
-  const sidebarScroller = page.locator(".buzz-sidebar-scrollbar");
+  const sidebarScroller = page.locator(".kura-sidebar-scrollbar");
   const [initialSearchBox, initialMenuBox] = await Promise.all([
     search.boundingBox(),
     primaryMenu.boundingBox(),
@@ -685,13 +696,13 @@ test("shows a sidebar update card when an update is ready", async ({
 
   await page.evaluate(() => {
     const testWindow = window as Window & {
-      __BUZZ_E2E__?: { mock?: { updateAvailable?: boolean } };
+      __KURA_E2E__?: { mock?: { updateAvailable?: boolean } };
     };
 
-    testWindow.__BUZZ_E2E__ = {
-      ...(testWindow.__BUZZ_E2E__ ?? {}),
+    testWindow.__KURA_E2E__ = {
+      ...(testWindow.__KURA_E2E__ ?? {}),
       mock: {
-        ...(testWindow.__BUZZ_E2E__?.mock ?? {}),
+        ...(testWindow.__KURA_E2E__?.mock ?? {}),
         restartDelayMs: 500,
         updateAvailable: true,
       },
@@ -711,9 +722,9 @@ test("shows a sidebar update card when an update is ready", async ({
         const commands =
           (
             window as Window & {
-              __BUZZ_E2E_COMMANDS__?: string[];
+              __KURA_E2E_COMMANDS__?: string[];
             }
-          ).__BUZZ_E2E_COMMANDS__ ?? [];
+          ).__KURA_E2E_COMMANDS__ ?? [];
         return (
           commands.includes("plugin:updater|install") ||
           commands.includes("plugin:process|restart")
@@ -739,9 +750,9 @@ test("shows a sidebar update card when an update is ready", async ({
         () =>
           (
             window as Window & {
-              __BUZZ_E2E_COMMANDS__?: string[];
+              __KURA_E2E_COMMANDS__?: string[];
             }
-          ).__BUZZ_E2E_COMMANDS__ ?? [],
+          ).__KURA_E2E_COMMANDS__ ?? [],
       ),
     )
     .toEqual(
@@ -756,9 +767,9 @@ test("shows a sidebar update card when an update is ready", async ({
     () =>
       (
         window as Window & {
-          __BUZZ_E2E_COMMANDS__?: string[];
+          __KURA_E2E_COMMANDS__?: string[];
         }
-      ).__BUZZ_E2E_COMMANDS__ ?? [],
+      ).__KURA_E2E_COMMANDS__ ?? [],
   );
   expect(commands.indexOf("plugin:updater|download")).toBeLessThan(
     commands.indexOf("plugin:updater|install"),
@@ -780,13 +791,13 @@ test("reflects an install started from the header update button on the sidebar c
 
   await page.evaluate(() => {
     const testWindow = window as Window & {
-      __BUZZ_E2E__?: { mock?: { updateAvailable?: boolean } };
+      __KURA_E2E__?: { mock?: { updateAvailable?: boolean } };
     };
 
-    testWindow.__BUZZ_E2E__ = {
-      ...(testWindow.__BUZZ_E2E__ ?? {}),
+    testWindow.__KURA_E2E__ = {
+      ...(testWindow.__KURA_E2E__ ?? {}),
       mock: {
-        ...(testWindow.__BUZZ_E2E__?.mock ?? {}),
+        ...(testWindow.__KURA_E2E__?.mock ?? {}),
         restartDelayMs: 500,
         updateAvailable: true,
       },
@@ -832,14 +843,14 @@ test("shows manual-required update card and never auto-downloads on non-AppImage
   // live (mirrors the ready-card test pattern).
   await page.evaluate(() => {
     const testWindow = window as Window & {
-      __BUZZ_E2E__?: {
+      __KURA_E2E__?: {
         mock?: { updateAvailable?: boolean; autoUpdateSupported?: boolean };
       };
     };
-    testWindow.__BUZZ_E2E__ = {
-      ...(testWindow.__BUZZ_E2E__ ?? {}),
+    testWindow.__KURA_E2E__ = {
+      ...(testWindow.__KURA_E2E__ ?? {}),
       mock: {
-        ...(testWindow.__BUZZ_E2E__?.mock ?? {}),
+        ...(testWindow.__KURA_E2E__?.mock ?? {}),
         updateAvailable: true,
         autoUpdateSupported: false,
       },
@@ -871,9 +882,9 @@ test("shows manual-required update card and never auto-downloads on non-AppImage
     () =>
       (
         window as Window & {
-          __BUZZ_E2E_COMMANDS__?: string[];
+          __KURA_E2E_COMMANDS__?: string[];
         }
-      ).__BUZZ_E2E_COMMANDS__ ?? [],
+      ).__KURA_E2E_COMMANDS__ ?? [],
   );
   expect(commands).not.toContain("plugin:updater|download");
   expect(commands).not.toContain("plugin:updater|install");

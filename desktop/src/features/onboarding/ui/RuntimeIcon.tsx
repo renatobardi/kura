@@ -27,14 +27,14 @@ export const PRESET_LOGOS: Record<string, string> = {
   openclaw: "/harness-logos/openclaw.svg",
 };
 
-function isBuzzRuntime(runtime: AcpRuntimeCatalogEntry): boolean {
-  return runtime.id.trim().toLowerCase() === "buzz-agent";
+function isKuraRuntime(runtime: AcpRuntimeCatalogEntry): boolean {
+  return runtime.id.trim().toLowerCase() === "kura-agent";
 }
 
 export function getRuntimeDisplayLabel(
   runtime: AcpRuntimeCatalogEntry,
 ): string {
-  return isBuzzRuntime(runtime) ? "Kura" : runtime.label;
+  return isKuraRuntime(runtime) ? "Kura" : runtime.label;
 }
 
 function getRuntimeLogoUrl(runtime: AcpRuntimeCatalogEntry): string | null {
@@ -56,7 +56,7 @@ export function RuntimeIcon({
   const imageUrl = getRuntimeLogoUrl(runtime);
   const Mark = RUNTIME_MARKS[id];
 
-  if (isBuzzRuntime(runtime)) {
+  if (isKuraRuntime(runtime)) {
     // The mark's wide viewBox letterboxes inside a square box, so honoring
     // the caller's size keeps it optically in line with the square logos.
     return <KuraMark className={cn(className, "text-foreground")} />;

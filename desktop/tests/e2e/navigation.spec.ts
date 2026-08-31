@@ -27,7 +27,7 @@ async function hoverUntilMetadataTooltip(
       await chip.hover();
       return page
         .getByRole("tooltip")
-        .locator('[data-buzz-tooltip-metadata-content=""]')
+        .locator('[data-kura-tooltip-metadata-content=""]')
         .count();
     })
     .toBeGreaterThan(0);
@@ -403,9 +403,9 @@ test("mixed Kura permalinks render as chips in the composer", async ({
   const links = [
     `kura://message?channel=${channelId}&id=mock-general-welcome`,
     `kura://channel/${channelId}`,
-    `kura://repo?owner=${owner}&d=buzz-world`,
-    `kura://pr?id=${pullRequestId}&owner=${owner}&d=buzz-world`,
-    `kura://issue?id=${issueId}&owner=${owner}&d=buzz-world`,
+    `kura://repo?owner=${owner}&d=kura-world`,
+    `kura://pr?id=${pullRequestId}&owner=${owner}&d=kura-world`,
+    `kura://issue?id=${issueId}&owner=${owner}&d=kura-world`,
   ].join(" ");
   const composerInput = page.getByTestId("message-input");
   await composerInput.evaluate((element, text) => {
@@ -420,14 +420,14 @@ test("mixed Kura permalinks render as chips in the composer", async ({
     );
   }, links);
 
-  const chips = composerInput.locator('[data-composer-buzz-link=""]');
+  const chips = composerInput.locator('[data-composer-kura-link=""]');
   await expect(chips).toHaveCount(5);
   await expect(chips.nth(0)).toHaveText("general");
   await expect(chips.nth(1)).toHaveText("general");
-  await expect(chips.nth(2)).toHaveText("buzz-world");
+  await expect(chips.nth(2)).toHaveText("kura-world");
   // PR and issue chips both use repository identity only, matching rendered chips.
-  await expect(chips.nth(3)).toHaveText("buzz-world");
-  await expect(chips.nth(4)).toHaveText("buzz-world");
+  await expect(chips.nth(3)).toHaveText("kura-world");
+  await expect(chips.nth(4)).toHaveText("kura-world");
   await expect(chips.nth(1)).toHaveClass(/inline-chip-icon-channel/);
   await expect(chips.nth(2)).toHaveClass(/inline-chip-icon-repo/);
   await expect(chips.nth(3)).toHaveClass(/inline-chip-icon-pr/);
@@ -449,7 +449,7 @@ test("composer Kura chip labels wrap without orphaning their icons", async ({
   page,
 }) => {
   await page.addInitScript(() => {
-    window.__BUZZ_E2E_EXTRA_PROJECT_EVENTS__ = [
+    window.__KURA_E2E_EXTRA_PROJECT_EVENTS__ = [
       {
         id: "mock-project-relaytoolsobservabilityconsole-main",
         kind: 30617,
@@ -488,7 +488,7 @@ test("composer Kura chip labels wrap without orphaning their icons", async ({
     );
   }, repoLink);
 
-  const chip = composerInput.locator('[data-composer-buzz-link=""]');
+  const chip = composerInput.locator('[data-composer-kura-link=""]');
   const leadingFragment = chip.locator(".inline-chip-leading-fragment");
   await expect(chip).toHaveText("relaytoolsobservabilityconsole-main");
   const emptyLeadingFragmentHeight = await composerInput.evaluate((element) => {
@@ -654,8 +654,8 @@ test("message links to visible root messages open the thread panel", async ({
   );
   await page.evaluate(() => {
     (
-      window as Window & { __BUZZ_E2E_DEFER_GET_EVENT__?: string | null }
-    ).__BUZZ_E2E_DEFER_GET_EVENT__ = "mock-general-welcome";
+      window as Window & { __KURA_E2E_DEFER_GET_EVENT__?: string | null }
+    ).__KURA_E2E_DEFER_GET_EVENT__ = "mock-general-welcome";
   });
 
   const link =
@@ -678,7 +678,7 @@ test("message links to visible root messages open the thread panel", async ({
   await expect(composerLink).toHaveText(/general(?: · mock-gen)?/);
   await expect(composerLink).toHaveClass(/mention-chip/);
   await expect(composerLink).toHaveClass(/inline-chip-icon-message/);
-  await expect(composerLink).toHaveAttribute("data-buzz-link", "");
+  await expect(composerLink).toHaveAttribute("data-kura-link", "");
   await expect(composerLink).toHaveAttribute("title", "Thread in #general");
   await expect(composerInput).not.toContainText("kura://message");
   await page.getByTestId("send-message").click();
@@ -697,15 +697,15 @@ test("message links to visible root messages open the thread panel", async ({
     .poll(() =>
       page.evaluate(
         () =>
-          (window as Window & { __BUZZ_E2E_GET_EVENT_CALL_COUNT__?: number })
-            .__BUZZ_E2E_GET_EVENT_CALL_COUNT__ ?? 0,
+          (window as Window & { __KURA_E2E_GET_EVENT_CALL_COUNT__?: number })
+            .__KURA_E2E_GET_EVENT_CALL_COUNT__ ?? 0,
       ),
     )
     .toBe(1);
   await page.evaluate(() => {
     (
-      window as Window & { __BUZZ_E2E_RELEASE_GET_EVENT__?: () => number }
-    ).__BUZZ_E2E_RELEASE_GET_EVENT__?.();
+      window as Window & { __KURA_E2E_RELEASE_GET_EVENT__?: () => number }
+    ).__KURA_E2E_RELEASE_GET_EVENT__?.();
   });
   await expect(rootThreadLink).toHaveText("general");
   await expect(rootThreadLink).toHaveClass(/mention-chip/);
@@ -718,9 +718,9 @@ test("message links to visible root messages open the thread panel", async ({
         () =>
           (
             window as Window & {
-              __BUZZ_E2E_COMMAND_LOG__?: Array<{ command: string }>;
+              __KURA_E2E_COMMAND_LOG__?: Array<{ command: string }>;
             }
-          ).__BUZZ_E2E_COMMAND_LOG__?.filter(
+          ).__KURA_E2E_COMMAND_LOG__?.filter(
             ({ command }) => command === "get_event",
           ).length ?? 0,
       ),
@@ -729,7 +729,7 @@ test("message links to visible root messages open the thread panel", async ({
   await hoverUntilMetadataTooltip(page, rootThreadLink);
   const messageTooltip = page.getByRole("tooltip");
   await expect(
-    messageTooltip.locator('[data-buzz-tooltip-metadata-content=""]'),
+    messageTooltip.locator('[data-kura-tooltip-metadata-content=""]'),
   ).toHaveText("Welcome to general");
   // The tooltip proves metadata resolved; the inline chip must still carry the
   // channel label at the exact width it had while the fetch was in flight, and
@@ -739,10 +739,10 @@ test("message links to visible root messages open the thread panel", async ({
     pendingChipBox?.width,
   );
   await expect(
-    messageTooltip.locator('[data-buzz-tooltip-metadata-content=""]'),
+    messageTooltip.locator('[data-kura-tooltip-metadata-content=""]'),
   ).toHaveClass(/line-clamp-3/);
   const messageFooter = messageTooltip.locator(
-    '[data-buzz-tooltip-metadata-type=""]',
+    '[data-kura-tooltip-metadata-type=""]',
   );
   await expect(messageFooter).toHaveText(
     /#general · .+ · (just now|\d+[mhdw] ago)/,
@@ -767,7 +767,7 @@ test("message links to visible root messages open the thread panel", async ({
   await expect(
     page
       .getByRole("tooltip")
-      .locator('[data-buzz-tooltip-metadata-content=""]'),
+      .locator('[data-kura-tooltip-metadata-content=""]'),
   ).toHaveText("Welcome to general");
   await expect
     .poll(() =>
@@ -775,9 +775,9 @@ test("message links to visible root messages open the thread panel", async ({
         () =>
           (
             window as Window & {
-              __BUZZ_E2E_COMMAND_LOG__?: Array<{ command: string }>;
+              __KURA_E2E_COMMAND_LOG__?: Array<{ command: string }>;
             }
-          ).__BUZZ_E2E_COMMAND_LOG__?.filter(
+          ).__KURA_E2E_COMMAND_LOG__?.filter(
             ({ command }) => command === "get_event",
           ).length ?? 0,
       ),
@@ -796,10 +796,10 @@ test("message links to visible root messages open the thread panel", async ({
   await randomChannelLink.hover();
   const channelTooltip = page.getByRole("tooltip");
   await expect(
-    channelTooltip.locator('[data-buzz-tooltip-metadata-content=""]'),
+    channelTooltip.locator('[data-kura-tooltip-metadata-content=""]'),
   ).toHaveText("Off-topic, fun stuff");
   const channelFooter = channelTooltip.locator(
-    '[data-buzz-tooltip-metadata-type=""]',
+    '[data-kura-tooltip-metadata-type=""]',
   );
   await expect(channelFooter).toHaveText("Public channel");
   await expect(channelFooter).toHaveCSS("white-space", "normal");
@@ -807,7 +807,7 @@ test("message links to visible root messages open the thread panel", async ({
   await rootThreadLink.hover();
   await rootThreadLink.click({ button: "right" });
 
-  const linkMenu = page.locator("[data-buzz-link-context-menu]");
+  const linkMenu = page.locator("[data-kura-link-context-menu]");
   await expect(linkMenu).toBeVisible();
   await randomChannelLink.click({ button: "right" });
   await expect(linkMenu).toHaveCount(1);
@@ -822,12 +822,12 @@ test("message links to visible root messages open the thread panel", async ({
       page.evaluate(() => {
         return (
           window as Window & {
-            __BUZZ_E2E_COMMAND_LOG__?: Array<{
+            __KURA_E2E_COMMAND_LOG__?: Array<{
               command: string;
               payload: { text?: string };
             }>;
           }
-        ).__BUZZ_E2E_COMMAND_LOG__?.findLast(
+        ).__KURA_E2E_COMMAND_LOG__?.findLast(
           ({ command }) => command === "copy_text_to_clipboard",
         )?.payload.text;
       }),
@@ -855,7 +855,7 @@ test("direct-message tooltip metadata stays on one physical line", async ({
   await page.getByTestId("channel-alice-tyler").click();
   await expect(page.getByTestId("chat-title")).toHaveText("alice-tyler");
   await page.evaluate((id) => {
-    window.__BUZZ_E2E_EMIT_MOCK_MESSAGE__?.({
+    window.__KURA_E2E_EMIT_MOCK_MESSAGE__?.({
       channelName: "alice-tyler",
       content: "DM source message",
       id,
@@ -878,7 +878,7 @@ test("direct-message tooltip metadata stays on one physical line", async ({
 
   const footer = page
     .getByRole("tooltip")
-    .locator('[data-buzz-tooltip-metadata-type=""]');
+    .locator('[data-kura-tooltip-metadata-type=""]');
   await expect(footer).toContainText("Direct message with alice-tyler");
   await expect(footer).toHaveCSS("white-space", "nowrap");
   await expect(footer).toHaveCSS("overflow", "hidden");
@@ -925,7 +925,7 @@ test("message links explain when preview metadata is unavailable", async ({
   await expect(missingMessageLink).toHaveText("general");
   // The label is metadata-independent now, so gate the hover on the state the
   // failed lookup does change: the unavailable styling.
-  await expect(missingMessageLink).toHaveClass(/buzz-link-unavailable/);
+  await expect(missingMessageLink).toHaveClass(/kura-link-unavailable/);
   await missingMessageLink.hover();
   const unavailableTooltip = page.getByRole("tooltip");
   await expect(unavailableTooltip).toHaveText("Message unavailable");
@@ -1023,7 +1023,7 @@ test("cold-start channel deep link drains after the router mounts", async ({
   await expect
     .poll(() =>
       page.evaluate(() =>
-        (window.__BUZZ_E2E_COMMAND_LOG__ ?? []).filter(
+        (window.__KURA_E2E_COMMAND_LOG__ ?? []).filter(
           (entry) =>
             entry.command === "acknowledge_pending_navigation_deep_link",
         ),

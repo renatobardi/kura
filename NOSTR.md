@@ -1,6 +1,6 @@
 # Using Third-Party Nostr Clients with Kura
 
-Kura is a Nostr relay that speaks NIP-29 (relay-based groups) natively. Third-party Nostr clients connect directly to `buzz-relay` using NIP-29 and NIP-42 authentication. The old NIP-28 compatibility proxy has been removed.
+Kura is a Nostr relay that speaks NIP-29 (relay-based groups) natively. Third-party Nostr clients connect directly to `kura-relay` using NIP-29 and NIP-42 authentication. The old NIP-28 compatibility proxy has been removed.
 
 ## Community scope
 
@@ -29,14 +29,14 @@ Connect any NIP-29 client straight to the relay.
 
 ```bash
 # 1. (Optional) Enable pubkey allowlist — must be set BEFORE relay startup
-export BUZZ_PUBKEY_ALLOWLIST=true
+export KURA_PUBKEY_ALLOWLIST=true
 
 # 2. Start the relay (auto-starts Docker services and runs migrations)
 just relay &                         # relay on :3000
 
 # 3. Add a pubkey to the allowlist (if enabled)
 #    Insert directly — there is no CLI command for this yet.
-PGPASSWORD=buzz_dev psql -h localhost -U buzz -d buzz -c \
+PGPASSWORD=kura_dev psql -h localhost -U kura -d kura -c \
   "INSERT INTO pubkey_allowlist (pubkey) VALUES (decode('<64-char-hex-pubkey>', 'hex'))"
 
 # 4. Connect any NIP-29 + NIP-42 client to ws://localhost:3000
@@ -84,7 +84,7 @@ PGPASSWORD=buzz_dev psql -h localhost -U buzz -d buzz -c \
 
 ### Pubkey Allowlist
 
-When `BUZZ_PUBKEY_ALLOWLIST=true`, NIP-42 connections that authenticate with only a pubkey
+When `KURA_PUBKEY_ALLOWLIST=true`, NIP-42 connections that authenticate with only a pubkey
 (no API token) are checked against the `pubkey_allowlist` table. This lets you open the
 relay to specific external Nostr identities without granting full access.
 
@@ -201,7 +201,7 @@ nak req -k 1059 --tag "p=<your-hex-pubkey>" \
 
 | Client | Platform | Evidence | Notes |
 |--------|----------|:--------:|-------|
-| **BuzzTestClient** | Rust (repo) | Automated E2E | Full NIP-29 flow: discovery (39000/39001/39002), kind:9 send/receive, reactions, deletions, h-tag enforcement |
+| **KuraTestClient** | Rust (repo) | Automated E2E | Full NIP-29 flow: discovery (39000/39001/39002), kind:9 send/receive, reactions, deletions, h-tag enforcement |
 | **E2E nostr interop** | Rust (repo) | Automated E2E | NIP-50 search (3 tests), NIP-10 threads (3 tests), NIP-17 gift wraps (3 tests), DM discovery (1 test) |
 | **nak** | CLI | Manual (verified) | kind:9 send/recv, NIP-50 search, NIP-10 thread replies, group discovery |
 
@@ -213,13 +213,13 @@ nak req -k 1059 --tag "p=<your-hex-pubkey>" \
 
 ## Relay Membership (NIP-43)
 
-When `BUZZ_REQUIRE_RELAY_MEMBERSHIP=true`, every authenticated connection is checked against the
+When `KURA_REQUIRE_RELAY_MEMBERSHIP=true`, every authenticated connection is checked against the
 `relay_members` table. In today's single-community deployment this is the relay-wide member list; in multi-community mode the same rule is scoped to the host-derived community. Only pubkeys with a row for that community may use that community. The relay owner
 is bootstrapped automatically from `RELAY_OWNER_PUBKEY` on startup.
 
 ### CLI: Managing Members
 
-Use `buzz-admin` — the operator CLI shipped in the relay image — to manage relay membership.
+Use `kura-admin` — the operator CLI shipped in the relay image — to manage relay membership.
 In a Docker Compose deployment, use `run.sh`:
 
 ```bash
@@ -236,13 +236,13 @@ In a Docker Compose deployment, use `run.sh`:
 ./run.sh list-members
 ```
 
-Or invoke `buzz-admin` directly inside the container:
+Or invoke `kura-admin` directly inside the container:
 
 ```bash
-docker compose exec relay buzz-admin add-member --pubkey npub1abc...
-docker compose exec relay buzz-admin add-member --pubkey npub1abc... --role admin
-docker compose exec relay buzz-admin remove-member --pubkey npub1abc...
-docker compose exec relay buzz-admin list-members
+docker compose exec relay kura-admin add-member --pubkey npub1abc...
+docker compose exec relay kura-admin add-member --pubkey npub1abc... --role admin
+docker compose exec relay kura-admin remove-member --pubkey npub1abc...
+docker compose exec relay kura-admin list-members
 ```
 
 **Exit codes:**
@@ -262,7 +262,7 @@ docker compose exec relay buzz-admin list-members
 |----------|-------|
 | `DATABASE_URL` | Postgres connection string |
 | `REDIS_URL` | Redis connection string |
-| `BUZZ_RELAY_PRIVATE_KEY` | Hex private key — required to sign kind:13534 events |
+| `KURA_RELAY_PRIVATE_KEY` | Hex private key — required to sign kind:13534 events |
 
 ### NIP-43 Admin Events (WebSocket)
 
@@ -334,9 +334,9 @@ but only admins/owners can set it. Full spec:
 
 | Variable | Required | Default | Description |
 |----------|:--------:|---------|-------------|
-| `BUZZ_PUBKEY_ALLOWLIST` | ❌ | `false` | Enable pubkey allowlist for NIP-42 pubkey-only auth |
-| `BUZZ_RELAY_PRIVATE_KEY` | ❌ | random | Hex secret key for relay signing (discovery events, system messages) |
-| `BUZZ_REQUIRE_AUTH_TOKEN` | ❌ | `false` | Require authenticated NIP-42 for all connections |
+| `KURA_PUBKEY_ALLOWLIST` | ❌ | `false` | Enable pubkey allowlist for NIP-42 pubkey-only auth |
+| `KURA_RELAY_PRIVATE_KEY` | ❌ | random | Hex secret key for relay signing (discovery events, system messages) |
+| `KURA_REQUIRE_AUTH_TOKEN` | ❌ | `false` | Require authenticated NIP-42 for all connections |
 
 ---
 

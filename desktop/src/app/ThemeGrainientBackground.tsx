@@ -2,10 +2,10 @@ export function ThemeGrainientBackground() {
   return (
     <div
       aria-hidden="true"
-      className="buzz-setup-grainient"
+      className="kura-setup-grainient"
       data-testid="setup-grainient-background"
     >
-      <div className="buzz-setup-grainient__wash">
+      <div className="kura-setup-grainient__wash">
         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern
@@ -91,7 +91,7 @@ export function ThemeGrainientBackground() {
           <rect width="100%" height="100%" fill="url(#kura-seigaiha)" />
         </svg>
       </div>
-      <div className="buzz-setup-grainient__veil" />
+      <div className="kura-setup-grainient__veil" />
     </div>
   );
 }

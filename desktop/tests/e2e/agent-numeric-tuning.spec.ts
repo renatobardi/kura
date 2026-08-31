@@ -4,7 +4,7 @@
  * per-agent Advanced section.
  *
  * Covers:
- *   1. Global defaults Advanced shows numeric inputs for buzz-agent.
+ *   1. Global defaults Advanced shows numeric inputs for kura-agent.
  *   2. Global defaults Advanced hides numeric inputs for non-capable runtimes.
  *   3. Per-agent Goose: saving a max-tokens value globally surfaces as
  *      Inherit (<value>) placeholder in the per-agent edit dialog.
@@ -57,25 +57,25 @@ async function openEditAgentDialog(
 
 // ── Tests ──────────────────────────────────────────────────────────────────
 
-test("global_advanced_buzz_agent_shows_all_numeric_controls", async ({
+test("global_advanced_kura_agent_shows_all_numeric_controls", async ({
   page,
 }) => {
   // The mock bridge's withMockRuntimeConfigMetadata injects the numeric env var
-  // fields for buzz-agent. When buzz-agent is selected and Advanced is opened,
+  // fields for kura-agent. When kura-agent is selected and Advanced is opened,
   // all three numeric inputs must be visible.
   await installMockBridge(page, {
     acpRuntimesCatalog: [
       {
-        id: "buzz-agent",
+        id: "kura-agent",
         label: "Kura Agent",
         avatar_url: "",
         availability: "available",
-        command: "buzz-agent",
-        binary_path: "/usr/local/bin/buzz-agent",
+        command: "kura-agent",
+        binary_path: "/usr/local/bin/kura-agent",
         default_args: [],
         mcp_command: null,
         install_hint: "Ships with the Kura desktop app.",
-        install_instructions_url: "https://github.com/block/buzz",
+        install_instructions_url: "https://github.com/block/kura",
         can_auto_install: false,
         underlying_cli_path: null,
         auth_status: { status: "not_applicable" },
@@ -85,7 +85,7 @@ test("global_advanced_buzz_agent_shows_all_numeric_controls", async ({
       env_vars: {},
       provider: "anthropic",
       model: null,
-      preferred_runtime: "buzz-agent",
+      preferred_runtime: "kura-agent",
     },
   });
 
@@ -95,7 +95,7 @@ test("global_advanced_buzz_agent_shows_all_numeric_controls", async ({
   // animation wrapper), so we click the toggle and wait for content directly.
   await page.getByTestId("global-agent-advanced-toggle").click();
 
-  // All three numeric inputs must be present for buzz-agent.
+  // All three numeric inputs must be present for kura-agent.
   await expect(page.getByTestId("numeric-max-output-tokens-input")).toBeVisible(
     { timeout: 5_000 },
   );
@@ -240,16 +240,16 @@ test("delayed_catalog_per_agent_saved_tuning_values_visible_then_structured_cont
   await installMockBridge(page, {
     acpRuntimesCatalog: [
       {
-        id: "buzz-agent",
+        id: "kura-agent",
         label: "Kura Agent",
         avatar_url: "",
         availability: "available",
-        command: "buzz-agent",
-        binary_path: "/usr/local/bin/buzz-agent",
+        command: "kura-agent",
+        binary_path: "/usr/local/bin/kura-agent",
         default_args: [],
         mcp_command: null,
         install_hint: "Ships with the Kura desktop app.",
-        install_instructions_url: "https://github.com/block/buzz",
+        install_instructions_url: "https://github.com/block/kura",
         can_auto_install: false,
         underlying_cli_path: null,
         auth_status: { status: "not_applicable" },
@@ -263,18 +263,18 @@ test("delayed_catalog_per_agent_saved_tuning_values_visible_then_structured_cont
       env_vars: {},
       provider: "anthropic",
       model: null,
-      preferred_runtime: "buzz-agent",
+      preferred_runtime: "kura-agent",
     },
     managedAgents: [
       {
         pubkey: TEST_IDENTITIES.tyler.pubkey,
         name: "Tyler Agent",
-        runtime: "buzz-agent",
+        runtime: "kura-agent",
         status: "stopped",
         channelNames: ["agents"],
         envVars: {
-          BUZZ_AGENT_MAX_OUTPUT_TOKENS: "4096",
-          BUZZ_AGENT_MAX_ROUNDS: "25",
+          KURA_AGENT_MAX_OUTPUT_TOKENS: "4096",
+          KURA_AGENT_MAX_ROUNDS: "25",
         },
       },
     ],
@@ -293,16 +293,16 @@ test("delayed_catalog_per_agent_saved_tuning_values_visible_then_structured_cont
   );
 
   // The saved tuning env vars must be visible as generic rows (not hidden)
-  // while the catalog hasn't settled: BUZZ_AGENT_MAX_OUTPUT_TOKENS and
-  // BUZZ_AGENT_MAX_ROUNDS should appear in the env-vars editor.
+  // while the catalog hasn't settled: KURA_AGENT_MAX_OUTPUT_TOKENS and
+  // KURA_AGENT_MAX_ROUNDS should appear in the env-vars editor.
   await expect(
     page.locator(
-      'input[data-testid="env-vars-key"][value="BUZZ_AGENT_MAX_OUTPUT_TOKENS"]',
+      'input[data-testid="env-vars-key"][value="KURA_AGENT_MAX_OUTPUT_TOKENS"]',
     ),
   ).toBeVisible();
   await expect(
     page.locator(
-      'input[data-testid="env-vars-key"][value="BUZZ_AGENT_MAX_ROUNDS"]',
+      'input[data-testid="env-vars-key"][value="KURA_AGENT_MAX_ROUNDS"]',
     ),
   ).toBeVisible();
 
@@ -329,18 +329,18 @@ test("failed_catalog_per_agent_saved_tuning_values_remain_visible_as_generic_row
       env_vars: {},
       provider: "anthropic",
       model: null,
-      preferred_runtime: "buzz-agent",
+      preferred_runtime: "kura-agent",
     },
     managedAgents: [
       {
         pubkey: TEST_IDENTITIES.tyler.pubkey,
         name: "Tyler Agent",
-        runtime: "buzz-agent",
+        runtime: "kura-agent",
         status: "stopped",
         channelNames: ["agents"],
         envVars: {
-          BUZZ_AGENT_MAX_OUTPUT_TOKENS: "8192",
-          BUZZ_AGENT_MAX_ROUNDS: "10",
+          KURA_AGENT_MAX_OUTPUT_TOKENS: "8192",
+          KURA_AGENT_MAX_ROUNDS: "10",
         },
       },
     ],
@@ -361,12 +361,12 @@ test("failed_catalog_per_agent_saved_tuning_values_remain_visible_as_generic_row
   // state must never hide persisted values with no editor to replace them.
   await expect(
     page.locator(
-      'input[data-testid="env-vars-key"][value="BUZZ_AGENT_MAX_OUTPUT_TOKENS"]',
+      'input[data-testid="env-vars-key"][value="KURA_AGENT_MAX_OUTPUT_TOKENS"]',
     ),
   ).toBeVisible({ timeout: 5_000 });
   await expect(
     page.locator(
-      'input[data-testid="env-vars-key"][value="BUZZ_AGENT_MAX_ROUNDS"]',
+      'input[data-testid="env-vars-key"][value="KURA_AGENT_MAX_ROUNDS"]',
     ),
   ).toBeVisible();
 });

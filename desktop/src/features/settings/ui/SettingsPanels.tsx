@@ -34,7 +34,7 @@ import { LocalArchiveSettingsCard } from "@/features/local-archive/ui/LocalArchi
 import { cn } from "@/shared/lib/cn";
 import { useCommunities } from "@/features/communities/useCommunities";
 import { Badge } from "@/shared/ui/badge";
-import { isBuzzTheme, useTheme } from "@/shared/theme/ThemeProvider";
+import { isKuraTheme, useTheme } from "@/shared/theme/ThemeProvider";
 import {
   LIGHT_THEMES,
   SYNTAX_THEMES,
@@ -42,7 +42,7 @@ import {
   getThemePair,
 } from "@/shared/theme/theme-loader";
 import {
-  BUZZ_GRADIENT_STOPS,
+  KURA_GRADIENT_STOPS,
   SystemPreferencePreviewFrame,
   ThemePreviewFrame,
   type ThemePreviewVars,
@@ -237,8 +237,8 @@ export const settingsSections: SettingsSectionDescriptor[] = [
 ];
 
 function formatThemeLabel(name: string): string {
-  if (name === "buzz") return "Kura";
-  if (name === "buzz-dark") return "Kura Dark";
+  if (name === "kura") return "Kura";
+  if (name === "kura-dark") return "Kura Dark";
   return name
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -342,9 +342,9 @@ function PairedThemeTile({
             ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
             : "group-hover:ring-2 group-hover:ring-border",
         )}
-        darkGradient={darkName ? BUZZ_GRADIENT_STOPS[darkName] : undefined}
+        darkGradient={darkName ? KURA_GRADIENT_STOPS[darkName] : undefined}
         darkVars={darkVars}
-        lightGradient={BUZZ_GRADIENT_STOPS[lightName]}
+        lightGradient={KURA_GRADIENT_STOPS[lightName]}
         lightVars={lightVars}
       />
       <span
@@ -385,7 +385,7 @@ function SingleThemeTile({
             ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
             : "group-hover:ring-2 group-hover:ring-border",
         )}
-        sidebarGradient={BUZZ_GRADIENT_STOPS[name]}
+        sidebarGradient={KURA_GRADIENT_STOPS[name]}
         vars={vars}
       />
       <span
@@ -442,8 +442,8 @@ function ThemeSettingsCard() {
   // Kura themes pin a neutral accent (GitHub black in light, white in dark),
   // so the accent picker is hidden while a Kura theme is active. `themeName` is
   // the effective theme, so this also covers System mode resolving to Kura.
-  const buzzThemeSelected = isBuzzTheme(themeName);
-  const accentPickerHidden = buzzThemeSelected;
+  const kuraThemeSelected = isKuraTheme(themeName);
+  const accentPickerHidden = kuraThemeSelected;
   const shouldReduceMotion = useReducedMotion();
 
   const previewVarsByTheme = useThemePreviewVars();
@@ -544,19 +544,19 @@ function ThemeSettingsCard() {
       className="h-[112px] w-[168px] shrink-0"
       darkGradient={
         selectedPairedDarkTheme
-          ? BUZZ_GRADIENT_STOPS[selectedPairedDarkTheme]
+          ? KURA_GRADIENT_STOPS[selectedPairedDarkTheme]
           : undefined
       }
       darkVars={
         selectedPairedDarkTheme ? getVars(selectedPairedDarkTheme) : null
       }
-      lightGradient={BUZZ_GRADIENT_STOPS[selectedPairedTheme]}
+      lightGradient={KURA_GRADIENT_STOPS[selectedPairedTheme]}
       lightVars={getVars(selectedPairedTheme)}
     />
   ) : (
     <ThemePreviewFrame
       className="h-[112px] w-[168px] shrink-0"
-      sidebarGradient={BUZZ_GRADIENT_STOPS[selectedTheme]}
+      sidebarGradient={KURA_GRADIENT_STOPS[selectedTheme]}
       vars={getVars(selectedTheme)}
     />
   );
@@ -785,7 +785,7 @@ function ThemeSettingsCard() {
           )}
 
           <GlassBackgroundSetting />
-          {buzzThemeSelected ? <ProminentActiveTabSetting /> : null}
+          {kuraThemeSelected ? <ProminentActiveTabSetting /> : null}
         </SettingsOptionGroup>
 
         <SettingsOptionGroup

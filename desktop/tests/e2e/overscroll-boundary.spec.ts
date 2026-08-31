@@ -136,10 +136,10 @@ test("locks horizontal viewport pan everywhere", async ({ page }) => {
     const terminal = document.querySelector<HTMLElement>(
       '[data-testid="terminal-wheel-target"]',
     );
-    const buzzContent = document.createElement("div");
-    buzzContent.dataset.testid = "concealed-terminal-dead-space";
-    terminal?.append(buzzContent);
-    if (terminal) terminal.dataset.terminalOwner = "buzz";
+    const kuraContent = document.createElement("div");
+    kuraContent.dataset.testid = "concealed-terminal-dead-space";
+    terminal?.append(kuraContent);
+    if (terminal) terminal.dataset.terminalOwner = "kura";
   });
   await expect(
     dispatchWheelPrevented(

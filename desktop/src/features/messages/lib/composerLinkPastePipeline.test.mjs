@@ -89,7 +89,7 @@ async function mountComposerEditor() {
     render(React.createElement(Harness));
   });
   // Tiptap emits `create` from a `setTimeout(…, 0)`, and Link's `onCreate` is
-  // what teaches linkify the `buzz` protocol. Paste before that lands and a
+  // what teaches linkify the `kura` protocol. Paste before that lands and a
   // `kura://` assertion passes for the wrong reason.
   await waitFor(() =>
     assert.ok(editor?.isInitialized, "composer editor never emitted `create`"),
@@ -102,7 +102,7 @@ async function mountComposerEditor() {
   assert.equal(
     findLinks(CHANNEL_HREF)[0]?.href,
     CHANNEL_HREF,
-    "expected Link's onCreate to register the buzz protocol with linkify",
+    "expected Link's onCreate to register the kura protocol with linkify",
   );
   return editor;
 }

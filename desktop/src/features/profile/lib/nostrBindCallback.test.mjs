@@ -17,32 +17,32 @@ function decodePayload(callbackUrl) {
 test("buildNostrBindCallbackUrl returns a UTF-8 base64url payload in the fragment", () => {
   const response = JSON.stringify({ content: "Kura ⚡", sig: "+/=" });
   const result = buildNostrBindCallbackUrl(
-    "https://example.com/buzz?source=bind",
+    "https://example.com/kura?source=bind",
     response,
   );
   const url = new URL(result);
 
   assert.equal(url.origin, "https://example.com");
-  assert.equal(url.pathname, "/buzz");
+  assert.equal(url.pathname, "/kura");
   assert.equal(url.search, "?source=bind");
-  assert.match(url.hash, /^#buzz_bind=v1\.[A-Za-z0-9_-]+$/);
+  assert.match(url.hash, /^#kura_bind=v1\.[A-Za-z0-9_-]+$/);
   assert.equal(decodePayload(result), response);
-  assert.equal(url.searchParams.has("buzz_bind"), false);
+  assert.equal(url.searchParams.has("kura_bind"), false);
 });
 
 test("buildNostrBindCallbackUrl replaces an existing fragment", () => {
   const result = buildNostrBindCallbackUrl(
-    "https://example.com/buzz#stale-fragment",
+    "https://example.com/kura#stale-fragment",
     "signed",
   );
 
-  assert.equal(new URL(result).hash, "#buzz_bind=v1.c2lnbmVk");
+  assert.equal(new URL(result).hash, "#kura_bind=v1.c2lnbmVk");
 });
 
 test("buildNostrBindCallbackUrl rejects callback URLs beyond the opener ceiling", () => {
   assert.throws(
     () =>
-      buildNostrBindCallbackUrl("https://example.com/buzz", "x".repeat(4_096)),
+      buildNostrBindCallbackUrl("https://example.com/kura", "x".repeat(4_096)),
     /too large/,
   );
 });

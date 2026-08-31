@@ -1,11 +1,11 @@
 {
   "bundle": {
     "externalBin": [
-      "binaries/buzz-acp",
-      "binaries/buzz-agent",
-      "binaries/buzz-dev-mcp",
+      "binaries/kura-acp",
+      "binaries/kura-agent",
+      "binaries/kura-dev-mcp",
       "binaries/git-credential-nostr",
-      "binaries/buzz"
+      "binaries/kura"
     ]
   }
 }

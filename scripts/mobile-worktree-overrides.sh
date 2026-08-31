@@ -16,8 +16,8 @@
 # profile builds never read these overrides.
 #
 # Android-only test builds can opt into a more explicit side-by-side identity:
-#   BUZZ_ANDROID_DEBUG_APP_NAME="Buzz Huddles"
-#   BUZZ_ANDROID_DEBUG_ID_SUFFIX=".huddles_829c"
+#   KURA_ANDROID_DEBUG_APP_NAME="Kura Huddles"
+#   KURA_ANDROID_DEBUG_ID_SUFFIX=".huddles_829c"
 # Both values are validated before the generated properties file is written.
 set -euo pipefail
 
@@ -76,16 +76,16 @@ case "$android_slug" in
 esac
 
 ios_bundle_id="pro.oute.kura.dogfood.mobile.${ios_slug}"
-android_app_name="${BUZZ_ANDROID_DEBUG_APP_NAME:-Kura (${label})}"
-android_suffix="${BUZZ_ANDROID_DEBUG_ID_SUFFIX:-.${android_slug}}"
+android_app_name="${KURA_ANDROID_DEBUG_APP_NAME:-Kura (${label})}"
+android_suffix="${KURA_ANDROID_DEBUG_ID_SUFFIX:-.${android_slug}}"
 
 if [[ "$android_app_name" == *$'\n'* || "$android_app_name" == *$'\r'* ]] || \
     ! printf '%s\n' "$android_app_name" | LC_ALL=C grep -Eq '^[A-Za-z0-9._() -]+$'; then
-    echo "BUZZ_ANDROID_DEBUG_APP_NAME must contain only letters, numbers, spaces, ., _, -, or parentheses" >&2
+    echo "KURA_ANDROID_DEBUG_APP_NAME must contain only letters, numbers, spaces, ., _, -, or parentheses" >&2
     exit 2
 fi
 if [[ ! "$android_suffix" =~ ^\.[a-z][a-z0-9_]*$ ]]; then
-    echo "BUZZ_ANDROID_DEBUG_ID_SUFFIX must match \\.[a-z][a-z0-9_]* (for example .huddles_829c)" >&2
+    echo "KURA_ANDROID_DEBUG_ID_SUFFIX must match \\.[a-z][a-z0-9_]* (for example .huddles_829c)" >&2
     exit 2
 fi
 

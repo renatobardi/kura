@@ -26,15 +26,15 @@ Everything about this project—decisions, tasks, code review, and releases—ha
 
 | Action | Command |
 | --- | --- |
-| Inspect the repository | \`buzz repos get --owner {{REPO_OWNER_HEX}} --id {{REPO_SLUG}}\` |
-| Create a task | \`buzz issues create --channel {{CHANNEL_UUID}} --title "..." --content -\` |
-| Claim or assign a task | \`buzz issues assign --issue <id> --repo-owner {{REPO_OWNER_HEX}} --repo-id {{REPO_SLUG}} --assignee <hex>\` |
-| Track task state | \`buzz issues status --issue <id> --repo-owner {{REPO_OWNER_HEX}} --repo-id {{REPO_SLUG}} --status open|resolved|closed|draft\` |
-| Open a review | \`buzz pr open --repo-owner {{REPO_OWNER_HEX}} --repo-id {{REPO_SLUG}} --subject "..." --body-file - --commit <tip> --clone {{REPO_CLONE_URL}} --branch-name <branch> --channel {{CHANNEL_UUID}}\` |
-| Update a review | \`buzz pr update --repo-owner {{REPO_OWNER_HEX}} --repo-id {{REPO_SLUG}} --pr <id> --pr-author <hex> --commit <tip> --clone {{REPO_CLONE_URL}}\` |
-| Mark a review merged or closed | \`buzz pr status --pr <id> --repo-owner {{REPO_OWNER_HEX}} --repo-id {{REPO_SLUG}} --status merged|closed\` |
-| Share files or artifacts | \`buzz upload file --file <path>\` |
-| Update this living document | \`buzz canvas set --channel {{CHANNEL_UUID}} --content -\` |
+| Inspect the repository | \`kura repos get --owner {{REPO_OWNER_HEX}} --id {{REPO_SLUG}}\` |
+| Create a task | \`kura issues create --channel {{CHANNEL_UUID}} --title "..." --content -\` |
+| Claim or assign a task | \`kura issues assign --issue <id> --repo-owner {{REPO_OWNER_HEX}} --repo-id {{REPO_SLUG}} --assignee <hex>\` |
+| Track task state | \`kura issues status --issue <id> --repo-owner {{REPO_OWNER_HEX}} --repo-id {{REPO_SLUG}} --status open|resolved|closed|draft\` |
+| Open a review | \`kura pr open --repo-owner {{REPO_OWNER_HEX}} --repo-id {{REPO_SLUG}} --subject "..." --body-file - --commit <tip> --clone {{REPO_CLONE_URL}} --branch-name <branch> --channel {{CHANNEL_UUID}}\` |
+| Update a review | \`kura pr update --repo-owner {{REPO_OWNER_HEX}} --repo-id {{REPO_SLUG}} --pr <id> --pr-author <hex> --commit <tip> --clone {{REPO_CLONE_URL}}\` |
+| Mark a review merged or closed | \`kura pr status --pr <id> --repo-owner {{REPO_OWNER_HEX}} --repo-id {{REPO_SLUG}} --status merged|closed\` |
+| Share files or artifacts | \`kura upload file --file <path>\` |
+| Update this living document | \`kura canvas set --channel {{CHANNEL_UUID}} --content -\` |
 
 ## Workflow
 

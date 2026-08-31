@@ -7,7 +7,7 @@ import { installMockBridge } from "../helpers/bridge";
 // already mounted app for a minimum visible duration, then fades out. E2E
 // runs skip the hold by default (it would slow every spec's boot and block
 // pointer actionability); this spec opts back in via
-// __BUZZ_E2E__.bootSplashHoldMs.
+// __KURA_E2E__.bootSplashHoldMs.
 
 test("boot splash overlay holds with a pulsing glyph, then dismisses", async ({
   page,
@@ -17,10 +17,10 @@ test("boot splash overlay holds with a pulsing glyph, then dismisses", async ({
   // script and can extend the config it assigns.
   await page.addInitScript(() => {
     const testWindow = window as Window & {
-      __BUZZ_E2E__?: { bootSplashHoldMs?: number };
+      __KURA_E2E__?: { bootSplashHoldMs?: number };
     };
-    testWindow.__BUZZ_E2E__ = {
-      ...(testWindow.__BUZZ_E2E__ ?? {}),
+    testWindow.__KURA_E2E__ = {
+      ...(testWindow.__KURA_E2E__ ?? {}),
       bootSplashHoldMs: 1_500,
     };
   });

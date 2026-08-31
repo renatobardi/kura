@@ -9,10 +9,10 @@ import {
 } from "./entityLink";
 
 export type SupportedLinkPreviewKind =
-  | "buzz-pull-request"
-  | "buzz-issue"
-  | "buzz-repository"
-  | "buzz-project"
+  | "kura-pull-request"
+  | "kura-issue"
+  | "kura-repository"
+  | "kura-project"
   | "github-pull-request"
   | "github-issue"
   | "github-repository"
@@ -299,7 +299,7 @@ function createPreview(
  * Exported so the resolver can tell "still the fallback" apart from a
  * markdown-label override it must not overwrite.
  */
-export function buzzEntityFallbackTitle(link: ParsedEntityLink): string {
+export function kuraEntityFallbackTitle(link: ParsedEntityLink): string {
   if (link.type === "repo" || link.type === "project") return link.dtag;
   return `${link.dtag} #${link.id.slice(0, 8)}`;
 }
@@ -309,15 +309,15 @@ export function buzzEntityFallbackTitle(link: ParsedEntityLink): string {
  * href is rebuilt through the canonical builders so equivalent links (case
  * or query order variants) dedupe to a single card.
  */
-function parseBuzzEntityPreview(href: string): SupportedLinkPreview | null {
+function parseKuraEntityPreview(href: string): SupportedLinkPreview | null {
   const parsed = parseEntityLink(href);
   if (!parsed.ok) return null;
 
   const link = parsed.value;
-  const title = buzzEntityFallbackTitle(link);
+  const title = kuraEntityFallbackTitle(link);
   if (link.type === "pr") {
     return {
-      kind: "buzz-pull-request",
+      kind: "kura-pull-request",
       href: buildPullRequestLink(link),
       provider: "Kura",
       title,
@@ -326,7 +326,7 @@ function parseBuzzEntityPreview(href: string): SupportedLinkPreview | null {
   }
   if (link.type === "issue") {
     return {
-      kind: "buzz-issue",
+      kind: "kura-issue",
       href: buildIssueLink(link),
       provider: "Kura",
       title,
@@ -335,7 +335,7 @@ function parseBuzzEntityPreview(href: string): SupportedLinkPreview | null {
   }
   if (link.type === "project") {
     return {
-      kind: "buzz-project",
+      kind: "kura-project",
       href: buildProjectLink(link),
       provider: "Kura",
       title,
@@ -343,7 +343,7 @@ function parseBuzzEntityPreview(href: string): SupportedLinkPreview | null {
     };
   }
   return {
-    kind: "buzz-repository",
+    kind: "kura-repository",
     href: buildRepoLink(link),
     provider: "Kura",
     title,
@@ -351,7 +351,7 @@ function parseBuzzEntityPreview(href: string): SupportedLinkPreview | null {
   };
 }
 
-const BUZZ_GIT_PATH_RE =
+const KURA_GIT_PATH_RE =
   /^\/git\/([a-f0-9]{64})\/([a-zA-Z0-9._-]+?)(?:\.git)?\/?$/;
 
 /**
@@ -368,7 +368,7 @@ const BUZZ_GIT_PATH_RE =
  * remain an ordinary external link. Pass `null` when the relay origin is not
  * yet resolved; the link stays external until it can be verified.
  */
-function parseBuzzGitLink(
+function parseKuraGitLink(
   parsed: URL,
   activeRelayOrigin: string | null,
 ): SupportedLinkPreview | null {
@@ -376,7 +376,7 @@ function parseBuzzGitLink(
     return null;
   }
 
-  const match = BUZZ_GIT_PATH_RE.exec(parsed.pathname);
+  const match = KURA_GIT_PATH_RE.exec(parsed.pathname);
   if (!match) return null;
 
   const [, owner, repo] = match;
@@ -385,7 +385,7 @@ function parseBuzzGitLink(
   }
 
   return {
-    kind: "buzz-repository",
+    kind: "kura-repository",
     href: buildRepoLink({ owner, dtag: repo }),
     provider: "Kura",
     title: repo,
@@ -547,7 +547,7 @@ export function parseSupportedLinkPreview(
 ): SupportedLinkPreview | null {
   const candidate = trimUrlCandidate(href);
   if (isEntityLink(candidate)) {
-    return parseBuzzEntityPreview(candidate);
+    return parseKuraEntityPreview(candidate);
   }
 
   let parsed: URL;
@@ -564,7 +564,7 @@ export function parseSupportedLinkPreview(
   }
 
   const recognized =
-    parseBuzzGitLink(parsed, activeRelayOrigin ?? null) ??
+    parseKuraGitLink(parsed, activeRelayOrigin ?? null) ??
     parseGithubLink(parsed) ??
     parseLinearIssue(parsed) ??
     parseGoogleDriveLink(parsed) ??

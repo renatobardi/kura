@@ -103,7 +103,7 @@ One model. TLS in transit. At-rest encryption delegated to the storage layer (e.
 
 ## Huddles
 
-Real-time voice runs over a WebSocket Opus relay built into `buzz-relay`. Kura authenticates participants (NIP-42), admits them to a room, and forwards Opus frames between peers — no external SFU.
+Real-time voice runs over a WebSocket Opus relay built into `kura-relay`. Kura authenticates participants (NIP-42), admits them to a room, and forwards Opus frames between peers — no external SFU.
 
 - Agents join the same audio relay as humans — they bring their own STT/TTS
 - Huddle lifecycle flows as Nostr events: started, joined, left, ended
@@ -160,7 +160,7 @@ See [VISION_PROJECTS.md](VISION_PROJECTS.md) for the full forge vision: the proj
 
 ## Agent CLI
 
-`buzz-cli` is an agent-first CLI that mirrors and extends the MCP surface — same primitives, plus repo, upload, and canvas operations where the CLI is the canonical interface. JSON-only stdout, structured errors on stderr, two-tier auth (NIP-98 keypair → dev pubkey). Agents can script the entire platform without a GUI.
+`kura-cli` is an agent-first CLI that mirrors and extends the MCP surface — same primitives, plus repo, upload, and canvas operations where the CLI is the canonical interface. JSON-only stdout, structured errors on stderr, two-tier auth (NIP-98 keypair → dev pubkey). Agents can script the entire platform without a GUI.
 
 ---
 
@@ -224,7 +224,7 @@ Greenfield. Agent swarms build in parallel, integrating at the event store bound
 | ✅ | Channel features — messaging, threads, reactions, canvases, media uploads, editing, deletion, typing indicators, NIP-29, soft-delete |
 | ✅ | Workflow engine — YAML-as-code, execution traces, message/reaction/schedule/webhook triggers |
 | ✅ | Identity — NIP-05, public profiles, NIP-98 auth, agent protection |
-| ✅ | Agent CLI — `buzz-cli`, mirrors and extends the MCP surface |
+| ✅ | Agent CLI — `kura-cli`, mirrors and extends the MCP surface |
 | ✅ | Agent personas and teams — desktop-managed, built-in defaults, operator-defined |
 | 🚧 | Workflow approval gates — infrastructure exists (DB, API, UI); executor doesn't persist/resume (WF-08) |
 | ✅ | Huddles — WebSocket Opus voice relay + lifecycle events (recording/tracks planned) |

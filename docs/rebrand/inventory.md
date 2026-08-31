@@ -1,4 +1,4 @@
-# Kura Rebrand Inventory (from block/buzz)
+# Kura Rebrand Inventory (from renatobardi/kura)
 
 Generated 2026-08-30. Phase 1 = user-visible. Phase 2 = internal (crate names, DB tables, env vars, docker images, k8s objects).
 
@@ -37,7 +37,7 @@ Related surface/animation components: `desktop/src/app/BuzzThemeSurfaces.tsx`, `
 
 Theme directory `desktop/src/shared/theme/`: `CommunityThemeController.tsx`, `useThemePreviewVars.ts`, `adaptive-theme.ts`, `useSystemColorScheme.ts`, `ThemePreviewFrame.tsx`, `communityThemePreference.ts` (+test), `terminal-palette.ts` (+test), `ThemeProvider.tsx`, `communityThemeSync.ts` (+test), `theme-loader.ts`.
 
-**Community/syntax theme catalog** (`desktop/src/shared/theme/theme-loader.ts`, `SYNTAX_THEMES`): first-party branded entries are `buzz` and `buzz-dark` (Shiki-based; `buzz` = GitHub Light palette + branded sidebar gradient, `buzz-dark` = GitHub Dark equivalent). Constants: `BUZZ_THEME_NAME = "buzz"`, `BUZZ_DARK_THEME_NAME = "buzz-dark"`, `BUZZ_BASE_THEME`, `BUZZ_DARK_BASE_THEME`. Rest of catalog is third-party Shiki theme names (andromeeda, aurora-x, ayu-dark, catppuccin-*, dark-plus, dracula, dracula-soft, everforest-*, github-*, etc.) — **not** rebrand targets. — PHASE 1 (the "Buzz"/"Buzz Dark" theme display name + gradient identity) / PHASE 2 (internal string ids `buzz`/`buzz-dark`).
+**Community/syntax theme catalog** (`desktop/src/shared/theme/theme-loader.ts`, `SYNTAX_THEMES`): first-party branded entries are `buzz` and `buzz-dark` (Shiki-based; `buzz` = GitHub Light palette + branded sidebar gradient, `buzz-dark` = GitHub Dark equivalent). Constants: `KURA_THEME_NAME = "buzz"`, `KURA_DARK_THEME_NAME = "buzz-dark"`, `KURA_BASE_THEME`, `KURA_DARK_BASE_THEME`. Rest of catalog is third-party Shiki theme names (andromeeda, aurora-x, ayu-dark, catppuccin-*, dark-plus, dracula, dracula-soft, everforest-*, github-*, etc.) — **not** rebrand targets. — PHASE 1 (the "Buzz"/"Buzz Dark" theme display name + gradient identity) / PHASE 2 (internal string ids `buzz`/`buzz-dark`).
 
 ### 1.2 Fonts — PHASE 1 (no change needed, but note for asset list)
 `desktop/src/main.tsx`: `@fontsource-variable/inter/opsz.css`, `opsz-italic.css`, `@fontsource/jetbrains-mono/400.css`, `700.css`. Other font-family refs in `terminal.css`, `theme.css`, `animations.css`, `markdown.css`. Not brand-specific fonts (Inter, JetBrains Mono) — no rename needed unless brand style guide differs.
@@ -131,7 +131,7 @@ Occurrences by directory (repo-wide, not desktop-only, since counted together):
 
 `block.xyz`: `docs` (2), `mobile/ios/BuzzPushKit/Tests/BuzzPushKitTests` (1), `README.md` (1).
 
-`github.com/block/buzz`: `desktop/tests/e2e` (8), `docs` (3), `desktop/src/features/projects/lib` (3), `desktop/src/shared/lib` (2), `desktop/src-tauri/src/commands` (2), `web/tests/e2e` (1), `web/src/shared/lib` (1), `mobile` (1), `docs/nips` (1), `desktop/src/testing` (1).
+`github.com/renatobardi/kura`: `desktop/tests/e2e` (8), `docs` (3), `desktop/src/features/projects/lib` (3), `desktop/src/shared/lib` (2), `desktop/src-tauri/src/commands` (2), `web/tests/e2e` (1), `web/src/shared/lib` (1), `mobile` (1), `docs/nips` (1), `desktop/src/testing` (1).
 
 ### 1.8 Deep link scheme `buzz://` — PHASE 1 (very high risk)
 
@@ -237,10 +237,10 @@ CHANGELOG.md is historical record — recommend leaving as-is (do not rewrite hi
 
 ## 5. Deploy/CI/scripts — mostly PHASE 2, some user-facing
 
-- `deploy/compose/*` (compose.yml, compose.dev.yml, compose.caddy.yml, run.sh, .env.example, README.md) — mention `buzz`; compose project name / `.env.example` var `BUZZ_IMAGE` — PHASE 2, except `deploy/compose/README.md` if user-facing setup doc → PHASE 1 review.
+- `deploy/compose/*` (compose.yml, compose.dev.yml, compose.caddy.yml, run.sh, .env.example, README.md) — mention `buzz`; compose project name / `.env.example` var `KURA_IMAGE` — PHASE 2, except `deploy/compose/README.md` if user-facing setup doc → PHASE 1 review.
 - `deploy/charts/buzz-push-gateway/` — Helm chart named `buzz-push-gateway` (Chart.yaml, values.yaml, values-production.yaml, templates/*, tests/*) — PHASE 2.
 - `deploy/charts/buzz/` — Helm chart named `buzz` (Chart.yaml, `buzz.image` template helper, ci/quickstart-values.yaml, tests/*) — PHASE 2.
-- Docker image references: `docker-compose.yml` → `image: ${BUZZ_IMAGE:-ghcr.io/block/buzz:main}`; `deploy/charts/buzz/templates/deployment.yaml` and `pairing-relay.yaml` → `{{ include "buzz.image" . }}` — PHASE 2 (registry path `ghcr.io/block/buzz` is user-visible only to operators pulling the image — borderline, flag for Phase 1 review since it appears in public docs/README install instructions).
+- Docker image references: `docker-compose.yml` → `image: ${KURA_IMAGE:-ghcr.io/renatobardi/kura:main}`; `deploy/charts/buzz/templates/deployment.yaml` and `pairing-relay.yaml` → `{{ include "buzz.image" . }}` — PHASE 2 (registry path `ghcr.io/renatobardi/kura` is user-visible only to operators pulling the image — borderline, flag for Phase 1 review since it appears in public docs/README install instructions).
 - `.github/workflows/`: `sprig-image.yml`, `release.yml`, `helm-chart.yml`, `codex-security-review.yml`, `promote-oss-desktop-release.yml`, `mesh-lifecycle.yml`, `auto-tag-on-release-pr-merge.yml`, `linux-canary.yml`, `windows-canary.yml`, plus `.github/CODEOWNERS` — reference `buzz`; GitHub release names/tags visible to users on the Releases page — PHASE 1 review for release naming, PHASE 2 for workflow internals.
 
 ---
@@ -267,7 +267,7 @@ This is printed in `--help` output — user-visible.
 name: "Buzz Relay",
 description: "Buzz — private team communication relay",
 contact: None,
-software: "https://github.com/block/buzz",
+software: "https://github.com/renatobardi/kura",
 ```
 All four fields are externally visible to any relay-info consumer — PHASE 1, high priority (this is the relay's public identity).
 
@@ -282,8 +282,8 @@ Things that will break or need careful coordination if renamed carelessly:
 3. **App identifier / bundle ID** — `xyz.block.buzz.app` (desktop), `xyz.block.buzz.mobile` (Android), iOS `$(BUNDLE_IDENTIFIER)` (value not located in this pass — follow up in xcconfig). Changing bundle/application IDs on already-published apps is effectively a **new app** on app stores (loses reviews, install base, update path) — must be an explicit, deliberate decision, likely Phase 2/3, not incidental to a visual rebrand.
 4. **Updater endpoints** — currently empty (`plugins.updater.endpoints: []`) in the OSS conf, so no live risk found here, but confirm any private/production overlay config doesn't point to a `buzz`-branded update server that would need parallel migration.
 5. **externalBin names** — `binaries/buzz-acp`, `buzz-agent`, `buzz-backend-kubernetes`, `buzz-dev-mcp`, `buzz` (and `git-credential-nostr`) are referenced by exact filename in `tauri.conf.json` bundle config; renaming the crate binaries (Phase 2) requires updating this list atomically or the desktop build fails to find sidecar binaries.
-6. **NIP-11 relay info** (`crates/buzz-relay/src/nip11.rs`) — public protocol-level identity queried by any Nostr client; `software` field is a GitHub URL (`github.com/block/buzz`) that will need to point at the new repo, and any client-side allowlists/pinning keyed on relay `name` could break.
+6. **NIP-11 relay info** (`crates/buzz-relay/src/nip11.rs`) — public protocol-level identity queried by any Nostr client; `software` field is a GitHub URL (`github.com/renatobardi/kura`) that will need to point at the new repo, and any client-side allowlists/pinning keyed on relay `name` could break.
 7. **Test files asserting "Buzz" strings**: **109 test files** (`.test.*`, `_test.dart`, `*test*.rs` patterns) reference "Buzz" across the repo — renaming user-visible strings without updating these will cause widespread test failures; budget for a dedicated test-fixture pass.
 8. **CHANGELOG.md** (43 occurrences) — historical record; recommend NOT rewriting past entries, only using new branding going forward, to avoid falsifying history.
 9. **Community/syntax theme id `buzz`/`buzz-dark`** is duplicated independently in desktop (`theme-loader.ts`) and mobile (`theme_catalog.dart`) — must rename both in sync or cross-platform theme-preference sync (`communityThemeSync.ts`, `community_theme_sync.dart`) will desync between platforms for users who picked the "Buzz" theme.
-10. **Docker image path `ghcr.io/block/buzz`** and Helm chart names `buzz` / `buzz-push-gateway` are technically Phase 2, but they appear in the public README/deploy docs that self-hosting users copy-paste — a partial rename (app renamed, docs/images not) will break copy-pasted install instructions; sequence Phase 1 docs updates to not reference Phase-2-only identifiers before those are ready.
+10. **Docker image path `ghcr.io/renatobardi/kura`** and Helm chart names `buzz` / `buzz-push-gateway` are technically Phase 2, but they appear in the public README/deploy docs that self-hosting users copy-paste — a partial rename (app renamed, docs/images not) will break copy-pasted install instructions; sequence Phase 1 docs updates to not reference Phase-2-only identifiers before those are ready.

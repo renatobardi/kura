@@ -38,7 +38,7 @@ These are not a wish list. They are the complete taxonomy: every event the agent
 
 ## Design Principles
 
-- **Semantics over transport.** Render *what the agent did*, not *which API it used*. A message sent through an MCP tool and the same message sent through a shell `buzz` command render as the identical card. How the agent reached the relay is plumbing; what it did is the contract.
+- **Semantics over transport.** Render *what the agent did*, not *which API it used*. A message sent through an MCP tool and the same message sent through a shell `kura` command render as the identical card. How the agent reached the relay is plumbing; what it did is the contract.
 
 - **Outcome-first.** Lead with success, failure, or result. The reader decides in under a second whether to expand. The raw dump is the fallback, never the headline.
 
@@ -60,6 +60,6 @@ These are not a wish list. They are the complete taxonomy: every event the agent
 
 The feed's real job is to **earn delegation.** Visible progress, visible consent, and visible outcomes compound: each turn you watch go well makes you trust the agent with a larger one. Deciding what *not* to show — suppressing heartbeats and internal chatter — is as much a feature as deciding what to show, because suppression is what makes the signal legible.
 
-A feed built this way is protocol-honest at its base: any compliant agent's messages, thoughts, tool calls, and turns become first-class items regardless of which tools it runs. The Kura-specific richness — semantic relay cards, the buzz-CLI parser, diff rendering — is a layer of enrichment on top, not a requirement underneath. Non-Kura agents get a correct, legible feed; Kura agents get a native one.
+A feed built this way is protocol-honest at its base: any compliant agent's messages, thoughts, tool calls, and turns become first-class items regardless of which tools it runs. The Kura-specific richness — semantic relay cards, the kura-CLI parser, diff rendering — is a layer of enrichment on top, not a requirement underneath. Non-Kura agents get a correct, legible feed; Kura agents get a native one.
 
 Two altitudes of the same truth. Polished for judgment, raw for debugging. The window stays a window.

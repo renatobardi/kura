@@ -24,7 +24,7 @@ const GOLDEN = JSON.parse(
 const OWNER = GOLDEN.owner;
 const EVENT_ID = GOLDEN.eventId;
 
-// This fixture is also consumed by buzz-cli and the Tauri deep-link validator.
+// This fixture is also consumed by kura-cli and the Tauri deep-link validator.
 test("builders emit the canonical cross-language link format", () => {
   assert.equal(
     buildPullRequestLink({ id: EVENT_ID, owner: OWNER, dtag: GOLDEN.dtag }),
@@ -61,12 +61,12 @@ test("builders emit the canonical cross-language link format", () => {
 
 test("builders reject invalid identifiers", () => {
   assert.throws(() =>
-    buildRepoLink({ owner: "not-a-pubkey", dtag: "buzz-world" }),
+    buildRepoLink({ owner: "not-a-pubkey", dtag: "kura-world" }),
   );
   assert.throws(() => buildRepoLink({ owner: OWNER, dtag: ".hidden" }));
   assert.throws(() => buildRepoLink({ owner: OWNER, dtag: "a..b" }));
   assert.throws(() =>
-    buildPullRequestLink({ id: "short", owner: OWNER, dtag: "buzz-world" }),
+    buildPullRequestLink({ id: "short", owner: OWNER, dtag: "kura-world" }),
   );
 });
 
@@ -74,23 +74,23 @@ test("parseEntityLink round-trips built links", () => {
   const link = buildPullRequestLink({
     id: EVENT_ID,
     owner: OWNER,
-    dtag: "buzz-world",
+    dtag: "kura-world",
   });
   assert.deepEqual(parseEntityLink(link), {
     ok: true,
-    value: { type: "pr", id: EVENT_ID, owner: OWNER, dtag: "buzz-world" },
+    value: { type: "pr", id: EVENT_ID, owner: OWNER, dtag: "kura-world" },
   });
 
-  const repoLink = buildRepoLink({ owner: OWNER, dtag: "buzz-world" });
+  const repoLink = buildRepoLink({ owner: OWNER, dtag: "kura-world" });
   assert.deepEqual(parseEntityLink(repoLink), {
     ok: true,
-    value: { type: "repo", owner: OWNER, dtag: "buzz-world" },
+    value: { type: "repo", owner: OWNER, dtag: "kura-world" },
   });
 
-  const projectLink = buildProjectLink({ owner: OWNER, dtag: "buzz-world" });
+  const projectLink = buildProjectLink({ owner: OWNER, dtag: "kura-world" });
   assert.deepEqual(parseEntityLink(projectLink), {
     ok: true,
-    value: { type: "project", owner: OWNER, dtag: "buzz-world" },
+    value: { type: "project", owner: OWNER, dtag: "kura-world" },
   });
 });
 
@@ -98,25 +98,25 @@ test("commit links select an exact repository commit", () => {
   const link = buildCommitLink({
     commitHash: EVENT_ID,
     owner: OWNER,
-    dtag: "buzz-world",
+    dtag: "kura-world",
   });
   assert.equal(
     link,
-    `kura://repo?owner=${OWNER}&d=buzz-world&tab=commits&commit=${EVENT_ID}`,
+    `kura://repo?owner=${OWNER}&d=kura-world&tab=commits&commit=${EVENT_ID}`,
   );
   assert.deepEqual(parseEntityLink(link), {
     ok: true,
     value: {
       type: "repo",
       owner: OWNER,
-      dtag: "buzz-world",
+      dtag: "kura-world",
       tab: "commits",
       commitHash: EVENT_ID,
     },
   });
   assert.deepEqual(
     parseEntityLink(
-      `kura://repo?owner=${OWNER}&d=buzz-world&tab=files&commit=${EVENT_ID}`,
+      `kura://repo?owner=${OWNER}&d=kura-world&tab=files&commit=${EVENT_ID}`,
     ),
     { ok: false, reason: "invalid-commit" },
   );
@@ -124,11 +124,11 @@ test("commit links select an exact repository commit", () => {
 
 test("parseEntityLink lowercase-normalizes hex identifiers", () => {
   const parsed = parseEntityLink(
-    `kura://issue?id=${EVENT_ID.toUpperCase()}&owner=${OWNER.toUpperCase()}&d=buzz-world`,
+    `kura://issue?id=${EVENT_ID.toUpperCase()}&owner=${OWNER.toUpperCase()}&d=kura-world`,
   );
   assert.deepEqual(parsed, {
     ok: true,
-    value: { type: "issue", id: EVENT_ID, owner: OWNER, dtag: "buzz-world" },
+    value: { type: "issue", id: EVENT_ID, owner: OWNER, dtag: "kura-world" },
   });
 });
 
@@ -154,108 +154,108 @@ test("isEntityLink matches entity hosts and excludes message links", () => {
   assert.equal(isEntityLink(`kura://repo?owner=${OWNER}`), true);
   assert.equal(isEntityLink(`kura://project?owner=${OWNER}`), true);
   assert.equal(isEntityLink("kura://message?channel=x&id=y"), false);
-  assert.equal(isEntityLink("https://github.com/block/buzz"), false);
+  assert.equal(isEntityLink("https://github.com/block/kura"), false);
   assert.equal(isEntityLink(null), false);
 });
 
 test("entityLinkProjectRouteId emits the canonical 30617 coordinate route id", () => {
   const parsed = parseEntityLink(
-    buildRepoLink({ owner: OWNER, dtag: "buzz-world" }),
+    buildRepoLink({ owner: OWNER, dtag: "kura-world" }),
   );
   assert.ok(parsed.ok);
   assert.equal(
     entityLinkProjectRouteId(parsed.value),
-    `30617:${OWNER}:buzz-world`,
+    `30617:${OWNER}:kura-world`,
   );
 });
 
 test("entityLinkProjectRouteId routes project links to the 30621 coordinate", () => {
   const parsed = parseEntityLink(
-    buildProjectLink({ owner: OWNER, dtag: "buzz-world" }),
+    buildProjectLink({ owner: OWNER, dtag: "kura-world" }),
   );
   assert.ok(parsed.ok);
   assert.equal(
     entityLinkProjectRouteId(parsed.value),
-    `30621:${OWNER}:buzz-world`,
+    `30621:${OWNER}:kura-world`,
   );
 });
 
 test("coordinate links carry an optional workspace tab", () => {
   const link = buildProjectLink({
     owner: OWNER,
-    dtag: "buzz-world",
+    dtag: "kura-world",
     tab: "prs",
   });
-  assert.equal(link, `kura://project?owner=${OWNER}&d=buzz-world&tab=prs`);
+  assert.equal(link, `kura://project?owner=${OWNER}&d=kura-world&tab=prs`);
   assert.deepEqual(parseEntityLink(link), {
     ok: true,
-    value: { type: "project", owner: OWNER, dtag: "buzz-world", tab: "prs" },
+    value: { type: "project", owner: OWNER, dtag: "kura-world", tab: "prs" },
   });
 
   const repoLink = buildRepoLink({
     owner: OWNER,
-    dtag: "buzz-world",
+    dtag: "kura-world",
     tab: "issues",
   });
   assert.deepEqual(parseEntityLink(repoLink), {
     ok: true,
-    value: { type: "repo", owner: OWNER, dtag: "buzz-world", tab: "issues" },
+    value: { type: "repo", owner: OWNER, dtag: "kura-world", tab: "issues" },
   });
 
   // The default overview has no tab spelling; unknown values are rejected
   // rather than silently dropped, and event links accept no tab at all.
   assert.throws(() =>
-    buildRepoLink({ owner: OWNER, dtag: "buzz-world", tab: "overview" }),
+    buildRepoLink({ owner: OWNER, dtag: "kura-world", tab: "overview" }),
   );
   assert.deepEqual(
-    parseEntityLink(`kura://repo?owner=${OWNER}&d=buzz-world&tab=overview`),
+    parseEntityLink(`kura://repo?owner=${OWNER}&d=kura-world&tab=overview`),
     { ok: false, reason: "invalid-tab" },
   );
   assert.deepEqual(
-    parseEntityLink(`kura://repo?owner=${OWNER}&d=buzz-world&tab=`),
+    parseEntityLink(`kura://repo?owner=${OWNER}&d=kura-world&tab=`),
     { ok: false, reason: "invalid-tab" },
   );
   assert.deepEqual(
     parseEntityLink(
-      `kura://pr?id=${EVENT_ID}&owner=${OWNER}&d=buzz-world&tab=prs`,
+      `kura://pr?id=${EVENT_ID}&owner=${OWNER}&d=kura-world&tab=prs`,
     ),
     { ok: false, reason: "unknown-param" },
   );
 });
 
 test("isLinkableCoordinate gates coordinates the link format cannot express", () => {
-  assert.equal(isLinkableCoordinate(OWNER, "buzz-world"), true);
+  assert.equal(isLinkableCoordinate(OWNER, "kura-world"), true);
   assert.equal(isLinkableCoordinate(OWNER, "a".repeat(64)), true);
   // Addressable d-tags allow far more than the link charset does.
   assert.equal(isLinkableCoordinate(OWNER, "a".repeat(65)), false);
   assert.equal(isLinkableCoordinate(OWNER, "has space"), false);
   assert.equal(isLinkableCoordinate(OWNER, ".hidden"), false);
-  assert.equal(isLinkableCoordinate("not-a-pubkey", "buzz-world"), false);
+  assert.equal(isLinkableCoordinate("not-a-pubkey", "kura-world"), false);
 });
 
 test("parseEntityLink rejects noncanonical extras", () => {
   // Unexpected path segments — reserved for future versioning.
   assert.deepEqual(
     parseEntityLink(
-      `kura://pr/ignored?id=${EVENT_ID}&owner=${OWNER}&d=buzz-world`,
+      `kura://pr/ignored?id=${EVENT_ID}&owner=${OWNER}&d=kura-world`,
     ),
     { ok: false, reason: "unexpected-path" },
   );
   // Fragment — not part of the canonical format.
   assert.deepEqual(
-    parseEntityLink(`kura://repo?owner=${OWNER}&d=buzz-world#section`),
+    parseEntityLink(`kura://repo?owner=${OWNER}&d=kura-world#section`),
     { ok: false, reason: "unexpected-fragment" },
   );
   // Unknown query parameter — reject to preserve forward-compat posture.
   assert.deepEqual(
     parseEntityLink(
-      `kura://repo?owner=${OWNER}&d=buzz-world&relay=wss%3A%2F%2Frelay.example`,
+      `kura://repo?owner=${OWNER}&d=kura-world&relay=wss%3A%2F%2Frelay.example`,
     ),
     { ok: false, reason: "unknown-param" },
   );
   // Duplicate required parameter — reject.
   assert.deepEqual(
-    parseEntityLink(`kura://repo?owner=${OWNER}&d=buzz-world&owner=${OWNER}`),
+    parseEntityLink(`kura://repo?owner=${OWNER}&d=kura-world&owner=${OWNER}`),
     { ok: false, reason: "duplicate-param" },
   );
 });

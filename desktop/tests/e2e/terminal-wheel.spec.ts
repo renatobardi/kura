@@ -180,12 +180,12 @@ test("project terminal button opens Kura Term for the repository", async ({
   await page.getByTestId("projects-section-projects").click();
   const projectEntry = page
     .locator(
-      '[data-testid="project-card-buzz"], [data-testid="project-row-buzz"]',
+      '[data-testid="project-card-kura"], [data-testid="project-row-kura"]',
     )
     .first();
   await expect(projectEntry).toBeVisible({ timeout: 10_000 });
   await projectEntry.click();
-  await page.getByTestId("project-home-context-repo-buzz").click();
+  await page.getByTestId("project-home-context-repo-kura").click();
 
   const terminalButton = page.getByTestId("project-terminal-toggle");
   await expect(terminalButton).toBeEnabled();
@@ -201,7 +201,7 @@ test("scrollback: wheel over Kura Term reaches terminal_scroll", async ({
   page,
 }) => {
   await reveal(page);
-  await pushFrame(page, [{ line: 0, text: "buzz@term:~$ " }], {
+  await pushFrame(page, [{ line: 0, text: "kura@term:~$ " }], {
     line: 0,
     column: 13,
   });
@@ -225,7 +225,7 @@ test("terminal viewport click retains keyboard input ownership", async ({
   await expect(input).toBeFocused();
 
   await page
-    .locator(".buzz-terminal-viewport")
+    .locator(".kura-terminal-viewport")
     .click({ position: { x: 40, y: 40 } });
   await expect(input).toBeFocused();
 
@@ -251,11 +251,11 @@ test("concealed terminal viewport does not steal Kura focus", async ({
   const input = page.getByLabel("Terminal input");
   await expect(input).toHaveCount(0);
   await page.getByTestId("chat-title").click();
-  await page.keyboard.type("BUZZ_KEYSTROKE");
+  await page.keyboard.type("KURA_KEYSTROKE");
   const terminalInputs = await page.evaluate(
     () =>
       (window as typeof window & { __SAMI_TERM__: { inputs: string[] } })
         .__SAMI_TERM__.inputs,
   );
-  expect(terminalInputs.join("")).not.toContain("BUZZ_KEYSTROKE");
+  expect(terminalInputs.join("")).not.toContain("KURA_KEYSTROKE");
 });

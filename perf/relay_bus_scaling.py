@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reproducible Buzz relay Redis bus scaling harness.
+"""Reproducible Kura relay Redis bus scaling harness.
 
 The harness isolates the relay's Redis fan-out boundary, not client rendering or
 DB ingest. It compares the pre-rewrite global-firehose shape (every pod receives
@@ -28,8 +28,8 @@ from typing import BinaryIO
 from urllib.parse import urlparse
 from uuid import UUID
 
-BUZZ_PREFIX = "buzz"
-OLD_GLOBAL_CHANNEL = f"{BUZZ_PREFIX}:global"
+KURA_PREFIX = "kura"
+OLD_GLOBAL_CHANNEL = f"{KURA_PREFIX}:global"
 
 
 @dataclass(frozen=True)
@@ -102,9 +102,9 @@ def community_id(index: int) -> str:
 
 
 def scoped_global_channel(community: str) -> str:
-    # Mirrors crates/buzz-pubsub/src/topic.rs EventTopic::Global:
-    # format!("buzz:{}:global", self.community_id)
-    return f"{BUZZ_PREFIX}:{community}:global"
+    # Mirrors crates/kura-pubsub/src/topic.rs EventTopic::Global:
+    # format!("kura:{}:global", self.community_id)
+    return f"{KURA_PREFIX}:{community}:global"
 
 
 def encode_command(*parts: object) -> bytes:
@@ -458,7 +458,7 @@ def assert_scaling(args: argparse.Namespace, rows: list[Measurement]) -> None:
 
 
 def print_rows(args: argparse.Namespace, rows: list[Measurement]) -> None:
-    print("Buzz relay Redis bus scaling harness")
+    print("Kura relay Redis bus scaling harness")
     print("====================================")
     print(
         "scenario: "

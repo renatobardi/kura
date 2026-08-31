@@ -6,7 +6,7 @@ BEGIN
     -- Keep this allowlist identical to the relay's validated NIP-PL descriptor.
     IF NEW.kind IN (9, 40002, 45001, 45003) THEN
         PERFORM pg_advisory_xact_lock_shared(
-            hashtextextended('buzz_push_gate:' || NEW.community_id::text, 0));
+            hashtextextended('kura_push_gate:' || NEW.community_id::text, 0));
         IF EXISTS (
             SELECT 1 FROM push_leases
             WHERE community_id = NEW.community_id

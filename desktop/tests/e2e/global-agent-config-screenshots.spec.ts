@@ -56,21 +56,21 @@ async function selectDropdownOption(
     .click({ timeout: 5_000 });
 }
 
-// A runtime catalog with both a provider-selection runtime (buzz-agent) and a
+// A runtime catalog with both a provider-selection runtime (kura-agent) and a
 // CLI-login runtime (Claude Code) marked available, so Claude Code appears and
 // is selectable in the harness dropdown. Same shape the readiness spec uses.
 const CATALOG_WITH_CLAUDE = [
   {
-    id: "buzz-agent",
+    id: "kura-agent",
     label: "Kura Agent",
     avatar_url: "",
     availability: "available",
-    command: "buzz-agent",
-    binary_path: "/usr/local/bin/buzz-agent",
+    command: "kura-agent",
+    binary_path: "/usr/local/bin/kura-agent",
     default_args: [],
-    mcp_command: "buzz-dev-mcp",
+    mcp_command: "kura-dev-mcp",
     install_hint: "Ships with the Kura desktop app.",
-    install_instructions_url: "https://github.com/block/buzz",
+    install_instructions_url: "https://github.com/block/kura",
     can_auto_install: false,
     underlying_cli_path: null,
   },
@@ -97,16 +97,16 @@ const CATALOG_WITH_CLAUDE = [
 // the Edit/Save-mode test to seed an editable Codex agent.
 const CATALOG_WITH_CODEX = [
   {
-    id: "buzz-agent",
+    id: "kura-agent",
     label: "Kura Agent",
     avatar_url: "",
     availability: "available",
-    command: "buzz-agent",
-    binary_path: "/usr/local/bin/buzz-agent",
+    command: "kura-agent",
+    binary_path: "/usr/local/bin/kura-agent",
     default_args: [],
-    mcp_command: "buzz-dev-mcp",
+    mcp_command: "kura-dev-mcp",
     install_hint: "Ships with the Kura desktop app.",
-    install_instructions_url: "https://github.com/block/buzz",
+    install_instructions_url: "https://github.com/block/kura",
     can_auto_install: false,
     underlying_cli_path: null,
   },
@@ -132,16 +132,16 @@ const CATALOG_WITH_CODEX = [
 // empty runtime — the precondition for blankRuntimeModelProviderEditable.
 const CATALOG_NONE_AVAILABLE = [
   {
-    id: "buzz-agent",
+    id: "kura-agent",
     label: "Kura Agent",
     avatar_url: "",
     availability: "not_installed",
-    command: "buzz-agent",
+    command: "kura-agent",
     binary_path: null,
     default_args: [],
-    mcp_command: "buzz-dev-mcp",
+    mcp_command: "kura-dev-mcp",
     install_hint: "Ships with the Kura desktop app.",
-    install_instructions_url: "https://github.com/block/buzz",
+    install_instructions_url: "https://github.com/block/kura",
     can_auto_install: false,
     underlying_cli_path: null,
   },
@@ -238,12 +238,12 @@ test.describe("global agent config screenshots", () => {
     const saved = await page.evaluate(async () =>
       (
         window as typeof window & {
-          __BUZZ_E2E_INVOKE_MOCK_COMMAND__?: (
+          __KURA_E2E_INVOKE_MOCK_COMMAND__?: (
             command: string,
             payload: unknown,
           ) => Promise<unknown>;
         }
-      ).__BUZZ_E2E_INVOKE_MOCK_COMMAND__?.("get_global_agent_config", null),
+      ).__KURA_E2E_INVOKE_MOCK_COMMAND__?.("get_global_agent_config", null),
     );
     expect(saved).toMatchObject({ preferred_runtime: "codex" });
   });
@@ -364,17 +364,17 @@ test.describe("global agent config screenshots", () => {
     await installMockBridge(page, {
       bakedBuildEnv: [
         {
-          key: "BUZZ_AGENT_PROVIDER",
+          key: "KURA_AGENT_PROVIDER",
           value: "anthropic",
           masked: false,
         },
         {
-          key: "BUZZ_AGENT_MODEL",
+          key: "KURA_AGENT_MODEL",
           value: "claude-opus-4-8",
           masked: false,
         },
         {
-          key: "BUZZ_AGENT_THINKING_EFFORT",
+          key: "KURA_AGENT_THINKING_EFFORT",
           value: "high",
           masked: false,
         },
@@ -406,17 +406,17 @@ test.describe("global agent config screenshots", () => {
       globalAgentConfig: {
         provider: "anthropic",
         model: "claude-opus-4-5",
-        env_vars: { BUZZ_AGENT_THINKING_EFFORT: "low" },
+        env_vars: { KURA_AGENT_THINKING_EFFORT: "low" },
       },
       bakedBuildEnv: [
         {
-          key: "BUZZ_AGENT_PROVIDER",
+          key: "KURA_AGENT_PROVIDER",
           value: "databricks_v2",
           masked: false,
         },
-        { key: "BUZZ_AGENT_MODEL", value: "build-model", masked: false },
+        { key: "KURA_AGENT_MODEL", value: "build-model", masked: false },
         {
-          key: "BUZZ_AGENT_THINKING_EFFORT",
+          key: "KURA_AGENT_THINKING_EFFORT",
           value: "high",
           masked: false,
         },
@@ -584,15 +584,15 @@ test.describe("global agent config screenshots", () => {
     const saved = await page.evaluate(async () =>
       (
         window as typeof window & {
-          __BUZZ_E2E_INVOKE_MOCK_COMMAND__?: (
+          __KURA_E2E_INVOKE_MOCK_COMMAND__?: (
             command: string,
             payload: unknown,
           ) => Promise<unknown>;
         }
-      ).__BUZZ_E2E_INVOKE_MOCK_COMMAND__?.("get_global_agent_config", null),
+      ).__KURA_E2E_INVOKE_MOCK_COMMAND__?.("get_global_agent_config", null),
     );
     expect(saved).toMatchObject({
-      preferred_runtime: "buzz-agent",
+      preferred_runtime: "kura-agent",
       provider: "anthropic",
     });
   });
@@ -603,7 +603,7 @@ test.describe("global agent config screenshots", () => {
     await installMockBridge(page, {
       acpRuntimesCatalog: CATALOG_WITH_CLAUDE,
       globalAgentConfig: {
-        preferred_runtime: "buzz-agent",
+        preferred_runtime: "kura-agent",
         provider: "anthropic",
         model: "claude-opus-4-5",
         env_vars: { ANTHROPIC_API_KEY: "sk-ant-global-value" },
@@ -636,12 +636,12 @@ test.describe("global agent config screenshots", () => {
         page.evaluate(() => {
           const log = (
             window as Window & {
-              __BUZZ_E2E_COMMAND_LOG__?: Array<{
+              __KURA_E2E_COMMAND_LOG__?: Array<{
                 command: string;
                 payload: { input?: Record<string, unknown> };
               }>;
             }
-          ).__BUZZ_E2E_COMMAND_LOG__;
+          ).__KURA_E2E_COMMAND_LOG__;
           const createPayload = log?.find(
             (entry) => entry.command === "create_persona",
           )?.payload.input;
@@ -656,7 +656,7 @@ test.describe("global agent config screenshots", () => {
   }) => {
     await installMockBridge(page, {
       globalAgentConfig: {
-        preferred_runtime: "buzz-agent",
+        preferred_runtime: "kura-agent",
         provider: "anthropic",
         model: "claude-opus-4-5",
         env_vars: {},
@@ -985,7 +985,7 @@ test.describe("global agent config screenshots", () => {
       globalAgentConfig: {
         provider: "databricks_v2",
         model: null,
-        preferred_runtime: "buzz-agent",
+        preferred_runtime: "kura-agent",
         env_vars: { OPENAI_API_KEY: "sk-placeholder" },
       },
     });

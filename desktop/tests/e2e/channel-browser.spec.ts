@@ -9,7 +9,7 @@ async function seedCustomSection(page: Page) {
   await page.addInitScript(
     ({ pubkey, section }) => {
       window.localStorage.setItem(
-        `buzz-channel-sections.v1:${pubkey}`,
+        `kura-channel-sections.v1:${pubkey}`,
         JSON.stringify({ version: 1, sections: [section], assignments: {} }),
       );
     },
@@ -80,11 +80,11 @@ test("channel browser sorts alphabetically or by member count", async ({
   await expect(rows).toHaveText([
     /#agents/,
     /#all-replies/,
-    /#buzz/,
     /#deep-history/,
     /#design/,
     /#engineering/,
     /#general/,
+    /#kura/,
     /#random/,
     /#sales/,
     /#secret-projects/,
@@ -104,7 +104,7 @@ test("channel browser sorts alphabetically or by member count", async ({
     /#design/,
     /#sales/,
     /#secret-projects/,
-    /#buzz/,
+    /#kura/,
     /#welcome-everyone/,
   ]);
   await expect(page.getByTestId("channel-browser-sort")).toHaveAttribute(
@@ -130,7 +130,7 @@ test("channel browser sorts by recent activity", async ({ page }) => {
     /#sales/,
     /#engineering/,
     /#design/,
-    /#buzz/,
+    /#kura/,
     /#random/,
     /#secret-projects/,
     /#welcome-everyone/,

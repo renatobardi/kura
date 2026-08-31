@@ -41,7 +41,7 @@ function projectEvent(repositoryTags, overrides = {}) {
       ["d", "sprout"],
       ["name", "Sprout"],
       ["description", "A multi-repository project"],
-      ["buzz-channel", "11111111-1111-4111-8111-111111111111"],
+      ["kura-channel", "11111111-1111-4111-8111-111111111111"],
       ...repositoryTags,
     ],
     ...overrides,
@@ -104,10 +104,10 @@ test("buildProjectReadModels keeps extra related channel ids", () => {
   const projects = buildProjectReadModels({
     projectEvents: [
       projectEvent([
-        ["buzz-related-channel", relatedA],
-        ["buzz-related-channel", home],
-        ["buzz-related-channel", relatedB],
-        ["buzz-related-channel", relatedA],
+        ["kura-related-channel", relatedA],
+        ["kura-related-channel", home],
+        ["kura-related-channel", relatedB],
+        ["kura-related-channel", relatedA],
       ]),
     ],
     repositoryEvents: [],
@@ -226,8 +226,8 @@ test("buildProjectReadModels keeps the viewer's own unlisted project", () => {
     tags: [
       ["d", "secret"],
       ["name", "Secret"],
-      ["buzz-channel", "11111111-1111-4111-8111-111111111111"],
-      ["buzz-visibility", "unlisted"],
+      ["kura-channel", "11111111-1111-4111-8111-111111111111"],
+      ["kura-visibility", "unlisted"],
       ["a", repoAddress],
     ],
   };
@@ -325,7 +325,7 @@ test("buildProjectReadModels conforms to the shared NIP-MP fold fixtures", () =>
             ["d", dtag],
             ["name", dtag],
             ...(project.visibility === "unlisted"
-              ? [["buzz-visibility", "unlisted"]]
+              ? [["kura-visibility", "unlisted"]]
               : []),
             ...project.members.map((member) => ["a", member]),
           ],
@@ -645,10 +645,10 @@ test("selectProjectRepository resolves a non-primary repository when repositoryI
   const OTHER = "b".repeat(64);
 
   const primaryRepo = {
-    id: `${OWNER}:buzz`,
-    dtag: "buzz",
+    id: `${OWNER}:kura`,
+    dtag: "kura",
     name: "Kura",
-    repoAddress: `30617:${OWNER}:buzz`,
+    repoAddress: `30617:${OWNER}:kura`,
     owner: OWNER,
     cloneUrls: [],
     webUrl: null,
@@ -674,15 +674,15 @@ test("selectProjectRepository resolves a non-primary repository when repositoryI
   };
 
   const project = {
-    id: `30621:${OWNER}:buzz`,
-    dtag: "buzz",
+    id: `30621:${OWNER}:kura`,
+    dtag: "kura",
     name: "Kura",
     description: "",
     owner: OWNER,
     createdAt: 100,
     projectChannelId: null,
     status: "active",
-    projectAddress: `30621:${OWNER}:buzz`,
+    projectAddress: `30621:${OWNER}:kura`,
     primaryRepositoryAddress: primaryRepo.repoAddress,
     repositoryAddresses: [primaryRepo.repoAddress, nonPrimaryRepo.repoAddress],
     repositories: [primaryRepo, nonPrimaryRepo],

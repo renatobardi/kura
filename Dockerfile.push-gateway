@@ -17,21 +17,21 @@ RUN apt-get update \
 COPY --from=planner /build/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
-RUN cargo build --release --locked -p buzz-push-gateway --bin buzz-push-gateway \
-    && strip target/release/buzz-push-gateway
+RUN cargo build --release --locked -p kura-push-gateway --bin kura-push-gateway \
+    && strip target/release/kura-push-gateway
 
 FROM debian:${DEBIAN_VERSION}-slim AS runtime
-LABEL org.opencontainers.image.title="Buzz Push Gateway" \
-      org.opencontainers.image.description="Capability-gated APNs last hop for Buzz" \
-      org.opencontainers.image.source="https://github.com/block/buzz" \
+LABEL org.opencontainers.image.title="Kura Push Gateway" \
+      org.opencontainers.image.description="Capability-gated APNs last hop for Kura" \
+      org.opencontainers.image.source="https://github.com/block/kura" \
       org.opencontainers.image.licenses="Apache-2.0"
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system --gid 1000 buzz \
-    && useradd --system --uid 1000 --gid 1000 --home-dir /var/lib/buzz --create-home --shell /usr/sbin/nologin buzz
-COPY --from=builder /build/target/release/buzz-push-gateway /usr/local/bin/buzz-push-gateway
+    && groupadd --system --gid 1000 kura \
+    && useradd --system --uid 1000 --gid 1000 --home-dir /var/lib/kura --create-home --shell /usr/sbin/nologin kura
+COPY --from=builder /build/target/release/kura-push-gateway /usr/local/bin/kura-push-gateway
 EXPOSE 8080 8081
-USER buzz:buzz
-WORKDIR /var/lib/buzz
-ENTRYPOINT ["/usr/local/bin/buzz-push-gateway"]
+USER kura:kura
+WORKDIR /var/lib/kura
+ENTRYPOINT ["/usr/local/bin/kura-push-gateway"]

@@ -11,7 +11,7 @@ import type { AcpRuntimeCatalogEntry } from "@/shared/api/types";
 // DoctorSettingsPanel RUNTIME_SORT_PRIORITY so the Kura + Goose rows stay
 // where users learned to find them.
 const ROW_SORT_PRIORITY: Record<string, number> = {
-  "buzz-agent": 0,
+  "kura-agent": 0,
   goose: 1,
 };
 

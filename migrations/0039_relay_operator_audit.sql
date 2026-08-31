@@ -10,11 +10,11 @@
 -- enforcement actions those principals perform.
 --
 -- Append-only by construction: written only inside the upsert/delete
--- transactions in crates/buzz-db/src/relay_operators.rs. No UPDATE/DELETE path.
+-- transactions in crates/kura-db/src/relay_operators.rs. No UPDATE/DELETE path.
 --
 -- Global (no community_id): mirrors relay_operators -- operators span all
 -- tenants. Registered in _operator_global_tables and in the hardcoded parser
--- list in crates/buzz-db/src/migration.rs.
+-- list in crates/kura-db/src/migration.rs.
 
 CREATE TABLE relay_operator_audit (
     id            UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),

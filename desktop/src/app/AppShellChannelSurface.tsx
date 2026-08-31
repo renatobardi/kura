@@ -1,5 +1,5 @@
 import type * as React from "react";
-import * as BuzzTheme from "@/app/BuzzThemeSurfaces";
+import * as KuraTheme from "@/app/KuraThemeSurfaces";
 import { HuddleRoomHeader, HuddleStartingView } from "@/features/huddle";
 import { MainInsetProvider } from "@/shared/layout/MainInsetContext";
 import { chromeCssVarDefaults } from "@/shared/layout/chromeLayout";
@@ -38,10 +38,10 @@ export function AppShellChannelSurface({
           isHuddleRoom ? "bg-background" : "bg-sidebar",
           hasCollapsedSidebarGutter && "pl-2",
         )}
-        data-buzz-content-surface={isHuddleRoom ? true : undefined}
-        data-buzz-content-unframed={isHuddleRoom ? true : undefined}
-        data-buzz-glass-inset
-        data-buzz-shadow-viewport
+        data-kura-content-surface={isHuddleRoom ? true : undefined}
+        data-kura-content-unframed={isHuddleRoom ? true : undefined}
+        data-kura-glass-inset
+        data-kura-shadow-viewport
         style={chromeCssVarDefaults as React.CSSProperties}
       >
         {hasCollapsedSidebarGutter ? (
@@ -51,9 +51,9 @@ export function AppShellChannelSurface({
           />
         ) : null}
         {isHuddleRoom && !isHuddleRoomStarting ? <HuddleRoomHeader /> : null}
-        <BuzzTheme.ContentSurface terminal={terminal} unframed={isHuddleRoom}>
+        <KuraTheme.ContentSurface terminal={terminal} unframed={isHuddleRoom}>
           {isHuddleRoomStarting ? <HuddleStartingView /> : children}
-        </BuzzTheme.ContentSurface>
+        </KuraTheme.ContentSurface>
       </SidebarInset>
     </MainInsetProvider>
   );

@@ -148,19 +148,19 @@ fn pinned_script_source_rejects_broad_sources() {
 }
 
 #[test]
-fn media_directives_allow_the_buzz_media_scheme() {
-    // `rewriteRelayUrl` emits `buzz-media://localhost/...` until the loopback
+fn media_directives_allow_the_kura_media_scheme() {
+    // `rewriteRelayUrl` emits `kura-media://localhost/...` until the loopback
     // proxy port resolves, so cold-start media renders through the custom
-    // scheme (mapped to `http://buzz-media.localhost` on Windows).
+    // scheme (mapped to `http://kura-media.localhost` on Windows).
     for directive in ["img-src", "media-src", "connect-src"] {
         let allowed = sources(directive);
         assert!(
-            allowed.contains(&"buzz-media:".to_owned()),
-            "{directive} must allow buzz-media:"
+            allowed.contains(&"kura-media:".to_owned()),
+            "{directive} must allow kura-media:"
         );
         assert!(
-            allowed.contains(&"http://buzz-media.localhost".to_owned()),
-            "{directive} must allow http://buzz-media.localhost"
+            allowed.contains(&"http://kura-media.localhost".to_owned()),
+            "{directive} must allow http://kura-media.localhost"
         );
     }
 }

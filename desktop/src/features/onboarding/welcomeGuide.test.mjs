@@ -29,11 +29,11 @@ function makeAgent(overrides = {}) {
     name: WELCOME_GUIDE_AGENT_NAME,
     personaId: null,
     relayUrl: RELAY_A,
-    acpCommand: "buzz-acp",
-    agentCommand: "buzz-agent",
+    acpCommand: "kura-acp",
+    agentCommand: "kura-agent",
     agentCommandOverride: null,
     agentArgs: [],
-    mcpCommand: "buzz-dev-mcp",
+    mcpCommand: "kura-dev-mcp",
     turnTimeoutSeconds: 120,
     idleTimeoutSeconds: null,
     maxTurnDurationSeconds: null,
@@ -173,11 +173,11 @@ test("all Welcome starters use the onboarding runtime preference", async () => {
     canAutoInstall: false,
     underlyingCliPath: "/bin/claude",
   };
-  const buzzAgent = {
+  const kuraAgent = {
     ...claude,
-    id: "buzz-agent",
+    id: "kura-agent",
     label: "Kura Agent",
-    command: "buzz-agent",
+    command: "kura-agent",
   };
 
   for (const starter of WELCOME_TEAM_STARTERS) {
@@ -195,7 +195,7 @@ test("all Welcome starters use the onboarding runtime preference", async () => {
         isBuiltIn: true,
         isActive: true,
       },
-      [buzzAgent, claude],
+      [kuraAgent, claude],
       "claude",
       RELAY_A,
     );
@@ -227,7 +227,7 @@ test("existing Welcome starter rematerializes runtime-specific fields atomically
       name: "Fizz",
       agentCommand: "codex-acp",
       agentArgs: ["--new"],
-      mcpCommand: "buzz-dev-mcp",
+      mcpCommand: "kura-dev-mcp",
       model: "gpt-5.6-sol",
       provider: null,
     }),
@@ -236,7 +236,7 @@ test("existing Welcome starter rematerializes runtime-specific fields atomically
       agentCommand: "codex-acp",
       harnessOverride: true,
       agentArgs: ["--new"],
-      mcpCommand: "buzz-dev-mcp",
+      mcpCommand: "kura-dev-mcp",
       model: "gpt-5.6-sol",
       provider: null,
     },
@@ -283,7 +283,7 @@ test("existing Welcome starter needs no update when runtime already matches", ()
       name: "Fizz",
       agentCommand: "codex-acp",
       agentArgs: ["--same"],
-      mcpCommand: "buzz-dev-mcp",
+      mcpCommand: "kura-dev-mcp",
       model: null,
       provider: null,
     }),

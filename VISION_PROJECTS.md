@@ -14,31 +14,31 @@ A project lives on the relay. `myproject.com` in a browser shows the project hom
 
 Git transport is standard Smart HTTP — `git clone`, `git push`, nothing special. Your npub signs pushes. Same domain, same auth, same identity as everything else on the relay. The host in the clone/push URL is also the community selector: the same `owner/repo` name may exist in two communities without sharing refs, branch protections, workflow runs, approvals, or repo announcements.
 
-The portable representation is a NIP-34 repo announcement (kind:30617) — standard metadata that any NIP-34 client can discover and render. Kura extends it with `buzz-` prefixed tags for channel binding and visibility:
+The portable representation is a NIP-34 repo announcement (kind:30617) — standard metadata that any NIP-34 client can discover and render. Kura extends it with `kura-` prefixed tags for channel binding and visibility:
 
 ```json
 {
   "kind": 30617,
   "tags": [
-    ["d", "buzz"],
-    ["name", "buzz"],
+    ["d", "kura"],
+    ["name", "kura"],
     ["clone", "https://repoa.myproject.com"],
     ["relays", "wss://myproject.com"],
     ["maintainers", "<co-maintainer-npub>"],
-    ["buzz-channel", "<channel-uuid>"],
-    ["buzz-visibility", "listed"],
-    ["buzz-protect", "main", "push-allowed", "<alice-npub>", "<bob-npub>"],
-    ["buzz-protect", "main", "require-approval", "2"],
-    ["buzz-protect", "main", "no-force-push"]
+    ["kura-channel", "<channel-uuid>"],
+    ["kura-visibility", "listed"],
+    ["kura-protect", "main", "push-allowed", "<alice-npub>", "<bob-npub>"],
+    ["kura-protect", "main", "require-approval", "2"],
+    ["kura-protect", "main", "no-force-push"]
   ]
 }
 ```
 
-Branch protections live in the same event — `buzz-protect` tags. The relay enforces them at the git transport layer. Only npubs listed in `push-allowed` can push to protected branches. Force pushes are blocked. Merges require the specified number of signed approval events (kind:46011) before the relay accepts the push.
+Branch protections live in the same event — `kura-protect` tags. The relay enforces them at the git transport layer. Only npubs listed in `push-allowed` can push to protected branches. Force pushes are blocked. Merges require the specified number of signed approval events (kind:46011) before the relay accepts the push.
 
 Agents inherit access from their owner via [NIP-OA](docs/nips/NIP-OA.md). The relay checks: does the push carry a valid NIP-OA auth tag, and is the owner pubkey in that tag listed in `push-allowed`? If yes, the push is accepted — the agent's own pubkey doesn't need to be in the list. Add a maintainer, and all their authorized agents can push. Remove the maintainer, and all their agents lose access instantly. Agents without NIP-OA attestation are treated as their own identity and must be listed explicitly.
 
-Standard NIP-34 clients see a normal repo. gitworkshop.dev renders it. ngit-cli works with it. Kura clients read the `buzz-` tags and wire up the channel and project UI. One event, two audiences, no custom kind for the repo itself.
+Standard NIP-34 clients see a normal repo. gitworkshop.dev renders it. ngit-cli works with it. Kura clients read the `kura-` tags and wire up the channel and project UI. One event, two audiences, no custom kind for the repo itself.
 
 NIP-34 is the metadata and discovery layer. Git remains the transport. The transport is boring. The metadata is portable.
 
@@ -60,10 +60,10 @@ So there is exactly one custom kind — [NIP-MP](docs/nips/NIP-MP.md), `kind:306
   "tags": [
     ["d", "platform"],
     ["name", "Platform"],
-    ["a", "30617:<alice-npub-hex>:buzz"],
-    ["a", "30617:<bob-npub-hex>:buzz-infra"],
-    ["buzz-channel", "<channel-uuid>"],
-    ["buzz-visibility", "listed"]
+    ["a", "30617:<alice-npub-hex>:kura"],
+    ["a", "30617:<bob-npub-hex>:kura-infra"],
+    ["kura-channel", "<channel-uuid>"],
+    ["kura-visibility", "listed"]
   ]
 }
 ```
@@ -155,7 +155,7 @@ Workflows orchestrate. Agents perform the compute. The relay is the message bus,
 
 A push to a branch channel triggers the CI workflow. The workflow engine coordinates the steps — build, test, lint. Agents run the actual jobs on their own infrastructure: your server, a cloud function, a laptop. Results post back to the branch channel alongside the conversation.
 
-Workflows live in the repo (`.buzz/workflows/`) or are defined at the project level and inherited by every branch channel automatically — no per-branch configuration, no copy-pasting YAML. Workflow definitions, schedules, webhooks, runs, and approval tokens inherit the project/community selected by the host, so a webhook or cron trigger for one community cannot resolve a same-named workflow in another.
+Workflows live in the repo (`.kura/workflows/`) or are defined at the project level and inherited by every branch channel automatically — no per-branch configuration, no copy-pasting YAML. Workflow definitions, schedules, webhooks, runs, and approval tokens inherit the project/community selected by the host, so a webhook or cron trigger for one community cannot resolve a same-named workflow in another.
 
 ```yaml
 name: CI
@@ -205,7 +205,7 @@ Agents are project members with npubs, contribution histories, and reputations. 
 | | Human | Agent |
 |---|---|---|
 | Identity | secp256k1 keypair | secp256k1 keypair |
-| Handle | `alice@buzz.dev` | `triage-bot@buzz.dev` |
+| Handle | `alice@kura.oute.pro` | `triage-bot@kura.oute.pro` |
 | Events | Signed with npub | Signed with npub |
 | History | On the relay | On the relay |
 | Reputation | Earned by contributions | Earned by contributions |
@@ -234,7 +234,7 @@ Standard kinds as substrate. Custom kinds only where genuinely novel.
 | **Artifacts** | 1063 (NIP-94) | — | Build outputs on Blossom/S3 |
 | **Workflows** | — | 46001-46012 | No NIP equivalent |
 | **Job dispatch** | — | 43001-43006 | Delegation trees |
-| **Project binding** | 30617 (NIP-34) | `buzz-` tags | Channel, visibility |
+| **Project binding** | 30617 (NIP-34) | `kura-` tags | Channel, visibility |
 | **Multi-repo projects** | — | 30621 ([NIP-MP](docs/nips/NIP-MP.md)) | Cross-owner grouping is unexpressible in per-repo tags |
 | **Audit** | — | 48001 | Hash-chain tamper-evident log |
 
@@ -251,7 +251,7 @@ If Kura disappears tomorrow, your repos still work on gitworkshop.dev, your patc
 | MCP server + ACP agent harness | ✅ Ships today |
 | Blossom media storage (SHA-256, S3) | ✅ Ships today |
 | Approval gates | 🚧 Infrastructure exists; executor wiring in progress |
-| Project binding (kind:30617 + `buzz-` tags) | 📋 Designed |
+| Project binding (kind:30617 + `kura-` tags) | 📋 Designed |
 | Multi-repo projects (kind:30621, [NIP-MP](docs/nips/NIP-MP.md)) | 📋 Designed |
 | Git hosting (smart HTTP + NIP-34) | ✅ Ships today |
 | Merge coordinator | 📋 Designed |

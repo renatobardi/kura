@@ -124,7 +124,7 @@ pub fn voice_registry(app: &AppHandle) -> Vec<VoiceRegistryEntry> {
         })),
         Err(error) => {
             eprintln!(
-                "buzz-desktop: {error}; imported Pocket voices are unavailable for this session"
+                "kura-desktop: {error}; imported Pocket voices are unavailable for this session"
             );
         }
     }
@@ -224,7 +224,7 @@ pub(crate) fn settings_path(app: &AppHandle) -> Result<PathBuf, String> {
     app.path()
         .app_data_dir()
         .map(|dir| dir.join(SETTINGS_FILE))
-        .map_err(|error| format!("could not locate Buzz settings storage: {error}"))
+        .map_err(|error| format!("could not locate Kura settings storage: {error}"))
 }
 
 pub(crate) fn load_from_path(path: &Path) -> Result<TtsSettings, String> {
@@ -248,7 +248,7 @@ pub(crate) fn load_from_path(path: &Path) -> Result<TtsSettings, String> {
         .ok_or("text-to-speech settings version is invalid")?;
     if version > u64::from(CURRENT_VERSION) {
         return Err(format!(
-            "text-to-speech settings version {version} is newer than this Buzz build supports"
+            "text-to-speech settings version {version} is newer than this Kura build supports"
         ));
     }
 
@@ -313,7 +313,7 @@ pub fn load_for_app(app: &AppHandle) -> (TtsSettings, Option<String>) {
     match result {
         Ok(settings) => (settings, None),
         Err(error) => {
-            eprintln!("buzz-desktop: {error}; preserving the file and using Mary for this session");
+            eprintln!("kura-desktop: {error}; preserving the file and using Mary for this session");
             (TtsSettings::default(), Some(error))
         }
     }
@@ -455,7 +455,7 @@ async fn apply_tts_settings(
         voice_change_wait = voice_change_ack;
         if active {
             if let Err(error) = super::pipeline::maybe_start_tts_pipeline(state).await {
-                eprintln!("buzz-desktop: could not hot-start text to speech: {error}");
+                eprintln!("kura-desktop: could not hot-start text to speech: {error}");
             }
         }
         state.emit_huddle_state_changed();
@@ -485,7 +485,7 @@ async fn finish_voice_change(voice_change: Option<VoiceChangeWait>) -> Result<()
 async fn finish_durable_voice_change(voice_change: Option<VoiceChangeWait>) {
     if let Err(error) = finish_voice_change(voice_change).await {
         eprintln!(
-            "buzz-desktop: tts stage=voice_switch status=delayed reason=ack_timeout error={error}"
+            "kura-desktop: tts stage=voice_switch status=delayed reason=ack_timeout error={error}"
         );
     }
 }
@@ -898,7 +898,7 @@ mod tests {
         .expect("fixture write");
         assert!(load_from_path(&path)
             .expect_err("future version should fail")
-            .contains("newer than this Buzz build supports"));
+            .contains("newer than this Kura build supports"));
     }
 
     #[test]

@@ -16,10 +16,10 @@ test("turns every bare Kura entity permalink family into a chip node", () => {
   const owner = "ab".repeat(32);
   const id = "cd".repeat(32);
   const links = [
-    `kura://repo?owner=${owner}&d=buzz`,
+    `kura://repo?owner=${owner}&d=kura`,
     `kura://project?owner=${owner}&d=onboarding`,
-    `kura://pr?id=${id}&owner=${owner}&d=buzz`,
-    `kura://issue?id=${id}&owner=${owner}&d=buzz`,
+    `kura://pr?id=${id}&owner=${owner}&d=kura`,
+    `kura://issue?id=${id}&owner=${owner}&d=kura`,
   ];
   for (const link of links) {
     const children = run(link);
@@ -29,7 +29,7 @@ test("turns every bare Kura entity permalink family into a chip node", () => {
 });
 
 test("keeps sentence punctuation outside entity chip nodes", () => {
-  const link = `kura://repo?owner=${"ab".repeat(32)}&d=buzz`;
+  const link = `kura://repo?owner=${"ab".repeat(32)}&d=kura`;
   const children = run(`${link}.`);
   assert.equal(children[0].value, link);
   assert.equal(children[1].value, ".");

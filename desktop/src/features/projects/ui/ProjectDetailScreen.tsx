@@ -219,7 +219,7 @@ export function ProjectDetailScreen(props: ProjectDetailScreenProps) {
     activeBranch,
     activeRepoPullRequest,
     activeTag,
-    isBuzzHost: repoRemote.host.kind === "buzz",
+    isKuraHost: repoRemote.host.kind === "kura",
     repository,
     reposDir: activeCommunity?.reposDir,
     repoSource,
@@ -229,7 +229,7 @@ export function ProjectDetailScreen(props: ProjectDetailScreenProps) {
   });
   const memberChannelIds = useMemberChannelIds();
   const remoteUnavailableReason =
-    repoRemote.host.kind === "buzz" &&
+    repoRemote.host.kind === "kura" &&
     !repoSnapshotQuery.isLoading &&
     !displayedRepoSnapshot
       ? refineRepoUnavailableReason({

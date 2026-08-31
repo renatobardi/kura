@@ -174,11 +174,11 @@ test("parsePromptText splits paired top-level turn sections and preserves inner 
     "[1] Alice (2026-08-25T12:00:00Z): prior message",
     "</thread-context>",
     "",
-    '<buzz-event type="@mention">',
+    '<kura-event type="@mention">',
     "Event ID: abc123",
     "From: Alice (hex: AABBCC)",
     "Content: ship it",
-    "</buzz-event>",
+    "</kura-event>",
   ].join("\n");
 
   const parsed = parsePromptText(text);
@@ -230,9 +230,9 @@ test("parsePromptText falls back to the complete prompt for ambiguous turn tags"
     "<context>",
     "literal authored boundary: </context>",
     "</context>",
-    '<buzz-event type="dm">',
+    '<kura-event type="dm">',
     "Content: hello",
-    "</buzz-event>",
+    "</kura-event>",
   ].join("\n");
 
   const parsed = parsePromptText(text);
@@ -271,14 +271,14 @@ test("extractToolIdentity ignores Kura tool names that only appear in file conte
       path: "desktop/src/features/agents/ui/agentSessionToolCatalog.ts",
     },
     content: {
-      text: 'const BUZZ_READ_TOOLS = new Set(["get_feed", "get_event"]);',
+      text: 'const KURA_READ_TOOLS = new Set(["get_feed", "get_event"]);',
     },
   });
 
   assert.deepEqual(identity, {
     title: "read_file",
     toolName: "read_file",
-    buzzToolName: null,
+    kuraToolName: null,
   });
 });
 
@@ -293,7 +293,7 @@ test("extractToolIdentity still recognizes explicit Kura tool fields", () => {
   assert.deepEqual(identity, {
     title: "Tool call",
     toolName: "get_feed",
-    buzzToolName: "get_feed",
+    kuraToolName: "get_feed",
   });
 });
 
@@ -431,13 +431,13 @@ test("parseSystemPromptSections splits current Base and Agent Instructions frami
 
 test("parseSystemPromptSections preserves a Windows workspace path", () => {
   const framed =
-    "[Base]\nbase text\n\n[Workspace]\nCurrent working directory: C:\\Users\\me\\buzz\n\n[Agent Instructions]\npersona text";
+    "[Base]\nbase text\n\n[Workspace]\nCurrent working directory: C:\\Users\\me\\kura\n\n[Agent Instructions]\npersona text";
   const sections = parseSystemPromptSections(framed);
   assert.deepEqual(sections, [
     { title: "Base", body: "base text" },
     {
       title: "Workspace",
-      body: "Current working directory: C:\\Users\\me\\buzz",
+      body: "Current working directory: C:\\Users\\me\\kura",
     },
     { title: "Agent Instructions", body: "persona text" },
   ]);
@@ -635,7 +635,7 @@ test("parseSystemPromptSections pins the full Base+System+Core+Canvas harness sh
     "[Channel Canvas]",
     "Canvas revision (event ID): a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
     "Last modified: 2026-07-11T10:00:00Z",
-    "Fetch current content with: buzz canvas get --channel 94a444a4-c0a3-5966-ab05-530c6ddc2301",
+    "Fetch current content with: kura canvas get --channel 94a444a4-c0a3-5966-ab05-530c6ddc2301",
   ].join("\n");
   const sections = parseSystemPromptSections(framed);
   assert.deepEqual(sections, [
@@ -644,7 +644,7 @@ test("parseSystemPromptSections pins the full Base+System+Core+Canvas harness sh
     { title: "Core Memory", body: "I am Duncan." },
     {
       title: "Channel Canvas",
-      body: "Canvas revision (event ID): a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2\nLast modified: 2026-07-11T10:00:00Z\nFetch current content with: buzz canvas get --channel 94a444a4-c0a3-5966-ab05-530c6ddc2301",
+      body: "Canvas revision (event ID): a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2\nLast modified: 2026-07-11T10:00:00Z\nFetch current content with: kura canvas get --channel 94a444a4-c0a3-5966-ab05-530c6ddc2301",
     },
   ]);
 });
@@ -814,7 +814,7 @@ test("parseSystemPromptSections extracts Team Instructions with Core Memory and 
     "[Channel Canvas]",
     "Canvas revision (event ID): a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
     "Last modified: 2026-07-11T10:00:00Z",
-    "Fetch current content with: buzz canvas get --channel 94a444a4-c0a3-5966-ab05-530c6ddc2301",
+    "Fetch current content with: kura canvas get --channel 94a444a4-c0a3-5966-ab05-530c6ddc2301",
   ].join("\n");
   const sections = parseSystemPromptSections(framed);
   assert.deepEqual(sections, [
@@ -833,7 +833,7 @@ test("parseSystemPromptSections extracts Team Instructions with Core Memory and 
     },
     {
       title: "Channel Canvas",
-      body: "Canvas revision (event ID): a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2\nLast modified: 2026-07-11T10:00:00Z\nFetch current content with: buzz canvas get --channel 94a444a4-c0a3-5966-ab05-530c6ddc2301",
+      body: "Canvas revision (event ID): a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2\nLast modified: 2026-07-11T10:00:00Z\nFetch current content with: kura canvas get --channel 94a444a4-c0a3-5966-ab05-530c6ddc2301",
     },
   ]);
 });
@@ -1011,7 +1011,7 @@ test("parseSystemPromptSections (modern) pins full 5-section shape: Base+System+
     "[Channel Canvas]",
     "Canvas revision (event ID): a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
     "Last modified: 2026-07-11T10:00:00Z",
-    "Fetch current content with: buzz canvas get --channel 94a444a4-c0a3-5966-ab05-530c6ddc2301",
+    "Fetch current content with: kura canvas get --channel 94a444a4-c0a3-5966-ab05-530c6ddc2301",
   ].join("\n");
   const sections = parseSystemPromptSections(framed);
   assert.deepEqual(sections, [
@@ -1030,7 +1030,7 @@ test("parseSystemPromptSections (modern) pins full 5-section shape: Base+System+
     },
     {
       title: "Channel Canvas",
-      body: "Canvas revision (event ID): a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2\nLast modified: 2026-07-11T10:00:00Z\nFetch current content with: buzz canvas get --channel 94a444a4-c0a3-5966-ab05-530c6ddc2301",
+      body: "Canvas revision (event ID): a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2\nLast modified: 2026-07-11T10:00:00Z\nFetch current content with: kura canvas get --channel 94a444a4-c0a3-5966-ab05-530c6ddc2301",
     },
   ]);
 });
