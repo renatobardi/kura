@@ -31,7 +31,7 @@ import { ancestorIsland, seedScenario } from "../helpers/seedRelay";
 const RELAY_HTTP = process.env.KURA_E2E_RELAY_URL ?? "http://localhost:3000";
 
 // uuid5(NAMESPACE_DNS, "kura.channel.general") — the seeded `general` channel.
-const GENERAL_CHANNEL_ID = "9f28288a-d724-587a-9709-92dc7f967110";
+const GENERAL_CHANNEL_ID = "3a5f0a9c-b199-5a34-807f-579747b9f223";
 
 // >60 newest rows so the cold window (CHANNEL_HISTORY_LIMIT=60) does NOT reach
 // the gap; the gap sits below the frontier, the old root below the gap.

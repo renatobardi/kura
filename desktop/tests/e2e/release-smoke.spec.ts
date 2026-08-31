@@ -9,7 +9,7 @@ import { denseSecondWall, seedScenario } from "../helpers/seedRelay";
 import { measureAction, type ActionMeasurement } from "./perf/metrics";
 
 const RELAY_HTTP = process.env.KURA_E2E_RELAY_URL ?? "http://localhost:3000";
-const GENERAL_CHANNEL_ID = "9f28288a-d724-587a-9709-92dc7f967110";
+const GENERAL_CHANNEL_ID = "3a5f0a9c-b199-5a34-807f-579747b9f223";
 const DEEP_ROW_COUNT = Number.parseInt(
   process.env.KURA_RELEASE_SMOKE_ROWS ?? "10000",
   10,

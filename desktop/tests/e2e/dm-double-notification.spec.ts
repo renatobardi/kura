@@ -12,7 +12,7 @@ const RELAY_HTTP_URL =
   process.env.KURA_E2E_RELAY_URL ?? "http://localhost:3000";
 
 // setup-desktop-test-data.sh: uuid5(NAMESPACE_DNS, "kura.channel.dm.alice-tyler")
-const ALICE_TYLER_DM_CHANNEL_ID = "5a9c064e-0411-5242-ae6b-0363ba99b8e6";
+const ALICE_TYLER_DM_CHANNEL_ID = "a6761500-a8f8-5d2b-a36c-7c9e66529a2f";
 
 async function getLoggedNotifications(page: import("@playwright/test").Page) {
   return page.evaluate(() => {

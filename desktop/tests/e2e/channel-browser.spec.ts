@@ -80,11 +80,11 @@ test("channel browser sorts alphabetically or by member count", async ({
   await expect(rows).toHaveText([
     /#agents/,
     /#all-replies/,
-    /#kura/,
     /#deep-history/,
     /#design/,
     /#engineering/,
     /#general/,
+    /#kura/,
     /#random/,
     /#sales/,
     /#secret-projects/,
