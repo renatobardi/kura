@@ -51,6 +51,14 @@ sudo certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --redirect \
     exit 1
   }
 
+# Vhosts existentes fixam listen no IP do Tailscale; sem um listen igual aqui,
+# conexões vindas do tailnet caem no primeiro vhost daquele socket.
+TSIP=$(tailscale ip -4 2>/dev/null || true)
+if [ -n "$TSIP" ] && ! sudo grep -q "listen $TSIP:443" "/etc/nginx/sites-enabled/$DOMAIN"; then
+  echo "==> Adicionando listen $TSIP:443 (tailnet) ao vhost…"
+  sudo sed -i "s|^    listen 443 ssl; # managed by Certbot|    listen 443 ssl; # managed by Certbot\n    listen $TSIP:443 ssl;|" "/etc/nginx/sites-enabled/$DOMAIN"
+fi
+
 sudo nginx -t && sudo systemctl reload nginx
 echo
 echo "OK. https://$DOMAIN no ar. Próximo passo: ./04-validate.sh"
