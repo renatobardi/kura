@@ -1,6 +1,6 @@
 ---
 title: "NIP-PL — Push Leases (full normative draft)"
-tags: [nostr, nip, push-notifications, buzz, draft]
+tags: [nostr, nip, push-notifications, kura, draft]
 status: draft
 created: 2026-07-02
 ---
@@ -315,7 +315,7 @@ Request members, in any request order:
 {"v":1,"challenge_id":"<uuid>","challenge":"<challenge>","key_id":"<standard-base64>","attestation":"<standard-base64 CBOR>","app_profile":"kura-ios-dogfood","endpoint":"<lowercase APNs-token hex>","endpoint_epoch":1,"expires_at":<unix-seconds>}
 ```
 
-`expires_at` MUST satisfy `now < expires_at <= now + configured_max_installation_lifetime`; the selected profile MUST be enabled. The exact transcript is domain `buzz.push.enroll.v1` followed by this ordered object:
+`expires_at` MUST satisfy `now < expires_at <= now + configured_max_installation_lifetime`; the selected profile MUST be enabled. The exact transcript is domain `kura.push.enroll.v1` followed by this ordered object:
 
 ```json
 {"v":1,"audience":"https://push.kura.oute.pro/v1/installations","challenge_id":"<uuid>","challenge":"<challenge>","key_id":"<standard-base64>","app_profile":"<registered-profile>","endpoint":"<lowercase-hex>","endpoint_epoch":1,"expires_at":<unix-seconds>}
@@ -339,7 +339,7 @@ Invalid attestation is `401 invalid_attestation`; a consumed/expired challenge o
 {"v":1,"challenge_id":"<uuid>","challenge":"<challenge>","installation_handle":"<uuid>","endpoint_epoch":<positive-integer>,"generation":<positive-integer>,"relay_pubkey":"<64-lowercase-hex>","not_before":<unix-seconds>,"expires_at":<unix-seconds>,"assertion":"<standard-base64 CBOR>"}
 ```
 
-`not_before <= now + 300`, `not_before < expires_at`, and `expires_at <= now + configured_max_grant_lifetime`. The endpoint epoch MUST equal the current installation epoch. For each `(installation_handle, relay_pubkey)`, generation MUST strictly increase. A successful delegation atomically extends the authenticated installation lifetime through at least the delegation's `expires_at`, allowing renewal without duplicate token enrollment. Transcript domain `buzz.push.delegate.v1`; ordered object:
+`not_before <= now + 300`, `not_before < expires_at`, and `expires_at <= now + configured_max_grant_lifetime`. The endpoint epoch MUST equal the current installation epoch. For each `(installation_handle, relay_pubkey)`, generation MUST strictly increase. A successful delegation atomically extends the authenticated installation lifetime through at least the delegation's `expires_at`, allowing renewal without duplicate token enrollment. Transcript domain `kura.push.delegate.v1`; ordered object:
 
 ```json
 {"v":1,"audience":"https://push.kura.oute.pro/v1/delegations","challenge_id":"<uuid>","challenge":"<challenge>","installation_handle":"<uuid>","endpoint_epoch":<integer>,"generation":<integer>,"relay_pubkey":"<hex>","not_before":<integer>,"expires_at":<integer>}
@@ -355,7 +355,7 @@ Success `201`: `{"endpoint_grant":"<opaque-capability>"}`. The sealed grant cont
 {"v":1,"challenge_id":"<uuid>","challenge":"<challenge>","installation_handle":"<uuid>","endpoint_epoch":<positive-integer>,"new_endpoint_epoch":<integer>,"endpoint":"<lowercase APNs-token hex>","assertion":"<standard-base64 CBOR>"}
 ```
 
-`new_endpoint_epoch` MUST equal `endpoint_epoch + 1` without overflow. Transcript domain `buzz.push.rotate-endpoint.v1`; ordered object:
+`new_endpoint_epoch` MUST equal `endpoint_epoch + 1` without overflow. Transcript domain `kura.push.rotate-endpoint.v1`; ordered object:
 
 ```json
 {"v":1,"audience":"https://push.kura.oute.pro/v1/installations/endpoint","challenge_id":"<uuid>","challenge":"<challenge>","installation_handle":"<uuid>","endpoint_epoch":<integer>,"new_endpoint_epoch":<integer>,"endpoint":"<lowercase-hex>"}
@@ -371,7 +371,7 @@ A successful atomic rotation invalidates every grant sealed to the old epoch and
 {"v":1,"challenge_id":"<uuid>","challenge":"<challenge>","installation_handle":"<uuid>","relay_pubkey":"<64-lowercase-hex>","generation":<positive-integer>,"assertion":"<standard-base64 CBOR>"}
 ```
 
-Transcript domain `buzz.push.revoke-delegation.v1`; ordered object:
+Transcript domain `kura.push.revoke-delegation.v1`; ordered object:
 
 ```json
 {"v":1,"audience":"https://push.kura.oute.pro/v1/delegations/revoke","challenge_id":"<uuid>","challenge":"<challenge>","installation_handle":"<uuid>","relay_pubkey":"<hex>","generation":<integer>}
@@ -385,7 +385,7 @@ The generation identifies the current delegation generation. Success is `200 {"s
 {"v":1,"challenge_id":"<uuid>","challenge":"<challenge>","installation_handle":"<uuid>","endpoint_epoch":<positive-integer>,"new_endpoint_epoch":<integer>,"assertion":"<standard-base64 CBOR>"}
 ```
 
-`new_endpoint_epoch` MUST equal `endpoint_epoch + 1` without overflow. Transcript domain `buzz.push.revoke-installation.v1`; ordered object:
+`new_endpoint_epoch` MUST equal `endpoint_epoch + 1` without overflow. Transcript domain `kura.push.revoke-installation.v1`; ordered object:
 
 ```json
 {"v":1,"audience":"https://push.kura.oute.pro/v1/installations/revoke","challenge_id":"<uuid>","challenge":"<challenge>","installation_handle":"<uuid>","endpoint_epoch":<integer>,"new_endpoint_epoch":<integer>}

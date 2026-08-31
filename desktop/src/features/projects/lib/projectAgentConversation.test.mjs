@@ -55,7 +55,7 @@ beforeEach(() => store.clear());
 
 test("conversation scopes isolate same-relay identities and restore on return", () => {
   const relay = "wss://relay.example.com";
-  const resource = "30617:owner:buzz";
+  const resource = "30617:owner:kura";
   const identityA = "a".repeat(64);
   const identityB = "b".repeat(64);
   const scopeA = projectsConversationScope(

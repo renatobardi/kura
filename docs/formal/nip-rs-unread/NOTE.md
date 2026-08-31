@@ -1,6 +1,6 @@
 ---
 title: "NIP-RS manual-unread: bounded exhaustive model — candidates A vs B"
-tags: [nostr, nip-rs, read-state, formal-model, buzz]
+tags: [nostr, nip-rs, read-state, formal-model, kura]
 status: active
 created: 2026-07-16
 ---

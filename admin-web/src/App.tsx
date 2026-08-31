@@ -829,7 +829,7 @@ function date(value: string) {
     : parsed.toLocaleString();
 }
 
-function BuzzMark() {
+function KuraMark() {
   return (
     <img src="/favicon.svg" alt="" aria-hidden="true" width={24} height={24} />
   );
@@ -999,7 +999,7 @@ export function App() {
       <header className="app-header">
         <Link href="/reports" className="brand">
           <span className="brand-mark">
-            <BuzzMark />
+            <KuraMark />
           </span>
           <span>
             Kura <b>Admin</b>

@@ -5,7 +5,7 @@ Context: the Welcome-channel kickoff choreography
 opener, teammates introduce themselves in-thread, and Fizz posts a closer.
 
 The file name says "silent-failures" for link stability (referenced from
-[PR #2066](https://github.com/block/buzz/pull/2066) and
+[PR #2066](https://github.com/renatobardi/kura/pull/2066) and
 `useWelcomeKickoffStage.ts`); the scope is all kickoff failure paths.
 
 ## The one bug behind all of it
@@ -417,7 +417,7 @@ The unit test passes only because it attaches the `p` tag independently of
 content — a shape no product path can produce.
 
 Options: relax the matcher to accept a leading `@Name` before the command, or
-add a mention flag to `buzz messages send`. First confirm these were ever
+add a mention flag to `kura messages send`. First confirm these were ever
 intended for anything but hand-crafted/test use.
 
 Even fixed, `!cancel` cancels **one turn, one agent, one channel**, and the

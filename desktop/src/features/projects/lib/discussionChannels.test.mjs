@@ -141,7 +141,7 @@ test("formatNameList reads naturally at every size", () => {
 test("discussionSnippet strips entity links and coordinates", () => {
   assert.equal(
     discussionSnippet(
-      `Can someone review kura://pr?id=${EVENT_ID}&owner=${OWNER}&d=buzz before Friday?`,
+      `Can someone review kura://pr?id=${EVENT_ID}&owner=${OWNER}&d=kura before Friday?`,
     ),
     "Can someone review before Friday?",
   );
@@ -150,7 +150,7 @@ test("discussionSnippet strips entity links and coordinates", () => {
     "Deploying tonight",
   );
   assert.equal(
-    discussionSnippet(`kura://repo?owner=${OWNER}&d=buzz`),
+    discussionSnippet(`kura://repo?owner=${OWNER}&d=kura`),
     "Shared a link to this.",
   );
 });

@@ -139,7 +139,7 @@ test.beforeEach(async ({ page }, testInfo) => {
       : testInfo.title.includes("cardless tweet preview")
         ? {
             linkPreviewMetadata: {
-              title: "Kura (@buzz) on X",
+              title: "Kura (@kura) on X",
               siteName: "X (formerly Twitter)",
               description:
                 "This is a real tweet-style description long enough to wrap across several lines while preserving the message-like treatment. It keeps going with enough distinct words to exceed five rendered lines at the preview width, proving that the overflow-aware control appears only when the content is genuinely clipped rather than relying on a brittle character-count guess.",

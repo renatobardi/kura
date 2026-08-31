@@ -51,7 +51,7 @@ test("project home context aligns with the channel header", async ({
   await enableProjectsFeature(page);
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await addProjectToSidebar(page, "buzz");
+  await addProjectToSidebar(page, "kura");
   await waitForAnimations(page);
 
   const [headerTitleBox, tasksBox] = await Promise.all([

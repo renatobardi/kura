@@ -10,7 +10,7 @@ Required configuration:
 
 ```text
 KURA_ADMIN_HOST=admin.example.com
-KURA_ADMIN_WEB_DIR=/srv/buzz/admin-web
+KURA_ADMIN_WEB_DIR=/srv/kura/admin-web
 ```
 
 Plus one of the authentication modes below.

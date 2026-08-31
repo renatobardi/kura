@@ -2,10 +2,10 @@ export const KURA_RELEASES_URL =
   "https://github.com/renatobardi/kura/releases/latest";
 const KURA_RELEASES_API_URL =
   "https://api.github.com/repos/renatobardi/kura/releases?per_page=10";
-const CACHE_KEY = "buzz.latestDownload.v1";
+const CACHE_KEY = "kura.latestDownload.v1";
 const CACHE_TTL_MS = 60 * 60 * 1000;
 
-export type BuzzDownloadPlatform = {
+export type KuraDownloadPlatform = {
   operatingSystem: "linux" | "macos" | "windows" | "unknown";
   architecture: "arm64" | "x64" | "unknown";
 };
@@ -27,7 +27,7 @@ type UserAgentData = {
 function normalizeOperatingSystem(
   navigatorValue: Navigator,
   userAgentData?: UserAgentData,
-): BuzzDownloadPlatform["operatingSystem"] {
+): KuraDownloadPlatform["operatingSystem"] {
   const userAgent = navigatorValue.userAgent.toLowerCase();
   const platform = (
     userAgentData?.platform ??
@@ -71,16 +71,16 @@ function normalizeOperatingSystem(
 
 function normalizeArchitecture(
   value: string,
-): BuzzDownloadPlatform["architecture"] {
+): KuraDownloadPlatform["architecture"] {
   const normalized = value.toLowerCase();
   if (/arm|aarch64/.test(normalized)) return "arm64";
   if (/x86|x64|amd64|64/.test(normalized)) return "x64";
   return "unknown";
 }
 
-export async function detectBuzzDownloadPlatform(
+export async function detectKuraDownloadPlatform(
   navigatorValue: Navigator,
-): Promise<BuzzDownloadPlatform> {
+): Promise<KuraDownloadPlatform> {
   const userAgentData = (
     navigatorValue as Navigator & { userAgentData?: UserAgentData }
   ).userAgentData;
@@ -108,7 +108,7 @@ export async function detectBuzzDownloadPlatform(
   return { operatingSystem, architecture };
 }
 
-function assetPattern(platform: BuzzDownloadPlatform): RegExp | undefined {
+function assetPattern(platform: KuraDownloadPlatform): RegExp | undefined {
   switch (platform.operatingSystem) {
     case "macos":
       if (platform.architecture === "arm64") return /_aarch64\.dmg$/i;
@@ -125,9 +125,9 @@ function assetPattern(platform: BuzzDownloadPlatform): RegExp | undefined {
   }
 }
 
-export function selectBuzzDownloadUrl(
+export function selectKuraDownloadUrl(
   releases: GitHubRelease[],
-  platform: BuzzDownloadPlatform,
+  platform: KuraDownloadPlatform,
 ): string | undefined {
   const pattern = assetPattern(platform);
   if (!pattern) return undefined;
@@ -140,13 +140,13 @@ export function selectBuzzDownloadUrl(
   return undefined;
 }
 
-export async function resolveBuzzDownloadUrlForPlatform(
-  platform: BuzzDownloadPlatform,
+export async function resolveKuraDownloadUrlForPlatform(
+  platform: KuraDownloadPlatform,
 ): Promise<string> {
   try {
     const cached = JSON.parse(sessionStorage.getItem(CACHE_KEY) ?? "null") as {
       expiresAt: number;
-      platform: BuzzDownloadPlatform;
+      platform: KuraDownloadPlatform;
       url: string;
     } | null;
     if (
@@ -166,7 +166,7 @@ export async function resolveBuzzDownloadUrlForPlatform(
       headers: { Accept: "application/vnd.github+json" },
     });
     if (!response.ok) return KURA_RELEASES_URL;
-    const url = selectBuzzDownloadUrl(
+    const url = selectKuraDownloadUrl(
       (await response.json()) as GitHubRelease[],
       platform,
     );
@@ -189,8 +189,8 @@ export async function resolveBuzzDownloadUrlForPlatform(
   }
 }
 
-export async function resolveBuzzDownloadUrl(): Promise<string> {
-  return resolveBuzzDownloadUrlForPlatform(
-    await detectBuzzDownloadPlatform(navigator),
+export async function resolveKuraDownloadUrl(): Promise<string> {
+  return resolveKuraDownloadUrlForPlatform(
+    await detectKuraDownloadPlatform(navigator),
   );
 }

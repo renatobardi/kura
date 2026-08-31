@@ -431,13 +431,13 @@ test("parseSystemPromptSections splits current Base and Agent Instructions frami
 
 test("parseSystemPromptSections preserves a Windows workspace path", () => {
   const framed =
-    "[Base]\nbase text\n\n[Workspace]\nCurrent working directory: C:\\Users\\me\\buzz\n\n[Agent Instructions]\npersona text";
+    "[Base]\nbase text\n\n[Workspace]\nCurrent working directory: C:\\Users\\me\\kura\n\n[Agent Instructions]\npersona text";
   const sections = parseSystemPromptSections(framed);
   assert.deepEqual(sections, [
     { title: "Base", body: "base text" },
     {
       title: "Workspace",
-      body: "Current working directory: C:\\Users\\me\\buzz",
+      body: "Current working directory: C:\\Users\\me\\kura",
     },
     { title: "Agent Instructions", body: "persona text" },
   ]);

@@ -645,10 +645,10 @@ test("selectProjectRepository resolves a non-primary repository when repositoryI
   const OTHER = "b".repeat(64);
 
   const primaryRepo = {
-    id: `${OWNER}:buzz`,
-    dtag: "buzz",
+    id: `${OWNER}:kura`,
+    dtag: "kura",
     name: "Kura",
-    repoAddress: `30617:${OWNER}:buzz`,
+    repoAddress: `30617:${OWNER}:kura`,
     owner: OWNER,
     cloneUrls: [],
     webUrl: null,
@@ -674,15 +674,15 @@ test("selectProjectRepository resolves a non-primary repository when repositoryI
   };
 
   const project = {
-    id: `30621:${OWNER}:buzz`,
-    dtag: "buzz",
+    id: `30621:${OWNER}:kura`,
+    dtag: "kura",
     name: "Kura",
     description: "",
     owner: OWNER,
     createdAt: 100,
     projectChannelId: null,
     status: "active",
-    projectAddress: `30621:${OWNER}:buzz`,
+    projectAddress: `30621:${OWNER}:kura`,
     primaryRepositoryAddress: primaryRepo.repoAddress,
     repositoryAddresses: [primaryRepo.repoAddress, nonPrimaryRepo.repoAddress],
     repositories: [primaryRepo, nonPrimaryRepo],

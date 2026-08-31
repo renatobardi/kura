@@ -6,7 +6,7 @@ import { buildProjectsViewAgentContextItems } from "./buildProjectsViewAgentCont
 const repository = {
   description: "Relay and desktop source",
   name: "Kura",
-  repoAddress: "owner:buzz",
+  repoAddress: "owner:kura",
 };
 const project = {
   createdAt: 1,

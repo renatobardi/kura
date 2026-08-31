@@ -56,12 +56,12 @@ async function openKuraProject(page: import("@playwright/test").Page) {
   await page.getByTestId("projects-section-projects").click();
   const projectEntry = page
     .locator(
-      '[data-testid="project-card-buzz"], [data-testid="project-row-buzz"]',
+      '[data-testid="project-card-kura"], [data-testid="project-row-kura"]',
     )
     .first();
   await expect(projectEntry).toBeVisible({ timeout: 10_000 });
   await projectEntry.click();
-  await page.getByTestId("project-home-context-repo-buzz").click();
+  await page.getByTestId("project-home-context-repo-kura").click();
 }
 
 test("repository-only relays keep the Repositories section available", async ({
@@ -78,7 +78,7 @@ test("repository-only relays keep the Repositories section available", async ({
   await page.getByTestId("projects-section-repositories").click();
   await expect(
     page.locator(
-      '[data-testid="repository-card-buzz"], [data-testid="repository-row-buzz"]',
+      '[data-testid="repository-card-kura"], [data-testid="repository-row-kura"]',
     ),
   ).toBeVisible();
 });
@@ -152,7 +152,7 @@ test("submitted project context stays compact and expandable", async ({
 test("sidebar project add flow browses before creating", async ({ page }) => {
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await expect(page.getByTestId("sidebar-project-buzz")).toHaveCount(0);
+  await expect(page.getByTestId("sidebar-project-kura")).toHaveCount(0);
   await page.getByTestId("sidebar-projects-section-label").hover();
   await page.getByTestId("sidebar-projects-create").click();
 
@@ -178,13 +178,13 @@ test("sidebar project add flow browses before creating", async ({ page }) => {
   await page.getByRole("button", { name: "Back to projects" }).click();
   await expect(browser).toBeVisible();
 
-  await search.fill("buzz");
-  await browser.getByTestId("project-browser-result-buzz").click();
+  await search.fill("kura");
+  await browser.getByTestId("project-browser-result-kura").click();
   await expect(browser).toBeHidden();
   await expect(
     page.getByRole("navigation", { name: "Project breadcrumb" }),
-  ).toContainText("buzz");
-  const addedProject = page.getByTestId("sidebar-project-buzz");
+  ).toContainText("kura");
+  const addedProject = page.getByTestId("sidebar-project-kura");
   await expect(addedProject).toBeVisible();
   await addedProject.click({ button: "right" });
   await page.getByRole("menuitem", { name: "Remove from sidebar" }).click();
@@ -357,7 +357,7 @@ test("projects v3 workspace screenshot states", async ({ page }) => {
   await expect(projectContextCard).toBeVisible();
   await expect(projectContextCard).toHaveCSS("border-radius", "16px");
   const repositoryHeading = repositoryActionsPanel.getByRole("heading", {
-    name: "buzz",
+    name: "kura",
     exact: true,
   });
   await expect(repositoryHeading).toBeVisible();
@@ -849,7 +849,7 @@ test("projects v3 workspace screenshot states", async ({ page }) => {
   await expect(localSourceTrigger).toBeVisible();
   await expect(
     repositoryActionsPanel.getByTestId("project-repository-local-path"),
-  ).toHaveText("…/buzz/REPOS/buzz");
+  ).toHaveText("…/kura/REPOS/kura");
   await expect(
     repositoryActionsPanel.getByRole("button", {
       name: "Open",
@@ -1249,7 +1249,7 @@ test("projects v3 work-item list metadata", async ({ page }) => {
   const pullRequestRow = page.getByTestId(/^projects-pr-row-/).first();
   await expect(pullRequestRow).toBeVisible();
   await expectSinglePrimaryTextColumn(pullRequestRow);
-  await expect(pullRequestRow).toContainText(/relay-tools|buzz|design-system/);
+  await expect(pullRequestRow).toContainText(/relay-tools|kura|design-system/);
   await waitForAnimations(page);
   await page.screenshot({ path: `${SHOTS}/05-pr-list-metadata.png` });
 
@@ -1259,7 +1259,7 @@ test("projects v3 work-item list metadata", async ({ page }) => {
   const issueRow = page.getByTestId(/^projects-issue-row-/).first();
   await expect(issueRow).toBeVisible();
   await expectSinglePrimaryTextColumn(issueRow);
-  await expect(issueRow).toContainText(/relay-tools|buzz|design-system/);
+  await expect(issueRow).toContainText(/relay-tools|kura|design-system/);
   await waitForAnimations(page);
   await page.screenshot({ path: `${SHOTS}/06-issue-list-metadata.png` });
 
@@ -1267,7 +1267,7 @@ test("projects v3 work-item list metadata", async ({ page }) => {
   const channelRow = page.getByTestId("project-channel-row").first();
   await expect(channelRow).toBeVisible();
   await expectSinglePrimaryTextColumn(channelRow);
-  await expect(channelRow).toContainText("#buzz");
+  await expect(channelRow).toContainText("#kura");
   await expect(
     page.getByTestId("project-channel-project").first(),
   ).toBeVisible();

@@ -80,7 +80,7 @@ test("snapshot project home cannot publish repository healing", async ({
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await waitForProjectSnapshot(page);
-  await page.getByTestId("channel-buzz").click();
+  await page.getByTestId("channel-kura").click();
   await expect(page.getByTestId("project-home-context-panel")).toBeVisible();
 
   await page.addInitScript(() => {
@@ -89,7 +89,7 @@ test("snapshot project home cannot publish repository healing", async ({
   });
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await mutateProjectCache(page);
-  await page.getByTestId("channel-buzz").click();
+  await page.getByTestId("channel-kura").click();
 
   await expect(page.getByTestId("project-home-context-panel")).toBeVisible();
   await page.waitForTimeout(500);
@@ -98,7 +98,7 @@ test("snapshot project home cannot publish repository healing", async ({
       window.__KURA_E2E_ACCEPTED_PROJECT_EVENTS__?.filter(
         (event) =>
           event.kind === 30621 &&
-          event.tags.some((tag) => tag[0] === "d" && tag[1] === "buzz"),
+          event.tags.some((tag) => tag[0] === "d" && tag[1] === "kura"),
       ) ?? [],
   );
   expect(projectPublications).toEqual([]);
@@ -119,7 +119,7 @@ test("stale non-matching snapshot uses the scoped project-home lookup", async ({
     if (!key) throw new Error("Project snapshot was not persisted.");
     const snapshot = JSON.parse(window.localStorage.getItem(key) ?? "{}");
     snapshot.projects = snapshot.projects.filter(
-      (project) => project.dtag !== "buzz",
+      (project) => project.dtag !== "kura",
     );
     const value = JSON.stringify([
       snapshot.ownerPubkey.toLowerCase(),
@@ -138,7 +138,7 @@ test("stale non-matching snapshot uses the scoped project-home lookup", async ({
   });
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await mutateProjectCache(page);
-  await page.getByTestId("channel-buzz").click();
+  await page.getByTestId("channel-kura").click();
 
   await expect(page.getByTestId("project-home-context-panel")).toBeVisible();
   const usedScopedLookup = await page.evaluate((channelId) => {
@@ -162,7 +162,7 @@ test("equal live project data enables healing after snapshot reconciliation", as
 
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await waitForProjectEnumeration(page);
-  await page.getByTestId("channel-buzz").click();
+  await page.getByTestId("channel-kura").click();
 
   await expect(page.getByTestId("project-channel-home")).toHaveAttribute(
     "data-repository-healing-enabled",

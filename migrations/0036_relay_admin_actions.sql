@@ -6,7 +6,7 @@
 --
 -- Both tables are deployment-global (no community_id direct column; the report
 -- FK carries community provenance). Registered in _operator_global_tables and
--- in the hardcoded parser list in crates/buzz-db/src/migration.rs.
+-- in the hardcoded parser list in crates/kura-db/src/migration.rs.
 
 CREATE TABLE relay_admin_actions (
     id              UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),

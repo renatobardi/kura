@@ -56,12 +56,12 @@ async function openKuraProject(page: import("@playwright/test").Page) {
   await page.getByTestId("projects-section-projects").click();
   const projectEntry = page
     .locator(
-      '[data-testid="project-card-buzz"], [data-testid="project-row-buzz"]',
+      '[data-testid="project-card-kura"], [data-testid="project-row-kura"]',
     )
     .first();
   await expect(projectEntry).toBeVisible({ timeout: 10_000 });
   await projectEntry.click();
-  await page.getByTestId("project-home-context-repo-buzz").click();
+  await page.getByTestId("project-home-context-repo-kura").click();
 }
 
 async function addProjectToSidebar(
@@ -647,7 +647,7 @@ test("merge conflicts offer persistent terminal recovery", async ({ page }) => {
     page.getByText("Recovery commit fetched and terminal opened."),
   ).toBeHidden({ timeout: 10_000 });
   await expect(recovery).toContainText("git switch 'main'");
-  await expect(recovery).toContainText("git merge 'refs/buzz/merge-recovery/");
+  await expect(recovery).toContainText("git merge 'refs/kura/merge-recovery/");
   await expect(
     recovery.getByRole("button", { name: "Copy commands" }),
   ).toBeEnabled();
@@ -895,7 +895,7 @@ test("viewer without repository ownership cannot merge", async ({ page }) => {
             expectedCommit: "1".repeat(40),
             pullRequestAuthor: "2".repeat(64),
             pullRequestId: "3".repeat(64),
-            repoAddress: `30617:${targetOwner}:buzz`,
+            repoAddress: `30617:${targetOwner}:kura`,
             sourceBranch: "feature/untrusted",
             statusCreatedAt: 1,
             targetBranch: "main",
@@ -952,7 +952,7 @@ test("project pull requests preserve partial results from batched queries", asyn
     workItemFilters.every((filter) => (filter["#a"]?.length ?? 0) > 1),
   ).toBe(true);
   const expectedRepoAddresses = [
-    `30617:${DEFAULT_MOCK_PUBKEY}:buzz`,
+    `30617:${DEFAULT_MOCK_PUBKEY}:kura`,
     `30617:${TEST_IDENTITIES.alice.pubkey}:relay-tools`,
     `30617:${TEST_IDENTITIES.bob.pubkey}:design-system`,
   ].sort();
@@ -1154,8 +1154,8 @@ test("sidebar distinguishes the Projects overview from an open project", async (
   await projectsOverview.click();
   await expect(projectsOverview).toHaveAttribute("data-active", "true");
 
-  await addProjectToSidebar(page, "buzz");
-  const sidebarProject = page.getByTestId("sidebar-project-buzz");
+  await addProjectToSidebar(page, "kura");
+  const sidebarProject = page.getByTestId("sidebar-project-kura");
   await expect(projectsOverview).toHaveAttribute("data-active", "false");
   await expect(sidebarProject).toHaveAttribute("data-active", "true");
   await expect(sidebarProject).toHaveCSS(
@@ -1523,7 +1523,7 @@ test("channels tab opens the latest matching conversation without leaving the pr
       author: TEST_IDENTITIES.alice.pubkey,
       latestContent,
       olderContent,
-      repoToken: `${DEFAULT_MOCK_PUBKEY} buzz`,
+      repoToken: `${DEFAULT_MOCK_PUBKEY} kura`,
     },
   );
 
@@ -1531,12 +1531,12 @@ test("channels tab opens the latest matching conversation without leaving the pr
   await page.getByTestId("projects-section-projects").click();
   const projectEntry = page
     .locator(
-      '[data-testid="project-card-buzz"], [data-testid="project-row-buzz"]',
+      '[data-testid="project-card-kura"], [data-testid="project-row-kura"]',
     )
     .first();
   await expect(projectEntry).toBeVisible({ timeout: 10_000 });
   await projectEntry.click();
-  await page.getByTestId("project-home-context-repo-buzz").click();
+  await page.getByTestId("project-home-context-repo-kura").click();
   await page.getByRole("tab", { name: "Channels", exact: true }).click();
   const channelRow = page.getByTestId("project-channel-row").first();
   await expect(channelRow).toBeVisible({ timeout: 10_000 });
@@ -1850,9 +1850,9 @@ test("project overview presents collapsible context beside grouped activity", as
   );
   const channelRows = page.getByTestId("project-channel-row");
   expect(await channelRows.count()).toBeGreaterThan(0);
-  await expect(channelRows.first()).toContainText("#buzz");
+  await expect(channelRows.first()).toContainText("#kura");
   const channelsList = page.getByTestId("projects-channels-list");
-  await expect(channelsList).toContainText("buzz");
+  await expect(channelsList).toContainText("kura");
   await expect(channelsList).toContainText("relay-tools");
   await expect(channelsList).toContainText("design-system");
   const channelCount = await channelRows.count();
@@ -2179,10 +2179,10 @@ test("Projects search replaces and restores the section tabs", async ({
     page.getByTestId("projects-page-tabs").getByRole("combobox"),
   ).toHaveValue("updated");
 
-  await search.fill("buzz");
+  await search.fill("kura");
   await expect(
     page.locator(
-      '[data-testid="project-card-buzz"], [data-testid="project-row-buzz"]',
+      '[data-testid="project-card-kura"], [data-testid="project-row-kura"]',
     ),
   ).toBeVisible();
 
@@ -2321,8 +2321,8 @@ test("repository changes discard captured selection context before agent sends",
   await enableProjectsFeature(page);
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await addProjectToSidebar(page, "buzz");
-  await page.getByTestId("project-home-context-repo-buzz").click();
+  await addProjectToSidebar(page, "kura");
+  await page.getByTestId("project-home-context-repo-kura").click();
   await page.getByRole("tab", { name: "Tasks", exact: true }).click();
 
   const selectedRow = page.getByTestId("project-issue-row").first();
@@ -2577,11 +2577,11 @@ test("selecting repository workspace rows switches the context pod to the cluste
   await page.getByTestId("projects-section-projects").click();
   await page
     .locator(
-      '[data-testid="project-card-buzz"], [data-testid="project-row-buzz"]',
+      '[data-testid="project-card-kura"], [data-testid="project-row-kura"]',
     )
     .first()
     .click();
-  await page.getByTestId("project-home-context-repo-buzz").click();
+  await page.getByTestId("project-home-context-repo-kura").click();
 
   await page.getByRole("tab", { name: "Commits" }).click();
   const commitRows = page.getByTestId("project-activity-feed-item");
@@ -2766,7 +2766,7 @@ test("repository rows identify their git host", async ({ page }) => {
   await page.getByRole("button", { name: "List layout" }).click();
 
   const kuraHostIcon = page
-    .getByTestId("repository-row-buzz")
+    .getByTestId("repository-row-kura")
     .getByTestId("repository-host-icon");
   await expect(kuraHostIcon).toHaveAttribute(
     "aria-label",
@@ -3054,7 +3054,7 @@ test("repository tags can be browsed as immutable remote snapshots", async ({
   await expect(page.getByText("Cloned repository.")).toBeVisible();
   await expect(
     repositoryPanel.getByTestId("project-repository-local-path"),
-  ).toHaveText("…/buzz/REPOS/buzz");
+  ).toHaveText("…/kura/REPOS/kura");
   await expect(
     repositoryPanel.getByRole("button", { name: "Open", exact: true }),
   ).toHaveAttribute("title", "Open local repository folder");
@@ -3134,7 +3134,7 @@ test("external repositories stay on local source after a branch round trip", asy
       JSON.stringify({ "relay-tools": { [localBranch]: commit } }),
     );
     window.__KURA_E2E_PROJECT_REPO_SYNC_STATUS__ = {
-      local_path: "/tmp/buzz/REPOS/relay-tools",
+      local_path: "/tmp/kura/REPOS/relay-tools",
       local_branch: localBranch,
       local_branches: ["main", localBranch],
       local_head: commit,
@@ -3153,7 +3153,7 @@ test("external repositories stay on local source after a branch round trip", asy
       pull_block_reason: "Local branch is up to date.",
     };
     window.__KURA_E2E_PROJECT_LOCAL_REPO_SNAPSHOT__ = {
-      path: "/tmp/buzz/REPOS/relay-tools",
+      path: "/tmp/kura/REPOS/relay-tools",
       snapshot: {
         latest_commit: null,
         commits: [],
@@ -3173,7 +3173,7 @@ test("external repositories stay on local source after a branch round trip", asy
   });
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await addProjectToSidebar(page, "buzz");
+  await addProjectToSidebar(page, "kura");
   await page.getByTestId("project-home-context-repo-relay-tools").click();
   await page.getByRole("button", { name: "github.com" }).click();
   await page.getByRole("menuitemradio", { name: /^Local/ }).click();
@@ -3254,7 +3254,7 @@ test("repository files beyond the eager preview limit load on demand", async ({
       },
     ];
     window.__KURA_E2E_PROJECT_LOCAL_REPO_SNAPSHOT__ = {
-      path: "/tmp/buzz/REPOS/relay-tools",
+      path: "/tmp/kura/REPOS/relay-tools",
       snapshot: {
         latest_commit: null,
         commits: [],
@@ -3269,7 +3269,7 @@ test("repository files beyond the eager preview limit load on demand", async ({
   });
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await addProjectToSidebar(page, "buzz");
+  await addProjectToSidebar(page, "kura");
   await page.getByTestId("project-home-context-repo-relay-tools").click();
   await page.getByRole("button", { name: "github.com" }).click();
   await page.getByRole("menuitemradio", { name: /^Local/ }).click();
@@ -3296,7 +3296,7 @@ test("pushed local branch can open a pull request", async ({ page }) => {
   await page.addInitScript(() => {
     const commit = "1234567890abcdef1234567890abcdef12345678";
     window.__KURA_E2E_PROJECT_REPO_SYNC_STATUS__ = {
-      local_path: "/tmp/buzz/REPOS/buzz",
+      local_path: "/tmp/kura/REPOS/kura",
       local_branch: "feature/projects-workflow",
       local_branches: ["feature/projects-workflow", "space"],
       local_head: commit,
@@ -3331,7 +3331,7 @@ test("pushed local branch can open a pull request", async ({ page }) => {
     .getByRole("button", { name: "Create review" })
     .click();
   await expect(page.getByTestId("create-pull-request-repository")).toHaveValue(
-    /:buzz$/,
+    /:kura$/,
   );
   await expect(page.getByTestId("create-pull-request-base-branch")).toHaveValue(
     "main",

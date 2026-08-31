@@ -679,8 +679,8 @@ Each axiom is *admitted* per deployment, not assumed universally:
      be shared across pods (e.g. Redis with the same atomic insert-if-absent
      semantics and TTL ≥ 120 s). The chart default (`replicaCount: 1`) satisfies
      this gate today; the shipped HA examples (`replicaCount: 3` in
-     `deploy/charts/buzz/examples/argocd-app.yaml:27` and
-     `deploy/charts/buzz/examples/flux-helmrelease.yaml:35`) are
+     `deploy/charts/kura/examples/argocd-app.yaml:27` and
+     `deploy/charts/kura/examples/flux-helmrelease.yaml:35`) are
      P3-non-conforming as shipped unless the operator adds one of:
      - **(a)** an ingress annotation hashing upstream selection on a header stable
        across replays — `nginx.ingress.kubernetes.io/upstream-hash-by:
@@ -961,9 +961,9 @@ The model's obligations map to concrete code seams:
 - **Redis / subscription refinement** — Redis pub/sub keys, presence keys, typing
   keys, cache invalidation channels, and local-echo dedup labels include
   community context in any shared multi-tenant deployment. The safe shape is
-  `buzz:{community}:channel:{channel_id}`,
-  `buzz:{community}:presence:{pubkey}`, and
-  `buzz:{community}:typing:{channel_id}`. The current unprefixed keys are
+  `kura:{community}:channel:{channel_id}`,
+  `kura:{community}:presence:{pubkey}`, and
+  `kura:{community}:typing:{channel_id}`. The current unprefixed keys are
   admissible only for the degenerate single-community deployment or physically
   isolated Redis.
 - **Media / Blossom** — raw blob bytes may remain content-addressed and

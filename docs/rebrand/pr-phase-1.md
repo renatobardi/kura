@@ -1,6 +1,6 @@
 ## Rebrand — phase 1 (visible surface)
 
-Kura is a new product derived from [block/buzz](https://github.com/block/buzz) @ `eed74bd` (Apache-2.0, see `NOTICE`). This PR replaces everything a user can see of the Buzz brand with the Kura identity (`docs/rebrand/identity.md`): washi/sumi/shu palette, Geist type, hanko seal 蔵 logo.
+Kura is a new product derived from [renatobardi/kura](https://github.com/renatobardi/kura) @ `eed74bd` (Apache-2.0, see `NOTICE`). This PR replaces everything a user can see of the Buzz brand with the Kura identity (`docs/rebrand/identity.md`): washi/sumi/shu palette, Geist type, hanko seal 蔵 logo.
 
 ### Desktop
 - Theme tokens light + dark, flat surfaces (no gradients), seigaiha lattice on setup shells

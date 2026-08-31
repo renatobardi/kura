@@ -807,7 +807,7 @@ the latter, not the former.
 
 **Create-intent fingerprint (normative).** The divergence discriminator
 in the never-started rows is a recorded annotation,
-`buzz.block.xyz/create-intent`, written at pod create — the same shape as
+`kura.block.xyz/create-intent`, written at pod create — the same shape as
 the image-reference and pubkey annotations the pod already carries. Its
 value is an **unkeyed SHA-256** over a canonical serialization of the
 provider's **non-secret create-intent template**, computed *before* the
@@ -990,7 +990,7 @@ agent-level I5 into substrate-level I5.
 
 ## The Kubernetes Binding (`kura-backend-kubernetes`)
 
-The first conforming provider: a Rust crate in `block/buzz`, distributed as a
+The first conforming provider: a Rust crate in this repo, distributed as a
 standalone binary. Everything above is the contract; this section is its
 realization.
 
@@ -1161,22 +1161,22 @@ regardless of `HOME`.
   pubkey is 64 chars, one over):
   - pod name: `kura-agent-<first-12-hex-of-pubkey>` — also the returned
     `agent_id`
-  - label `buzz.block.xyz/agent-pubkey: <first-32-hex>` — the selector key
+  - label `kura.block.xyz/agent-pubkey: <first-32-hex>` — the selector key
     for reconciliation and GC. 128 bits is collision-*resistant*, not
     collision-free, which is why the annotation check below is normative,
     not decorative
   - label `app.kubernetes.io/managed-by: kura-backend-kubernetes` and label
-    `buzz.block.xyz/binding-version: <schema-version>` — the **management
+    `kura.block.xyz/binding-version: <schema-version>` — the **management
     marker** (§Deploy State Machine auto-repair fence): present on every
     pod and Secret this provider creates, and **required before any
     destructive repair or GC action**. Identity labels/annotations prove
     identity; the marker asserts protocol ownership — without it, an object
     that merely matches our schema fails closed to the operator
-  - annotation `buzz.block.xyz/agent-pubkey-full: <full-64-hex>` —
+  - annotation `kura.block.xyz/agent-pubkey-full: <full-64-hex>` —
     **load-bearing**: per §Deploy State Machine step 1, every label-selected
     object's annotation MUST equal the derived pubkey before the provider
     no-ops against it, deletes it, mutates its Secret, or returns its name
-  - annotation `buzz.block.xyz/create-intent: <sha256-of-intent-template>` — the
+  - annotation `kura.block.xyz/create-intent: <sha256-of-intent-template>` — the
     recorded create intent (§Deploy State Machine, create-intent
     fingerprint), written at pod create; the divergence discriminator for
     never-started pods

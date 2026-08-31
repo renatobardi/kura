@@ -3600,7 +3600,7 @@ test("profile popover wave sends a direct message for a human profile", async ({
       expect.objectContaining({
         command: "send_channel_message",
         payload: expect.objectContaining({
-          content: expect.stringContaining("<!-- buzz:wave:v1 -->"),
+          content: expect.stringContaining("<!-- kura:wave:v1 -->"),
         }),
       }),
     ]),

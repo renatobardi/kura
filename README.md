@@ -291,4 +291,4 @@ just reset          # ⚠️  Wipe data + recreate
 
 ## Origin
 
-Kura is derived from Buzz by Block, Inc. (Apache-2.0). See [NOTICE](NOTICE).
+Kura is derived from Kura by Block, Inc. (Apache-2.0). See [NOTICE](NOTICE).

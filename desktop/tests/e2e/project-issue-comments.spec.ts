@@ -16,12 +16,12 @@ async function openKuraProject(page: import("@playwright/test").Page) {
   await page.getByTestId("projects-section-projects").click();
   const projectEntry = page
     .locator(
-      '[data-testid="project-card-buzz"], [data-testid="project-row-buzz"]',
+      '[data-testid="project-card-kura"], [data-testid="project-row-kura"]',
     )
     .first();
   await expect(projectEntry).toBeVisible({ timeout: 10_000 });
   await projectEntry.click();
-  await page.getByTestId("project-home-context-repo-buzz").click();
+  await page.getByTestId("project-home-context-repo-kura").click();
 }
 
 test("issue detail can open agent chat or seed a channel question", async ({
@@ -90,7 +90,7 @@ test("issue discussion ignores an author-claimed origin channel", async ({
           created_at: Math.floor(Date.now() / 1000) + 10,
           content: "This task claims an unrelated visible channel.",
           tags: [
-            ["a", `30617:${owner}:buzz`],
+            ["a", `30617:${owner}:kura`],
             ["subject", "Forged origin task"],
             ["h", "9dae0116-799b-5071-a0a8-fdd30a91a35d"],
           ],
@@ -115,15 +115,15 @@ test("issue discussion ignores an author-claimed origin channel", async ({
     "project-context-related-channel",
   );
   await expect(relatedChannel).toHaveCount(1);
-  await expect(relatedChannel).toContainText("#buzz");
+  await expect(relatedChannel).toContainText("#kura");
   await expect(channelChoices).not.toContainText("#random");
   await relatedChannel.click();
 
-  await expect(page.getByTestId("chat-title")).toHaveText("buzz");
+  await expect(page.getByTestId("chat-title")).toHaveText("kura");
   const issueDraftChip = page
     .getByTestId("message-input")
     .locator('[data-composer-kura-link=""]', {
-      hasText: "buzz",
+      hasText: "kura",
     });
   await expect(issueDraftChip).toHaveAttribute(
     "data-href",

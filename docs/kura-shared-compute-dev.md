@@ -8,7 +8,7 @@ It does not use a substitute agent harness.
 
 ## Before starting
 
-Run from the `block/buzz` repository root on the mesh-enabled branch.
+Run from the this repo repository root on the mesh-enabled branch.
 
 For a completely fresh, deterministic local state, use:
 
@@ -19,7 +19,7 @@ just mesh-dev-fresh
 
 This removes development app data, the development keyring entry,
 `~/.kura-dev`, and local Docker volumes; it preserves the installed Kura app's
-data, production keyring, and `~/.buzz`. The first dev page load also clears
+data, production keyring, and `~/.kura`. The first dev page load also clears
 only that dev server origin's WebKit storage, so saved fields from an earlier
 run cannot leak into the fresh state. It then seeds local channels and starts
 the mesh-enabled desktop with the repository's public Tyler test identity.

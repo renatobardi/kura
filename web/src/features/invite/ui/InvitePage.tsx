@@ -2,9 +2,9 @@ import kuraAppIcon from "@/assets/app-icon@3x.png";
 import { claimInviteInBrowser } from "@/features/invite/invite-api";
 import {
   KURA_RELEASES_URL,
-  type BuzzDownloadPlatform,
-  detectBuzzDownloadPlatform,
-  resolveBuzzDownloadUrlForPlatform,
+  type KuraDownloadPlatform,
+  detectKuraDownloadPlatform,
+  resolveKuraDownloadUrlForPlatform,
 } from "@/shared/lib/kura-download";
 import { hasNip07Provider } from "@/shared/lib/nostr-signer";
 import { relayWsUrl } from "@/shared/lib/relay-url";
@@ -62,7 +62,7 @@ export function InvitePage({ code }: { code: string }) {
 
   React.useEffect(() => {
     let active = true;
-    detectBuzzDownloadPlatform(navigator).then(async (platform) => {
+    detectKuraDownloadPlatform(navigator).then(async (platform) => {
       if (!active) return;
       if (
         platform.operatingSystem === "macos" &&
@@ -71,7 +71,7 @@ export function InvitePage({ code }: { code: string }) {
         setNeedsMacChoice(true);
         return;
       }
-      const url = await resolveBuzzDownloadUrlForPlatform(platform);
+      const url = await resolveKuraDownloadUrlForPlatform(platform);
       if (active) setDownloadUrl(url);
     });
     return () => {
@@ -157,7 +157,7 @@ export function InvitePage({ code }: { code: string }) {
   }, []);
   const chooseMacDownload = async (
     event: React.MouseEvent<HTMLAnchorElement>,
-    platform: BuzzDownloadPlatform,
+    platform: KuraDownloadPlatform,
   ) => {
     event.preventDefault();
     if (choosingMacDownloadRef.current) return;
@@ -167,7 +167,7 @@ export function InvitePage({ code }: { code: string }) {
     if (downloadWindow) downloadWindow.opener = null;
     setShowMacChoice(false);
     try {
-      const url = await resolveBuzzDownloadUrlForPlatform(platform);
+      const url = await resolveKuraDownloadUrlForPlatform(platform);
       downloadWindow?.location.replace(url);
     } finally {
       choosingMacDownloadRef.current = false;

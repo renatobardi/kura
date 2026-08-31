@@ -7,7 +7,7 @@
 --
 -- Global (no community_id): operators span all tenants, so tenant-scoping
 -- would be a misnomer. Registered in _operator_global_tables and in the
--- hardcoded parser list in crates/buzz-db/src/migration.rs.
+-- hardcoded parser list in crates/kura-db/src/migration.rs.
 
 CREATE TABLE relay_operators (
     pubkey      BYTEA NOT NULL PRIMARY KEY CHECK (length(pubkey) = 32),

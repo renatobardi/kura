@@ -36,7 +36,7 @@ just relay &                         # relay on :3000
 
 # 3. Add a pubkey to the allowlist (if enabled)
 #    Insert directly — there is no CLI command for this yet.
-PGPASSWORD=buzz_dev psql -h localhost -U buzz -d buzz -c \
+PGPASSWORD=kura_dev psql -h localhost -U kura -d kura -c \
   "INSERT INTO pubkey_allowlist (pubkey) VALUES (decode('<64-char-hex-pubkey>', 'hex'))"
 
 # 4. Connect any NIP-29 + NIP-42 client to ws://localhost:3000
@@ -201,7 +201,7 @@ nak req -k 1059 --tag "p=<your-hex-pubkey>" \
 
 | Client | Platform | Evidence | Notes |
 |--------|----------|:--------:|-------|
-| **BuzzTestClient** | Rust (repo) | Automated E2E | Full NIP-29 flow: discovery (39000/39001/39002), kind:9 send/receive, reactions, deletions, h-tag enforcement |
+| **KuraTestClient** | Rust (repo) | Automated E2E | Full NIP-29 flow: discovery (39000/39001/39002), kind:9 send/receive, reactions, deletions, h-tag enforcement |
 | **E2E nostr interop** | Rust (repo) | Automated E2E | NIP-50 search (3 tests), NIP-10 threads (3 tests), NIP-17 gift wraps (3 tests), DM discovery (1 test) |
 | **nak** | CLI | Manual (verified) | kind:9 send/recv, NIP-50 search, NIP-10 thread replies, group discovery |
 

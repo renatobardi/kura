@@ -11,7 +11,7 @@ import {
 
 const OWNER = "a".repeat(64);
 const REVIEWER = "b".repeat(64);
-const REPO_ADDRESS = `30617:${OWNER}:buzz`;
+const REPO_ADDRESS = `30617:${OWNER}:kura`;
 const PR_ID = "c".repeat(64);
 const ISSUE_ID = "d".repeat(64);
 
@@ -35,8 +35,8 @@ function feedItem(overrides = {}) {
 }
 
 const repository = {
-  id: "buzz",
-  dtag: "buzz",
+  id: "kura",
+  dtag: "kura",
   name: "Kura",
   owner: OWNER,
   repoAddress: REPO_ADDRESS,

@@ -338,7 +338,7 @@ test("returns a signed response in the callback fragment after consent", async (
   await installClipboardStub(page, false);
   await openNostrBind(page, {
     ...VALID_REQUEST,
-    callbackUrl: "https://admin.example.com/buzz?source=bind#stale",
+    callbackUrl: "https://admin.example.com/kura?source=bind#stale",
     returnMode: "browser_fragment_v1",
   });
 
@@ -408,7 +408,7 @@ test("returns a signed response in the callback fragment after consent", async (
   });
   const callbackUrl = new URL(callback ?? "");
   expect(callbackUrl.origin).toBe("https://admin.example.com");
-  expect(callbackUrl.pathname).toBe("/buzz");
+  expect(callbackUrl.pathname).toBe("/kura");
   expect(callbackUrl.search).toBe("?source=bind");
   expect(callbackUrl.searchParams.has("kura_bind")).toBe(false);
   expect(callbackUrl.hash).toMatch(/^#kura_bind=v1\.[A-Za-z0-9_-]+$/);
@@ -421,7 +421,7 @@ test("opens the manual fallback when returning to the browser fails", async ({
     page,
     {
       ...VALID_REQUEST,
-      callbackUrl: "https://admin.example.com/buzz",
+      callbackUrl: "https://admin.example.com/kura",
       returnMode: "browser_fragment_v1",
     },
     { openerError: "browser unavailable" },

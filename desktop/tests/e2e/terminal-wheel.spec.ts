@@ -180,12 +180,12 @@ test("project terminal button opens Kura Term for the repository", async ({
   await page.getByTestId("projects-section-projects").click();
   const projectEntry = page
     .locator(
-      '[data-testid="project-card-buzz"], [data-testid="project-row-buzz"]',
+      '[data-testid="project-card-kura"], [data-testid="project-row-kura"]',
     )
     .first();
   await expect(projectEntry).toBeVisible({ timeout: 10_000 });
   await projectEntry.click();
-  await page.getByTestId("project-home-context-repo-buzz").click();
+  await page.getByTestId("project-home-context-repo-kura").click();
 
   const terminalButton = page.getByTestId("project-terminal-toggle");
   await expect(terminalButton).toBeEnabled();
@@ -201,7 +201,7 @@ test("scrollback: wheel over Kura Term reaches terminal_scroll", async ({
   page,
 }) => {
   await reveal(page);
-  await pushFrame(page, [{ line: 0, text: "buzz@term:~$ " }], {
+  await pushFrame(page, [{ line: 0, text: "kura@term:~$ " }], {
     line: 0,
     column: 13,
   });

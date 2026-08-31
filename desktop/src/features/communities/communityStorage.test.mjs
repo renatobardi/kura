@@ -55,7 +55,7 @@ test("migrateLegacyCommunityStorage does not overwrite new community state", () 
 
 test("signed-build relay defaults auto-connect during first-run onboarding", () => {
   assert.equal(
-    shouldAutoConnectDefaultRelay("wss://buzz.block.builderlab.xyz"),
+    shouldAutoConnectDefaultRelay("wss://kura.block.builderlab.xyz"),
     true,
   );
   assert.equal(shouldAutoConnectDefaultRelay("ws://localhost:3000"), false);

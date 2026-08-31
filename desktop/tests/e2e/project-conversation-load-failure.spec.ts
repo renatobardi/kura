@@ -20,7 +20,7 @@ import { installMockBridge, TEST_IDENTITIES } from "../helpers/bridge";
  */
 
 const DEFAULT_MOCK_PUBKEY = "deadbeef".repeat(8);
-const ROOT_CONTENT = `Projects conversation root ${DEFAULT_MOCK_PUBKEY} buzz`;
+const ROOT_CONTENT = `Projects conversation root ${DEFAULT_MOCK_PUBKEY} kura`;
 const REPLY_CONTENT = "Projects conversation reply body";
 
 // The projects surface is a preview feature — opt in before the app mounts.
@@ -143,12 +143,12 @@ test.describe("project conversation load failure", () => {
     await page.getByTestId("projects-section-projects").click();
     const projectEntry = page
       .locator(
-        '[data-testid="project-card-buzz"], [data-testid="project-row-buzz"]',
+        '[data-testid="project-card-kura"], [data-testid="project-row-kura"]',
       )
       .first();
     await expect(projectEntry).toBeVisible({ timeout: 10_000 });
     await projectEntry.click();
-    await page.getByTestId("project-home-context-repo-buzz").click();
+    await page.getByTestId("project-home-context-repo-kura").click();
     await page.getByRole("tab", { name: "Channels", exact: true }).click();
     const channelRow = page
       .getByTestId("project-channel-row")

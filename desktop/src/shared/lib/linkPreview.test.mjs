@@ -91,8 +91,8 @@ test("parseSupportedLinkPreview parses Kura relay git clone URLs", () => {
   // Must pass the active relay origin for host validation.
   assert.deepEqual(
     parseSupportedLinkPreview(
-      `https://buzz.block.builderlab.xyz/git/${KURA_OWNER}/kura-world-galaxy`,
-      "https://buzz.block.builderlab.xyz",
+      `https://kura.block.builderlab.xyz/git/${KURA_OWNER}/kura-world-galaxy`,
+      "https://kura.block.builderlab.xyz",
     ),
     {
       kind: "kura-repository",
@@ -105,7 +105,7 @@ test("parseSupportedLinkPreview parses Kura relay git clone URLs", () => {
   // Same URL without a matching origin stays an ordinary external preview.
   assert.equal(
     parseSupportedLinkPreview(
-      `https://buzz.block.builderlab.xyz/git/${KURA_OWNER}/kura-world-galaxy`,
+      `https://kura.block.builderlab.xyz/git/${KURA_OWNER}/kura-world-galaxy`,
     )?.kind,
     "generic-link",
   );
@@ -153,7 +153,7 @@ test("parseSupportedLinkPreview rejects clone URLs from non-relay hosts", () => 
   assert.equal(
     parseSupportedLinkPreview(
       `https://evil.example/git/${KURA_OWNER}/my-repo`,
-      "https://buzz.block.builderlab.xyz",
+      "https://kura.block.builderlab.xyz",
     )?.kind,
     "generic-link",
   );
@@ -161,14 +161,14 @@ test("parseSupportedLinkPreview rejects clone URLs from non-relay hosts", () => 
   assert.equal(
     parseSupportedLinkPreview(
       `https://github.com/git/${KURA_OWNER}/my-repo`,
-      "https://buzz.block.builderlab.xyz",
+      "https://kura.block.builderlab.xyz",
     ),
     null,
   );
   // No relay origin provided — stays external.
   assert.equal(
     parseSupportedLinkPreview(
-      `https://buzz.block.builderlab.xyz/git/${KURA_OWNER}/kura-world`,
+      `https://kura.block.builderlab.xyz/git/${KURA_OWNER}/kura-world`,
       null,
     )?.kind,
     "generic-link",
@@ -264,11 +264,11 @@ test("extractSupportedLinkPreviews excludes markdown-labeled Kura entity links",
 test("parseSupportedLinkPreview parses Linear issue URLs", () => {
   assert.deepEqual(
     parseSupportedLinkPreview(
-      "https://linear.app/buzz/issue/BUG-321/fix-link-previews",
+      "https://linear.app/kura/issue/BUG-321/fix-link-previews",
     ),
     {
       kind: "linear-issue",
-      href: "https://linear.app/buzz/issue/BUG-321/fix-link-previews",
+      href: "https://linear.app/kura/issue/BUG-321/fix-link-previews",
       provider: "Linear",
       title: "BUG-321",
       typeLabel: "issue",
@@ -278,10 +278,10 @@ test("parseSupportedLinkPreview parses Linear issue URLs", () => {
 
 test("parseSupportedLinkPreview normalizes Linear issue URL variants", () => {
   assert.deepEqual(
-    parseSupportedLinkPreview("linear.app/buzz/issue/a-7/fix-link-previews"),
+    parseSupportedLinkPreview("linear.app/kura/issue/a-7/fix-link-previews"),
     {
       kind: "linear-issue",
-      href: "https://linear.app/buzz/issue/a-7/fix-link-previews",
+      href: "https://linear.app/kura/issue/a-7/fix-link-previews",
       provider: "Linear",
       title: "A-7",
       typeLabel: "issue",
@@ -313,7 +313,7 @@ test("extractSupportedLinkPreviews returns unique supported links in order", () 
     extractSupportedLinkPreviews(
       [
         "See github.com/block/sprout/pull/1",
-        "and https://linear.app/buzz/issue/BUG-2/fix-preview",
+        "and https://linear.app/kura/issue/BUG-2/fix-preview",
         "then https://github.com/block/sprout/pull/1 again.",
         "plus https://docs.google.com/document/d/doc123/edit",
       ].join(" "),
@@ -325,15 +325,15 @@ test("extractSupportedLinkPreviews returns unique supported links in order", () 
 test("extractSupportedLinkPreviews excludes same-relay Kura clone URLs", () => {
   assert.deepEqual(
     extractSupportedLinkPreviews(
-      `master pushed; clone: https://buzz.block.builderlab.xyz/git/${KURA_OWNER}/kura-world-galaxy and review please.`,
-      "https://buzz.block.builderlab.xyz",
+      `master pushed; clone: https://kura.block.builderlab.xyz/git/${KURA_OWNER}/kura-world-galaxy and review please.`,
+      "https://kura.block.builderlab.xyz",
     ),
     [],
   );
   // Without a relay origin the URL is treated as an ordinary external link.
   assert.deepEqual(
     extractSupportedLinkPreviews(
-      `clone: https://buzz.block.builderlab.xyz/git/${KURA_OWNER}/kura-world-galaxy`,
+      `clone: https://kura.block.builderlab.xyz/git/${KURA_OWNER}/kura-world-galaxy`,
     ).map((preview) => preview.kind),
     ["generic-link"],
   );
@@ -398,7 +398,7 @@ test("extractSupportedLinkPreviews skips URLs inside inline and fenced code", ()
       [
         "`https://github.com/block/sprout/pull/1`",
         "```",
-        "https://linear.app/buzz/issue/BUG-2/fix-preview",
+        "https://linear.app/kura/issue/BUG-2/fix-preview",
         "```",
         "https://github.com/block/sprout/pull/3",
       ].join("\n"),
@@ -465,7 +465,7 @@ test("extractSupportedLinkPreviews skips links inside block spoilers", () => {
       [
         "||",
         "",
-        "https://linear.app/buzz/issue/BUG-99/hidden-spoiler-link",
+        "https://linear.app/kura/issue/BUG-99/hidden-spoiler-link",
         "",
         "||",
         "https://github.com/block/sprout/pull/8",

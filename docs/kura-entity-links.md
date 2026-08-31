@@ -26,7 +26,7 @@ Still unimplemented: `link` on get commands and the follow-ups in slice 4.
 ## Problem
 
 When a message contains a GitHub URL, the desktop client renders a rich
-preview card ("GitHub · PR block/buzz #4020") below the message. Those cards
+preview card ("GitHub · PR renatobardi/kura #4020") below the message. Those cards
 are produced entirely client-side by URL parsing in
 `desktop/src/shared/lib/linkPreview.ts` and rendered by
 `desktop/src/shared/ui/link-preview-attachment.tsx`.
@@ -40,7 +40,7 @@ for a Kura repository, project, pull request, or issue:
 - OS-level deep links (`desktop/src-tauri/src/deep_link.rs`,
   `desktop/src/shared/deep-link.ts`) support `connect`, `join`,
   `add-community`, `message`, and `nostr-bind` — no git entities.
-- `buzz pr open` / `buzz issues create` return raw event ids; there is no URL
+- `kura pr open` / `kura issues create` return raw event ids; there is no URL
   in their output and no guidance in the agent base prompt
   (`crates/kura-acp/src/base_prompt.md`) for referencing Kura work items in
   chat. Agents can only say "PR up" with a hex id.
@@ -216,17 +216,17 @@ same view as one clicked in a message.
 Add a `link` field to the JSON output of the write commands that create
 linkable entities:
 
-- `buzz pr open` → `{ event_id, accepted, message, link }`
-- `buzz issues create` → same
-- `buzz repos create` → link built from owner pubkey + `d`-tag
-- `buzz projects create` → same
+- `kura pr open` → `{ event_id, accepted, message, link }`
+- `kura issues create` → same
+- `kura repos create` → link built from owner pubkey + `d`-tag
+- `kura projects create` → same
 
 The builder lives in one Rust helper (e.g. `crates/kura-cli/src/links.rs`)
 so the format has exactly one definition on the Rust side; the TypeScript
 `entityLink.ts` is its mirror and both are covered by shared-format tests
 (golden strings asserted on both sides, like the NIP-MP fixture pattern).
 
-`buzz pr get` / `buzz issues get` / `buzz repos get` also include `link` in
+`kura pr get` / `kura issues get` / `kura repos get` also include `link` in
 their output so agents can link to existing entities, not just ones they
 just created.
 
@@ -255,7 +255,7 @@ No persona changes needed — the base prompt applies to all managed agents.
 
 0. **HTTPS clone-URL repo cards** *(done, this branch)* — recognize relay
    `/git/<pubkey>/<repo>` URLs in `linkPreview.ts`, `Kura` provider card
-   with the `BuzzMark` logo, href normalized to the `kura://repo` deep link
+   with the `KuraMark` logo, href normalized to the `kura://repo` deep link
    for in-app navigation.
 1. **Link core + cards** *(done, this branch)* — `entityLink.ts`, detection
    in `linkPreview.ts`, `Kura` card variant in

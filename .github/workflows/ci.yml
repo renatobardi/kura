@@ -994,11 +994,11 @@ jobs:
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: Build
-        run: swift build --package-path mobile/ios/BuzzPushKit
+        run: swift build --package-path mobile/ios/KuraPushKit
       - name: Build release
-        run: swift build -c release --package-path mobile/ios/BuzzPushKit
+        run: swift build -c release --package-path mobile/ios/KuraPushKit
       - name: Test
-        run: swift test --package-path mobile/ios/BuzzPushKit
+        run: swift test --package-path mobile/ios/KuraPushKit
   security:
     name: Security
     runs-on: ubuntu-latest

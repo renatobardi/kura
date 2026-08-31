@@ -1092,7 +1092,7 @@ function createMockRelayMembershipEvent(): RelayEvent {
  * `listCustomEmoji` REQs. The community palette is the client-side UNION of
  * every member's own set (d=`kura:custom-emoji`). We serve TWO member-authored
  * sets from distinct pubkeys so the e2e exercises the union/collapse path, not
- * a single relay-owned set. `:buzz:` is the stable shortcode exercised by
+ * a single relay-owned set. `:kura:` is the stable shortcode exercised by
  * custom-emoji.spec.ts (claimed by BOTH members with different URLs, so the
  * palette must collapse it to one deterministic winner); `:narf:` and
  * `:bufo_joy:` prove a second member's distinct emoji unions in.
@@ -1104,7 +1104,7 @@ function createMockCustomEmojiSetEvents(): RelayEvent[] {
       "",
       [
         ["d", CUSTOM_EMOJI_SET_D_TAG],
-        ["emoji", "buzz", "https://example.com/e2e/buzz.png"],
+        ["emoji", "kura", "https://example.com/e2e/kura.png"],
         // A relay-hosted emoji whose URL matches rewriteRelayUrl()'s pattern,
         // used by the reaction guard to assert the proxy rewrite fires.
         ["emoji", REACTION_EMOJI_SHORTCODE, REACTION_EMOJI_URL],
@@ -1119,9 +1119,9 @@ function createMockCustomEmojiSetEvents(): RelayEvent[] {
       [
         ["d", CUSTOM_EMOJI_SET_D_TAG],
         ["emoji", "narf", "https://example.com/e2e/narf.png"],
-        // member B claims :buzz: with a DIFFERENT url — unionCustomEmoji must
+        // member B claims :kura: with a DIFFERENT url — unionCustomEmoji must
         // collapse it to one deterministic winner, never expose two URLs.
-        ["emoji", "buzz", "https://example.com/e2e/kura-b.png"],
+        ["emoji", "kura", "https://example.com/e2e/kura-b.png"],
         ["emoji", "bufo_joy", "https://example.com/e2e/bufo-joy.png"],
       ],
       "b".repeat(64),
@@ -1514,7 +1514,7 @@ let mockMediaProxyPort = MOCK_MEDIA_PROXY_PORT;
 
 // A relay-hosted custom emoji used by the reaction guard. Its URL matches
 // `rewriteRelayUrl()`'s `/media/{64-hex}.{ext}` pattern on the relay origin, so
-// reacting with it exercises the proxy rewrite (unlike the `:buzz:` fixture,
+// reacting with it exercises the proxy rewrite (unlike the `:kura:` fixture,
 // whose external example.com URL passes through unchanged).
 const REACTION_EMOJI_SHORTCODE = "react";
 const REACTION_EMOJI_SHA = "c".repeat(64);
@@ -2724,7 +2724,7 @@ const mockChannels: MockChannel[] = [
   }),
   createMockChannel({
     id: STARTER_PROJECT_HOME_CHANNEL_ID,
-    name: "buzz",
+    name: "kura",
     channel_type: "stream",
     visibility: "open",
     description: "Project home for the Kura community platform.",
@@ -5903,11 +5903,11 @@ function handleGetLikedNotes(): RawUserNotesResponse {
 
 const MOCK_PROJECT_SEEDS = [
   {
-    dtag: "buzz",
-    name: "buzz",
+    dtag: "kura",
+    name: "kura",
     description:
       "Relay, desktop, and mobile clients for the Kura community platform.",
-    cloneUrl: `${DEFAULT_RELAY_HTTP_URL}/git/${MOCK_IDENTITY_PUBKEY}/buzz`,
+    cloneUrl: `${DEFAULT_RELAY_HTTP_URL}/git/${MOCK_IDENTITY_PUBKEY}/kura`,
     webUrl: null,
     owner: MOCK_IDENTITY_PUBKEY,
     contributors: [ALICE_PUBKEY, BOB_PUBKEY, CHARLIE_PUBKEY],
@@ -6119,10 +6119,10 @@ function buildMockProjectEvents(): RelayEvent[] {
         KIND_PROJECT_ANNOUNCEMENT,
         "",
         [
-          ["d", "buzz"],
-          ["name", "buzz"],
+          ["d", "kura"],
+          ["name", "kura"],
           ["description", "The complete Kura community platform."],
-          ["a", `${KIND_REPO_ANNOUNCEMENT}:${projectOwner}:buzz`],
+          ["a", `${KIND_REPO_ANNOUNCEMENT}:${projectOwner}:kura`],
           ["a", `${KIND_REPO_ANNOUNCEMENT}:${ALICE_PUBKEY}:relay-tools`],
           [
             "kura-channel",
@@ -6133,7 +6133,7 @@ function buildMockProjectEvents(): RelayEvent[] {
         ],
         projectOwner,
         now,
-        "project-buzz".padEnd(64, "0"),
+        "project-kura".padEnd(64, "0"),
       ),
     );
   }
@@ -8541,7 +8541,7 @@ async function handleDiscoverManagedAgentPrereqs(
         configuredPrereqs?.acp?.command ?? args.input?.acpCommand ?? "kura-acp",
       resolved_path:
         configuredPrereqs?.acp?.resolvedPath ??
-        "/Users/wesb/dev/buzz/target/debug/kura-acp",
+        "/Users/wesb/dev/kura/target/debug/kura-acp",
       available: configuredPrereqs?.acp?.available ?? true,
     },
     mcp: {
@@ -12620,7 +12620,7 @@ export function maybeInstallE2eTauriMocks() {
         };
       case "clone_project_repository": {
         // Clones land in reposDir/<repo-name>, matching the terminal mocks.
-        const path = "/tmp/buzz/REPOS/buzz";
+        const path = "/tmp/kura/REPOS/kura";
         const commit = "0123456789abcdef0123456789abcdef01234567";
         window.__KURA_E2E_PROJECT_REPO_SYNC_STATUS__ = {
           local_path: path,
@@ -12947,15 +12947,15 @@ export function maybeInstallE2eTauriMocks() {
           input: { expectedCommit: string };
         };
         return {
-          path: "/tmp/buzz/REPOS/buzz",
+          path: "/tmp/kura/REPOS/kura",
           cloned: false,
-          recoveryRef: `refs/buzz/merge-recovery/${input.expectedCommit}`,
-          targetRef: `refs/buzz/merge-recovery-target/${"f".repeat(40)}`,
+          recoveryRef: `refs/kura/merge-recovery/${input.expectedCommit}`,
+          targetRef: `refs/kura/merge-recovery-target/${"f".repeat(40)}`,
         };
       }
       case "open_project_terminal":
         return {
-          path: "/tmp/buzz/REPOS/buzz",
+          path: "/tmp/kura/REPOS/kura",
           cloned: false,
         };
       case "get_relay_ws_url":

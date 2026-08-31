@@ -76,7 +76,7 @@ Both external registries are advisory, not authoritative allocators: neither res
     ["d", "platform"],
     ["name", "Platform"],
     ["description", "Relay, desktop, and mobile for the platform team."],
-    ["a", "30617:<owner-a-pubkey-hex>:buzz"],
+    ["a", "30617:<owner-a-pubkey-hex>:kura"],
     ["a", "30617:<owner-b-pubkey-hex>:kura-infra"],
     ["kura-channel", "<channel-uuid>"],
     ["kura-visibility", "listed"]
@@ -196,7 +196,7 @@ The Kura validator enforces all eight rules. The shared fixtures in [`NIP-MP.fix
 **Deletion** follows NIP-09 with two Kura-wide behaviors that are not project-specific:
 
 - A `kind:5` naming the coordinate deletes it when signed by the project signer **or** by that signer's registered NIP-OA owner ([Deletion](#deletion)).
-- The deletion applies only to versions whose `created_at` is at or before the deletion's own, per NIP-09. A delayed or replayed tombstone signed before the current head MUST NOT remove it; the relay MUST compare timestamps at the coordinate (`soft_delete_by_coordinate`, `crates/kura-db/src/event.rs`, whose inclusive `created_at <= <deletion>` bound is introduced alongside this specification in [#3171](https://github.com/block/buzz/pull/3171)).
+- The deletion applies only to versions whose `created_at` is at or before the deletion's own, per NIP-09. A delayed or replayed tombstone signed before the current head MUST NOT remove it; the relay MUST compare timestamps at the coordinate (`soft_delete_by_coordinate`, `crates/kura-db/src/event.rs`, whose inclusive `created_at <= <deletion>` bound is introduced alongside this specification in [#3171](https://github.com/renatobardi/kura/pull/3171)).
 
 ## Client Behavior
 

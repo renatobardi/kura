@@ -43,9 +43,9 @@ test("pending external metadata reserves the image treatment", () => {
 test("pending Kura entity metadata remains image-less", () => {
   const entityPreview = {
     kind: "kura-repository",
-    href: `kura://repo?owner=${"cd".repeat(32)}&d=buzz`,
+    href: `kura://repo?owner=${"cd".repeat(32)}&d=kura`,
     provider: "Kura",
-    title: "buzz",
+    title: "kura",
     typeLabel: "repo",
   };
   assert.deepEqual(resolveLinkPreview(entityPreview, undefined), {
@@ -204,9 +204,9 @@ test("metadata loader coalesces fragment variants and bounds concurrency", async
 test("withEntityFallbacks re-adds previews dropped by null metadata", () => {
   const entityPreview = {
     kind: "kura-pull-request",
-    href: `kura://pr?id=${"ab".repeat(32)}&owner=${"cd".repeat(32)}&d=buzz`,
+    href: `kura://pr?id=${"ab".repeat(32)}&owner=${"cd".repeat(32)}&d=kura`,
     provider: "Kura",
-    title: `buzz #${"ab".repeat(4)}`,
+    title: `kura #${"ab".repeat(4)}`,
     typeLabel: "Review",
   };
 
@@ -218,16 +218,16 @@ test("withEntityFallbacks re-adds previews dropped by null metadata", () => {
 test("withEntityFallbacks keeps resolved previews and preserves order", () => {
   const first = {
     kind: "kura-repository",
-    href: `kura://repo?owner=${"cd".repeat(32)}&d=buzz`,
+    href: `kura://repo?owner=${"cd".repeat(32)}&d=kura`,
     provider: "Kura",
-    title: "buzz",
+    title: "kura",
     typeLabel: "repo",
   };
   const second = {
     kind: "kura-issue",
-    href: `kura://issue?id=${"ef".repeat(32)}&owner=${"cd".repeat(32)}&d=buzz`,
+    href: `kura://issue?id=${"ef".repeat(32)}&owner=${"cd".repeat(32)}&d=kura`,
     provider: "Kura",
-    title: `buzz #${"ef".repeat(4)}`,
+    title: `kura #${"ef".repeat(4)}`,
     typeLabel: "Task",
   };
   const resolvedSecond = {
@@ -247,7 +247,7 @@ test("entity fallback eligibility is kind-scoped", () => {
     isKuraEntityPreview({
       ...preview,
       kind: "kura-repository",
-      href: `kura://repo?owner=${"cd".repeat(32)}&d=buzz`,
+      href: `kura://repo?owner=${"cd".repeat(32)}&d=kura`,
     }),
     true,
   );
@@ -280,7 +280,7 @@ test("Kura PR metadata includes repository identity and trusted root context", a
   const owner = "cd".repeat(32);
   const attacker = "ef".repeat(32);
   const id = "ab".repeat(32);
-  const repoAddress = `30617:${owner}:buzz`;
+  const repoAddress = `30617:${owner}:kura`;
   const commit = "1234567".padEnd(40, "0");
   const events = [
     relayEvent({
@@ -288,7 +288,7 @@ test("Kura PR metadata includes repository identity and trusted root context", a
       kind: 30617,
       pubkey: owner,
       tags: [
-        ["d", "buzz"],
+        ["d", "kura"],
         ["name", "Kura Desktop"],
         ["default-branch", "main"],
       ],
@@ -354,7 +354,7 @@ test("Kura PR metadata includes repository identity and trusted root context", a
       .slice(0, filter.limit);
 
   const result = await fetchKuraEntityMetadata(
-    `kura://pr?id=${id}&owner=${owner}&d=buzz`,
+    `kura://pr?id=${id}&owner=${owner}&d=kura`,
     fetchEvents,
   );
   assert.equal(result?.siteName, "Kura Desktop");
@@ -367,14 +367,14 @@ test("Kura PR metadata includes repository identity and trusted root context", a
 test("Kura entity roots reject ambiguous repository tags", async () => {
   const owner = "cd".repeat(32);
   const attacker = "ef".repeat(32);
-  const targetAddress = `30617:${owner}:buzz`;
+  const targetAddress = `30617:${owner}:kura`;
   const attackerAddress = `30617:${attacker}:other`;
   const repository = relayEvent({
     id: "01".repeat(32),
     kind: 30617,
     pubkey: owner,
     tags: [
-      ["d", "buzz"],
+      ["d", "kura"],
       ["name", "Kura Desktop"],
       ["default-branch", "main"],
     ],
@@ -396,7 +396,7 @@ test("Kura entity roots reject ambiguous repository tags", async () => {
       ],
     });
     const result = await fetchKuraEntityMetadata(
-      `kura://${type}?id=${id}&owner=${owner}&d=buzz`,
+      `kura://${type}?id=${id}&owner=${owner}&d=kura`,
       async (filter) =>
         filter.kinds?.includes(30617)
           ? [repository]

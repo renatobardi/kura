@@ -241,7 +241,7 @@ Steps 10–12 are fire-and-forget. Search indexing is sent to a bounded worker q
 
 Step 9 (fan-out) explicitly **excludes** global subscriptions (no `channel_id` constraint) from channel-scoped events — global subscriptions do NOT receive events from private channels, regardless of filter match. This is a deliberate security boundary: only subscriptions scoped to an accessible `channel_id` receive those events.
 
-Workflow loop prevention: workflow execution kinds (46001–46012), relay-signed messages with `buzz:workflow` tag, and `KIND_GIFT_WRAP` are excluded from triggering workflows. All other stored events (including kind 9 stream messages) trigger workflow evaluation.
+Workflow loop prevention: workflow execution kinds (46001–46012), relay-signed messages with `kura:workflow` tag, and `KIND_GIFT_WRAP` are excluded from triggering workflows. All other stored events (including kind 9 stream messages) trigger workflow evaluation.
 
 ### Ephemeral Sub-Pipeline (kinds 20000–29999)
 
@@ -431,13 +431,13 @@ All database access. Uses `sqlx::query()` (runtime, not compile-time macros) —
 
 ### kura-pubsub — Redis Pub/Sub, Presence, Typing
 
-Manages Redis pub/sub fan-out, presence tracking, and typing indicators. In multi-community mode all tenant-visible keys are prefixed or otherwise partitioned by community (`buzz:{community}:...`) so channel fan-out, presence, typing, and cache invalidation cannot cross hosts.
+Manages Redis pub/sub fan-out, presence tracking, and typing indicators. In multi-community mode all tenant-visible keys are prefixed or otherwise partitioned by community (`kura:{community}:...`) so channel fan-out, presence, typing, and cache invalidation cannot cross hosts.
 
 **Architecture:**
 
 ```
-Publisher  → pool connection   → PUBLISH buzz:channel:{uuid}
-Subscriber → dedicated PubSub  → PSUBSCRIBE buzz:channel:*
+Publisher  → pool connection   → PUBLISH kura:channel:{uuid}
+Subscriber → dedicated PubSub  → PSUBSCRIBE kura:channel:*
                                   → broadcast::channel(4096)
 ```
 
@@ -447,13 +447,13 @@ The subscriber uses a **dedicated** `redis::aio::PubSub` connection — not from
 
 **Reconnection:** exponential backoff 1s → 30s (`backoff_secs * 2`). Backoff resets to 1s only after a clean stream end, not on each reconnect attempt.
 
-**Presence:** `SET buzz:presence:{pubkey_hex} {status} EX 180` — 180-second TTL (3× the 60-second heartbeat interval). Single missed heartbeat does not cause presence flap.
+**Presence:** `SET kura:presence:{pubkey_hex} {status} EX 180` — 180-second TTL (3× the 60-second heartbeat interval). Single missed heartbeat does not cause presence flap.
 
 **Typing indicators:**
 ```
-ZADD buzz:typing:{channel_id} {now_unix} {pubkey_hex}
-ZREMRANGEBYSCORE buzz:typing:{channel_id} -inf {now - 5.0}
-EXPIRE buzz:typing:{channel_id} 60
+ZADD kura:typing:{channel_id} {now_unix} {pubkey_hex}
+ZREMRANGEBYSCORE kura:typing:{channel_id} -inf {now - 5.0}
+EXPIRE kura:typing:{channel_id} 60
 ```
 5-second activity window. 60-second key TTL prevents orphaned empty sets.
 
@@ -693,7 +693,7 @@ The `kura-admin` binary is shipped in the relay Docker image (`/usr/local/bin/ku
 
 ### kura-test-client — Integration Test Harness
 
-**`BuzzTestClient`** wraps a WebSocket connection with a `VecDeque<RelayMessage>` buffer for message interleaving. Methods: `connect`, `connect_unauthenticated`, `authenticate`, `send_event`, `send_text_message`, `subscribe`, `close_subscription`, `recv_event`, `collect_until_eose`, `disconnect`.
+**`KuraTestClient`** wraps a WebSocket connection with a `VecDeque<RelayMessage>` buffer for message interleaving. Methods: `connect`, `connect_unauthenticated`, `authenticate`, `send_event`, `send_text_message`, `subscribe`, `close_subscription`, `recv_event`, `collect_until_eose`, `disconnect`.
 
 **Test coverage:**
 
@@ -796,9 +796,9 @@ Docker Compose provides the full local development stack. All services include h
 
 | Pattern | Type | TTL | Purpose |
 |---------|------|-----|---------|
-| `buzz:channel:{uuid}` | Pub/Sub channel | — | Event fan-out (single-community form; shared multi-community Redis must use `buzz:{community}:channel:{uuid}` or equivalent) |
-| `buzz:presence:{pubkey_hex}` | String | 180s | Online/away status (single-community form; shared multi-community Redis must scope by community) |
-| `buzz:typing:{channel_uuid}` | Sorted Set | 60s | Active typers (5s window; shared multi-community Redis must scope by community) |
+| `kura:channel:{uuid}` | Pub/Sub channel | — | Event fan-out (single-community form; shared multi-community Redis must use `kura:{community}:channel:{uuid}` or equivalent) |
+| `kura:presence:{pubkey_hex}` | String | 180s | Online/away status (single-community form; shared multi-community Redis must scope by community) |
+| `kura:typing:{channel_uuid}` | Sorted Set | 60s | Active typers (5s window; shared multi-community Redis must scope by community) |
 
 ### Full-Text Search (Postgres FTS)
 

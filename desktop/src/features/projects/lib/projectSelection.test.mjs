@@ -39,7 +39,7 @@ const taskC = selectionItemFromTask({
 const commit = selectionItemFromCommit({
   channelId: "channel-1",
   commitHash: "abc",
-  projectId: "buzz",
+  projectId: "kura",
   shareLink: "kura://commit?h=abc",
   title: "Ship the pod",
 });

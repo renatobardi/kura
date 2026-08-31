@@ -17,13 +17,13 @@ function decodePayload(callbackUrl) {
 test("buildNostrBindCallbackUrl returns a UTF-8 base64url payload in the fragment", () => {
   const response = JSON.stringify({ content: "Kura ⚡", sig: "+/=" });
   const result = buildNostrBindCallbackUrl(
-    "https://example.com/buzz?source=bind",
+    "https://example.com/kura?source=bind",
     response,
   );
   const url = new URL(result);
 
   assert.equal(url.origin, "https://example.com");
-  assert.equal(url.pathname, "/buzz");
+  assert.equal(url.pathname, "/kura");
   assert.equal(url.search, "?source=bind");
   assert.match(url.hash, /^#kura_bind=v1\.[A-Za-z0-9_-]+$/);
   assert.equal(decodePayload(result), response);
@@ -32,7 +32,7 @@ test("buildNostrBindCallbackUrl returns a UTF-8 base64url payload in the fragmen
 
 test("buildNostrBindCallbackUrl replaces an existing fragment", () => {
   const result = buildNostrBindCallbackUrl(
-    "https://example.com/buzz#stale-fragment",
+    "https://example.com/kura#stale-fragment",
     "signed",
   );
 
@@ -42,7 +42,7 @@ test("buildNostrBindCallbackUrl replaces an existing fragment", () => {
 test("buildNostrBindCallbackUrl rejects callback URLs beyond the opener ceiling", () => {
   assert.throws(
     () =>
-      buildNostrBindCallbackUrl("https://example.com/buzz", "x".repeat(4_096)),
+      buildNostrBindCallbackUrl("https://example.com/kura", "x".repeat(4_096)),
     /too large/,
   );
 });

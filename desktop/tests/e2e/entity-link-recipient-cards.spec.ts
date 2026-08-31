@@ -385,21 +385,21 @@ test("entity tooltip uses project context while relay metadata is delayed", asyn
     ({ issueId, owner }) => {
       window.__KURA_E2E_EMIT_MOCK_MESSAGE__?.({
         channelName: "general",
-        content: `Delayed issue: kura://issue?id=${issueId}&owner=${owner}&d=buzz`,
+        content: `Delayed issue: kura://issue?id=${issueId}&owner=${owner}&d=kura`,
       });
     },
     { issueId: ISSUE_ID, owner: DEFAULT_MOCK_PUBKEY },
   );
 
   const issueChip = page.getByRole("button", {
-    name: /Open issue .* in repository buzz/,
+    name: /Open issue .* in repository kura/,
   });
   await issueChip.hover();
   await expect(
     page
       .getByRole("tooltip")
       .locator('[data-kura-tooltip-metadata-content=""]'),
-  ).toHaveText("buzz · The complete Kura community platform.");
+  ).toHaveText("kura · The complete Kura community platform.");
 });
 
 test("desktop composer and sent message keep Kura entities chip-only", async ({
@@ -457,7 +457,7 @@ test("composer classifies a same-relay clone URL as a repository chip, not a car
   // so the mismatch cannot appear. Point the bridge at an https relay so the
   // composer's classification is the only variable.
   const relayHttpUrl = "https://relay.e2e.example";
-  const cloneHref = `${relayHttpUrl}/git/${DEFAULT_MOCK_PUBKEY}/buzz.git`;
+  const cloneHref = `${relayHttpUrl}/git/${DEFAULT_MOCK_PUBKEY}/kura.git`;
   await installBridge(page, {
     mode: "mock",
     relayHttpUrl,
@@ -490,7 +490,7 @@ test("composer classifies a same-relay clone URL as a repository chip, not a car
 
   const row = page.getByTestId("message-row").last();
   await expect(row.locator("[data-link-preview]")).toHaveCount(0);
-  const repoChip = row.getByRole("button", { name: "Open repository buzz" });
+  const repoChip = row.getByRole("button", { name: "Open repository kura" });
   await expect(repoChip).toBeVisible();
   await repoChip.hover();
   await expect(
@@ -508,7 +508,7 @@ test("composer classifies a same-relay clone URL as a repository chip, not a car
 test("reopening the same entity link reapplies its workspace state", async ({
   page,
 }) => {
-  const repoAddress = `30617:${DEFAULT_MOCK_PUBKEY}:buzz`;
+  const repoAddress = `30617:${DEFAULT_MOCK_PUBKEY}:kura`;
   await page.addInitScript(
     ({ issueId, issueSubject, prId, prSubject, repoAddress, owner }) => {
       const createdAt = Math.floor(Date.now() / 1000) - 60;
@@ -551,9 +551,9 @@ test("reopening the same entity link reapplies its workspace state", async ({
   await installMockBridge(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await expect(page.getByTestId("open-projects-view")).toBeVisible();
-  const repoLink = `kura://repo?owner=${DEFAULT_MOCK_PUBKEY}&d=buzz&tab=prs`;
-  const prLink = `kura://pr?id=${PR_ID}&owner=${DEFAULT_MOCK_PUBKEY}&d=buzz`;
-  const issueLink = `kura://issue?id=${ISSUE_ID}&owner=${DEFAULT_MOCK_PUBKEY}&d=buzz`;
+  const repoLink = `kura://repo?owner=${DEFAULT_MOCK_PUBKEY}&d=kura&tab=prs`;
+  const prLink = `kura://pr?id=${PR_ID}&owner=${DEFAULT_MOCK_PUBKEY}&d=kura`;
+  const issueLink = `kura://issue?id=${ISSUE_ID}&owner=${DEFAULT_MOCK_PUBKEY}&d=kura`;
   const emitEntityLink = async (link: string) => {
     await page.waitForFunction(
       () => typeof window.__TAURI_INTERNALS__?.invoke === "function",
@@ -724,7 +724,7 @@ test("deleted top-level message links identify deletion and fall back to channel
 test("cold-start entity links drain after the React listener mounts", async ({
   page,
 }) => {
-  const href = `kura://repo?owner=${DEFAULT_MOCK_PUBKEY}&d=buzz&tab=prs`;
+  const href = `kura://repo?owner=${DEFAULT_MOCK_PUBKEY}&d=kura&tab=prs`;
   await installMockBridge(page, {
     pendingEntityDeepLinks: [{ id: "cold-start-project", href }],
   });

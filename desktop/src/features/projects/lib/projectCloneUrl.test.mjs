@@ -67,7 +67,7 @@ test("effectiveCloneUrls returns empty when no default can be derived", () => {
 });
 
 test("projectRepoHost recognizes a canonical repository on the relay", () => {
-  assert.deepEqual(projectRepoHost(`${ORIGIN}/git/${OWNER}/buzz`, ORIGIN), {
+  assert.deepEqual(projectRepoHost(`${ORIGIN}/git/${OWNER}/kura`, ORIGIN), {
     kind: "kura",
   });
 });
@@ -88,7 +88,7 @@ test("projectRepoHost treats a non-repository relay path as external", () => {
 
 test("projectRepoHost fails closed while either URL is unresolved", () => {
   assert.deepEqual(projectRepoHost(null, ORIGIN), { kind: "unresolved" });
-  assert.deepEqual(projectRepoHost(`${ORIGIN}/git/${OWNER}/buzz`, null), {
+  assert.deepEqual(projectRepoHost(`${ORIGIN}/git/${OWNER}/kura`, null), {
     kind: "unresolved",
   });
   assert.deepEqual(projectRepoHost("not a URL", ORIGIN), {
@@ -99,7 +99,7 @@ test("projectRepoHost fails closed while either URL is unresolved", () => {
 test("projectRepoHostForProject recognizes an implicit relay repository", () => {
   assert.deepEqual(
     projectRepoHostForProject(
-      { cloneUrls: [], dtag: "buzz", owner: OWNER },
+      { cloneUrls: [], dtag: "kura", owner: OWNER },
       ORIGIN,
     ),
     { kind: "kura" },
@@ -111,7 +111,7 @@ test("repositoryDisplayPath renders an external repo as host/path without .git",
     repositoryDisplayPath(
       {
         cloneUrls: ["https://github.com/block/kura.git"],
-        dtag: "buzz",
+        dtag: "kura",
         owner: OWNER,
       },
       ORIGIN,
@@ -123,32 +123,32 @@ test("repositoryDisplayPath renders an external repo as host/path without .git",
 test("repositoryDisplayPath renders a relay-hosted repo as owner/repo", () => {
   assert.equal(
     repositoryDisplayPath(
-      { cloneUrls: [], dtag: "buzz", owner: OWNER },
+      { cloneUrls: [], dtag: "kura", owner: OWNER },
       ORIGIN,
       "thomas",
     ),
-    "thomas/buzz",
+    "thomas/kura",
   );
 });
 
 test("repositoryDisplayPath falls back to a shortened pubkey owner", () => {
   assert.equal(
     repositoryDisplayPath(
-      { cloneUrls: [], dtag: "buzz", owner: OWNER },
+      { cloneUrls: [], dtag: "kura", owner: OWNER },
       ORIGIN,
     ),
-    `${"a".repeat(8)}…/buzz`,
+    `${"a".repeat(8)}…/kura`,
   );
 });
 
 test("repositoryDisplayPath fails closed without a resolvable clone URL", () => {
   assert.equal(
-    repositoryDisplayPath({ cloneUrls: [], dtag: "buzz", owner: OWNER }, null),
+    repositoryDisplayPath({ cloneUrls: [], dtag: "kura", owner: OWNER }, null),
     null,
   );
   assert.equal(
     repositoryDisplayPath(
-      { cloneUrls: ["not a URL"], dtag: "buzz", owner: OWNER },
+      { cloneUrls: ["not a URL"], dtag: "kura", owner: OWNER },
       ORIGIN,
     ),
     null,

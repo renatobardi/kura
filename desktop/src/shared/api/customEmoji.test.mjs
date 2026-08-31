@@ -65,7 +65,7 @@ test("ignores non-emoji tags", () => {
   const out = customEmojiFromEvent(
     ev([
       ["d", "x"],
-      ["client", "buzz"],
+      ["client", "kura"],
       ["emoji", "yes", "https://relay/y.png"],
     ]),
   );

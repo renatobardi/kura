@@ -4,7 +4,7 @@ import { waitForAnimations } from "../helpers/animations";
 import { installMockBridge, TEST_IDENTITIES } from "../helpers/bridge";
 
 const DEFAULT_MOCK_PUBKEY = "deadbeef".repeat(8);
-const KURA_REPO_ADDRESS = `30617:${DEFAULT_MOCK_PUBKEY}:buzz`;
+const KURA_REPO_ADDRESS = `30617:${DEFAULT_MOCK_PUBKEY}:kura`;
 
 test("Kura Git pull request renders and stays actionable in Inbox", async ({
   page,
@@ -22,7 +22,7 @@ test("Kura Git pull request renders and stays actionable in Inbox", async ({
   await page.getByTestId("open-projects-view").click();
   await page.getByRole("button", { name: "Repositories", exact: true }).click();
   const repositoryCardBody = page
-    .getByTestId("repository-card-buzz")
+    .getByTestId("repository-card-kura")
     .getByTestId("projects-grid-card-body");
   const repositoryCardBodyBounds = await repositoryCardBody.boundingBox();
   expect(repositoryCardBodyBounds).not.toBeNull();
