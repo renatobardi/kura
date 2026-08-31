@@ -15,8 +15,8 @@
 //! can leak by being forgotten.
 
 use base64::{engine::general_purpose::STANDARD, Engine as _};
-use kura_core_pkg::kind::KIND_TEAM_CATALOG;
 use image::ImageDecoder;
+use kura_core_pkg::kind::KIND_TEAM_CATALOG;
 use nostr::{EventBuilder, Kind, Tag};
 use serde::{Deserialize, Serialize};
 use std::io::Cursor;

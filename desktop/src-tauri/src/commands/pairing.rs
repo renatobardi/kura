@@ -2,11 +2,11 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 
+use futures_util::{SinkExt, StreamExt};
 use kura_core_pkg::kind::KIND_PAIRING;
 use kura_core_pkg::pairing::qr::encode_qr;
 use kura_core_pkg::pairing::session::PairingSession;
 use kura_core_pkg::pairing::types::{AbortReason, PayloadType};
-use futures_util::{SinkExt, StreamExt};
 use nostr::ToBech32;
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
