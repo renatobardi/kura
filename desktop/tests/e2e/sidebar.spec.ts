@@ -100,16 +100,27 @@ test("sidebar rows separate hover, selected, and reorder states", async ({
   // row typography.
   await expect(selectedRow).toHaveCSS("font-weight", "400");
 
+  // Measure the spacing between the selected row and whichever row renders
+  // directly below it, rather than a hardcoded neighbor: the live sidebar
+  // sorts alphabetically, so the #kura project channel now sits between
+  // #general and #random and made name-based adjacency assumptions stale.
   const rowGap = await page.evaluate(() => {
     const selected = document.querySelector<HTMLElement>(
       '[data-testid="channel-general"]',
     );
-    const following = document.querySelector<HTMLElement>(
-      '[data-testid="channel-random"]',
-    );
-    if (!selected || !following) return null;
+    if (!selected) return null;
     const selectedBox = selected.getBoundingClientRect();
-    const followingBox = following.getBoundingClientRect();
+    const followingBox = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-testid^="channel-"]'),
+    )
+      .map((row) => row.getBoundingClientRect())
+      .filter(
+        (box) =>
+          Math.abs(box.left - selectedBox.left) < 1 &&
+          box.top >= selectedBox.bottom - 1,
+      )
+      .sort((a, b) => a.top - b.top)[0];
+    if (!followingBox) return null;
     return followingBox.top - selectedBox.bottom;
   });
   expect(rowGap).toBe(4);
