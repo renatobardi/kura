@@ -5,7 +5,7 @@
 .kura-sidebar-scrollbar:hover {
   scrollbar-color: var(
       --kura-sidebar-scrollbar-thumb,
-      hsl(var(--sidebar-border) / 0.8)
+      color-mix(in srgb, hsl(var(--sidebar-border)) 80%, transparent)
     )
     transparent;
 }
@@ -29,7 +29,7 @@
 .kura-sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
   background-color: var(
     --kura-sidebar-scrollbar-thumb,
-    hsl(var(--sidebar-border) / 0.8)
+    color-mix(in srgb, hsl(var(--sidebar-border)) 80%, transparent)
   );
 }
 
@@ -95,5 +95,5 @@
  * these DO update dynamically — keep the thumb visible under the pointer. */
 .kura-content-scrollbar::-webkit-scrollbar-thumb:hover,
 .kura-content-scrollbar::-webkit-scrollbar-thumb:active {
-  background-color: hsl(var(--border) / 0.9);
+  background-color: color-mix(in srgb, hsl(var(--border)) 90%, transparent);
 }

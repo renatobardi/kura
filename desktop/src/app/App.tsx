@@ -18,7 +18,6 @@ import {
   replaceCommunityDestinationRoute,
 } from "@/app/communityViewTransition";
 import { deriveShellRoute } from "@/app/AppShell.helpers";
-import { ThemeGrainientBackground } from "@/app/ThemeGrainientBackground";
 import { CommunityThemeController } from "@/shared/theme/CommunityThemeController";
 import { useReloadShortcut } from "@/app/useReloadShortcut";
 import { useCloseWindowShortcut } from "@/app/useCloseWindowShortcut";
@@ -160,9 +159,9 @@ function BeeLoader({
   );
 }
 
-// Cold boot gate: the theme-adaptive grainient background with a single
-// centered Kura glyph pulsing over it. Replaces the old "Setting up your
-// community" text, which stays as an sr-only caption.
+// Cold boot gate: a flat themed surface with a single centered Kura glyph
+// pulsing over it. Replaces the old "Setting up your community" text, which
+// stays as an sr-only caption.
 function AppLoadingGate() {
   return (
     <div
@@ -171,7 +170,6 @@ function AppLoadingGate() {
       role="status"
     >
       <StartupWindowDragRegion />
-      <ThemeGrainientBackground />
       <span className="sr-only">{LOADING_TEXT}</span>
       <KuraGlyph
         aria-hidden="true"

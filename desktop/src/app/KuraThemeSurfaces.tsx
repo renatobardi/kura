@@ -1,22 +1,16 @@
 import type { ReactNode } from "react";
 
-export function GradientLayer() {
+/**
+ * Flat app-surface layer. Kubo has no gradients: this layer exists only so the
+ * optional macOS glass background has a single canvas to tint.
+ */
+export function SurfaceTintLayer() {
   return (
     <div
       aria-hidden="true"
-      className="kura-theme-gradient-layer pointer-events-none absolute inset-0 -z-10"
-      data-kura-gradient-layer
-    >
-      <div className="kura-theme-gradient-underlay absolute inset-0" />
-      <div
-        className="kura-theme-gradient-layer-light absolute inset-0 opacity-0"
-        data-kura-gradient="light"
-      />
-      <div
-        className="kura-theme-gradient-layer-dark absolute inset-0 opacity-0"
-        data-kura-gradient="dark"
-      />
-    </div>
+      className="kura-theme-tint-layer pointer-events-none absolute inset-0 -z-10"
+      data-kura-surface-tint-layer
+    />
   );
 }
 

@@ -268,49 +268,37 @@ async function expectKuraContentShadow(page: Page, mode: "light" | "dark") {
   }
 }
 
-async function expectKuraGradientPaint(
+async function expectKuraFlatPaint(
   page: Page,
   mode: "light" | "dark",
-): Promise<string> {
+): Promise<void> {
   const paint = await page.evaluate(() => {
     const root = document.documentElement;
     const appSurface = document.querySelector(".kura-huddle-app-surface");
-    const lightLayer = document.querySelector('[data-kura-gradient="light"]');
-    const darkLayer = document.querySelector('[data-kura-gradient="dark"]');
+    const tintLayer = document.querySelector("[data-kura-surface-tint-layer]");
     const sidebarRoot = document.querySelector(
       '[data-testid="app-sidebar"], [data-testid="settings-sidebar"]',
     );
     const sidebarSurface =
       sidebarRoot?.querySelector('[data-sidebar="sidebar"]') ?? sidebarRoot;
     const appStyles = appSurface ? getComputedStyle(appSurface) : null;
-    const lightStyles = lightLayer ? getComputedStyle(lightLayer) : null;
-    const darkStyles = darkLayer ? getComputedStyle(darkLayer) : null;
     return {
       isDark: root.classList.contains("dark"),
       theme: root.getAttribute("data-kura-theme"),
       surfaceImage: appStyles?.backgroundImage ?? "",
-      lightImage: lightStyles?.backgroundImage ?? "",
-      lightOpacity: lightStyles?.opacity ?? "",
-      darkImage: darkStyles?.backgroundImage ?? "",
-      darkOpacity: darkStyles?.opacity ?? "",
+      tintImage: tintLayer ? getComputedStyle(tintLayer).backgroundImage : "",
       sidebarImage: sidebarSurface
         ? getComputedStyle(sidebarSurface).backgroundImage
         : "",
     };
   });
 
+  // Kubo paints flat surfaces only — no gradient anywhere in the shell.
   expect(paint.theme).toBe(mode === "light" ? "kura" : "kura-dark");
   expect(paint.isDark).toBe(mode === "dark");
   expect(paint.surfaceImage).toBe("none");
-  expect(paint.lightImage).not.toBe("");
-  expect(paint.lightImage).not.toBe("none");
-  expect(paint.darkImage).not.toBe("");
-  expect(paint.darkImage).not.toBe("none");
-  expect(paint.lightImage).not.toBe(paint.darkImage);
-  expect(paint.lightOpacity).toBe(mode === "light" ? "1" : "0");
-  expect(paint.darkOpacity).toBe(mode === "dark" ? "1" : "0");
+  expect(paint.tintImage).toBe("none");
   expect(paint.sidebarImage).toBe("none");
-  return mode === "light" ? paint.lightImage : paint.darkImage;
 }
 
 async function expectKuraSettingsPalette(page: Page, mode: "light" | "dark") {
@@ -327,7 +315,7 @@ async function expectKuraSettingsPalette(page: Page, mode: "light" | "dark") {
     mutedColor,
   );
 
-  await expectKuraGradientPaint(page, mode);
+  await expectKuraFlatPaint(page, mode);
 
   const version = page.getByTestId("settings-version");
   if ((await version.count()) > 0) {
@@ -345,15 +333,10 @@ async function expectAppliedKuraTheme(
     .poll(() =>
       page.evaluate((storageKey) => {
         const root = document.documentElement;
-        const styles = getComputedStyle(root);
         return {
           storedTheme: window.localStorage.getItem(storageKey),
           isDark: root.classList.contains("dark"),
           kuraTheme: root.getAttribute("data-kura-theme"),
-          gradientTop: styles.getPropertyValue("--kura-gradient-top").trim(),
-          gradientBottom: styles
-            .getPropertyValue("--kura-gradient-bottom")
-            .trim(),
         };
       }, THEME_STORAGE_KEY),
     )
@@ -361,8 +344,6 @@ async function expectAppliedKuraTheme(
       storedTheme,
       isDark,
       kuraTheme: themeName,
-      gradientTop: isDark ? "#1f1d1a" : "#f7f4ee",
-      gradientBottom: isDark ? "#151412" : "#ece7dc",
     });
 }
 
@@ -385,11 +366,11 @@ async function emitNativeThemeChange(page: Page, theme: "light" | "dark") {
   }, theme);
 }
 
-test("kura light sidebar gradient", async ({ page }) => {
+test("kura light sidebar surface", async ({ page }) => {
   await seedTheme(page, "kura");
   await installMockBridge(page);
   await openChannel(page);
-  await expectKuraGradientPaint(page, "light");
+  await expectKuraFlatPaint(page, "light");
   await expectKuraSidebarPalette(page, "light");
   await expectKuraContentShadow(page, "light");
   await expectIconlessSectionTitleAligned(page, "stream-list");
@@ -400,18 +381,18 @@ test("kura light sidebar gradient", async ({ page }) => {
     .screenshot({ path: `${SHOTS}/01-kura-light-sidebar.png` });
 });
 
-test("kura dark sidebar gradient", async ({ page }) => {
+test("kura dark sidebar surface", async ({ page }) => {
   await seedTheme(page, "kura-dark");
   await installMockBridge(page);
   await openChannel(page);
-  await expectKuraGradientPaint(page, "dark");
+  await expectKuraFlatPaint(page, "dark");
   await expectKuraSidebarPalette(page, "dark");
   await expectKuraContentShadow(page, "dark");
   await expectIconlessSectionTitleAligned(page, "stream-list");
   await expectIconlessSectionTitleAligned(page, "dm-list");
   await expect(page.locator("[data-kura-content-surface]")).toHaveCSS(
     "background-color",
-    "rgb(22, 21, 19)",
+    "rgb(12, 10, 9)",
   );
   await waitForAnimations(page);
   await page
@@ -1227,7 +1208,7 @@ test("settings nav uses Kura active pill + hover (dark)", async ({ page }) => {
   await expectKuraSettingsPalette(page, "dark");
   await expect(page.getByTestId("settings-content-surface")).toHaveCSS(
     "background-color",
-    "rgb(22, 21, 19)",
+    "rgb(12, 10, 9)",
   );
   await waitForAnimations(page);
   await sidebar.screenshot({ path: `${SHOTS}/07-settings-nav-dark.png` });
@@ -1561,11 +1542,6 @@ test("glass background keeps the content panel solid", async ({ page }) => {
     .toBeNull();
   await expect(opacitySlider).toHaveCount(0);
   await expect(root).not.toHaveAttribute("data-glass-background", "");
-  await expect(page.locator(".kura-theme-gradient-underlay")).not.toHaveCSS(
-    "background-image",
-    "none",
-  );
-
   await toggle.click();
   await expect(toggle).toBeChecked();
   await expect(opacitySlider).toBeVisible();
@@ -1585,8 +1561,9 @@ test("glass background keeps the content panel solid", async ({ page }) => {
     page.getByTestId("thread-layout-control"),
     page.getByTestId("thread-layout-control-indicator"),
   ];
+  // `rounded-md` = --radius - 2px; the Kubo base radius is 8px.
   for (const control of matchingRadiusControls) {
-    await expect(control).toHaveCSS("border-radius", "8px");
+    await expect(control).toHaveCSS("border-radius", "6px");
   }
   await expect(page.getByTestId("glass-opacity-value")).toHaveCount(0);
   await expect(
@@ -1606,10 +1583,6 @@ test("glass background keeps the content panel solid", async ({ page }) => {
     "glass-opacity-row",
     "prominent-active-tab-row",
   ]);
-  await expect(page.locator(".kura-theme-gradient-underlay")).toHaveCSS(
-    "background-image",
-    "none",
-  );
   for (const canvas of [root, page.locator("body"), page.locator("#root")]) {
     await expect(canvas).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   }
@@ -1731,7 +1704,7 @@ test("non-Kura glass preserves the selected theme sidebar tint", async ({
   await expect(root).toHaveAttribute("data-glass-background", "");
 
   const tint = await page
-    .locator(".kura-theme-gradient-layer")
+    .locator(".kura-theme-tint-layer")
     .evaluate((element) => {
       const rootStyles = getComputedStyle(document.documentElement);
       const sidebar = rootStyles
@@ -1842,16 +1815,15 @@ test("Kura light and dark modes apply live without a reload", async ({
   await installMockBridge(page);
   await openAppearance(page, "light");
   await expectAppliedKuraTheme(page, "kura");
-  const lightGradient = await expectKuraGradientPaint(page, "light");
+  await expectKuraFlatPaint(page, "light");
 
   await page.getByTestId("appearance-mode-dark").click();
   await expectAppliedKuraTheme(page, "kura-dark");
-  const darkGradient = await expectKuraGradientPaint(page, "dark");
-  expect(darkGradient).not.toBe(lightGradient);
+  await expectKuraFlatPaint(page, "dark");
 
   await page.getByTestId("appearance-mode-light").click();
   await expectAppliedKuraTheme(page, "kura");
-  await expectKuraGradientPaint(page, "light");
+  await expectKuraFlatPaint(page, "light");
 
   // Exercise the overlap that previously let a slower, stale theme load win.
   await page.getByTestId("appearance-mode-dark").click();
@@ -1871,9 +1843,9 @@ test("Kura follows native system theme changes without a reload", async ({
 
   await emitNativeThemeChange(page, "dark");
   await expectAppliedKuraTheme(page, "kura-dark", "kura");
-  await expectKuraGradientPaint(page, "dark");
+  await expectKuraFlatPaint(page, "dark");
 
   await emitNativeThemeChange(page, "light");
   await expectAppliedKuraTheme(page, "kura", "kura");
-  await expectKuraGradientPaint(page, "light");
+  await expectKuraFlatPaint(page, "light");
 });

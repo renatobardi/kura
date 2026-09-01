@@ -653,46 +653,12 @@
 }
 
 /* ── Setup / cold-boot loading screen ───────────────────────────────────
-   Static seigaiha (wave-circle) pattern background for the "setting up
-   your community" gate. Flat washi paper, no animation — the animated
-   Kura mark is the hero (see AppLoadingGate in app/App.tsx). */
+   Flat surface for the "setting up your community" gate — no texture, no
+   gradient. The animated mark is the hero (see AppLoadingGate in app/App.tsx). */
 
 .kura-setup-loading-shell {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   isolation: isolate;
   position: relative;
-}
-
-.kura-setup-grainient {
-  color: hsl(var(--foreground));
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  position: absolute;
-  z-index: 0;
-}
-
-.kura-setup-grainient__wash,
-.kura-setup-grainient__veil {
-  inset: 0;
-  position: absolute;
-}
-
-.kura-setup-grainient__wash svg {
-  height: 100%;
-  opacity: 0.06;
-  width: 100%;
-}
-
-.dark .kura-setup-grainient__wash svg {
-  opacity: 0.08;
-}
-
-.kura-setup-grainient__veil {
-  background: linear-gradient(
-    0deg,
-    hsl(var(--background)) 0%,
-    hsl(var(--background) / 0) 45%
-  );
 }

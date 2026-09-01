@@ -66,7 +66,8 @@
 .kura-diff-theme .kura-diff-gutter {
   min-width: 3.5rem;
   padding: 0.125rem 0.5rem;
-  border-right: 1px solid hsl(var(--border) / 0.65);
+  border-right: 1px solid
+    color-mix(in srgb, hsl(var(--border)) 65%, transparent);
   color: hsl(var(--muted-foreground));
   font-size: calc(var(--kura-type-rem) * 0.6875);
 }

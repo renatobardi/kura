@@ -1,4 +1,3 @@
-import { ThemeGrainientBackground } from "@/app/ThemeGrainientBackground";
 import { KuraGlyph } from "@/shared/ui/kura-logo/KuraMark";
 
 /** Immediate feedback shown while the native huddle session is being prepared. */
@@ -10,7 +9,6 @@ export function HuddleStartingView() {
       data-testid="huddle-starting-view"
       role="status"
     >
-      <ThemeGrainientBackground />
       <span className="sr-only">Starting huddle</span>
       <KuraGlyph
         aria-hidden="true"

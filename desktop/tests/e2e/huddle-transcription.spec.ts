@@ -964,7 +964,7 @@ test("keeps the colored startup surface while huddle controls connect", async ({
     page.getByRole("status", { name: "Starting huddle" }),
   ).toBeVisible();
   await expect(page.getByTestId("huddle-starting-glyph")).toBeVisible();
-  await expect(page.getByTestId("setup-grainient-background")).toBeVisible();
+  await expect(page.getByTestId("huddle-starting-glyph")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Leave huddle" }),
   ).toBeVisible();

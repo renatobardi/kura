@@ -3,25 +3,6 @@ import { cn } from "@/shared/lib/cn";
 
 export type ThemePreviewVars = Record<string, string>;
 
-/**
- * Kura sidebar-gradient stop tokens, keyed by theme name. The actual custom
- * colors live once in `shared/styles/globals/theme.css`; the picker consumes
- * those same semantic variables instead of duplicating raw values here.
- */
-export const KURA_GRADIENT_STOPS: Record<
-  string,
-  { top: string; bottom: string }
-> = {
-  kura: {
-    top: "var(--kura-gradient-light-top)",
-    bottom: "var(--kura-gradient-light-bottom)",
-  },
-  "kura-dark": {
-    top: "var(--kura-gradient-dark-top)",
-    bottom: "var(--kura-gradient-dark-bottom)",
-  },
-};
-
 export const LIGHT_PREVIEW_VARS: ThemePreviewVars = {
   "--background": "0 0% 100%",
   "--border": "0 0% 89.8%",
@@ -52,15 +33,8 @@ function hslAlpha(vars: ThemePreviewVars | null, key: string, alpha: number) {
   return `hsl(${vars?.[key] ?? LIGHT_PREVIEW_VARS[key]} / ${alpha})`;
 }
 
-function ThemePreviewSvg({
-  vars,
-  sidebarGradient,
-}: {
-  vars: ThemePreviewVars | null;
-  sidebarGradient?: { top: string; bottom: string };
-}) {
+function ThemePreviewSvg({ vars }: { vars: ThemePreviewVars | null }) {
   const clipId = React.useId().replace(/:/g, "");
-  const gradientId = `${clipId}-kura`;
   const background = hsl(vars, "--background");
   const border = hsl(vars, "--border");
   const foreground = hsl(vars, "--foreground");
@@ -82,11 +56,7 @@ function ThemePreviewSvg({
       <g clipPath={`url(#${clipId})`}>
         <rect fill={background} height="180" rx="3.6" width="288" />
         <line stroke={border} x1="57" x2="117" y1="10.5" y2="10.5" />
-        <rect
-          fill={sidebarGradient ? `url(#${gradientId})` : sidebar}
-          height="180"
-          width="57.375"
-        />
+        <rect fill={sidebar} height="180" width="57.375" />
         <rect
           fill={sidebarForeground}
           height="3.6"
@@ -221,19 +191,6 @@ function ThemePreviewSvg({
         <clipPath id={clipId}>
           <rect fill={background} height="180" rx="3.6" width="288" />
         </clipPath>
-        {sidebarGradient ? (
-          <linearGradient
-            id={gradientId}
-            x1="0"
-            x2="0"
-            y1="0"
-            y2="180"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop offset="0" stopColor={sidebarGradient.top} />
-            <stop offset="1" stopColor={sidebarGradient.bottom} />
-          </linearGradient>
-        ) : null}
       </defs>
     </svg>
   );
@@ -246,20 +203,14 @@ function ThemePreviewSvg({
 function SystemPreferencePreviewSvg({
   darkVars,
   lightVars,
-  lightGradient,
-  darkGradient,
 }: {
   darkVars: ThemePreviewVars | null;
   lightVars: ThemePreviewVars | null;
-  lightGradient?: { top: string; bottom: string };
-  darkGradient?: { top: string; bottom: string };
 }) {
   const clipBase = React.useId().replace(/:/g, "");
   const clipDark = `${clipBase}-dark`;
   const clipLight = `${clipBase}-light`;
   const clipOuter = `${clipBase}-outer`;
-  const lightGradientId = `${clipBase}-kura-light`;
-  const darkGradientId = `${clipBase}-kura-dark`;
 
   // Dark half colors
   const darkBg = hsl(darkVars, "--background");
@@ -289,11 +240,7 @@ function SystemPreferencePreviewSvg({
       {/* Light half (top) */}
       <g clipPath={`url(#${clipLight})`}>
         <rect fill={lightBg} height="180" rx="3.6" width="288" />
-        <rect
-          fill={lightGradient ? `url(#${lightGradientId})` : lightSidebar}
-          height="180"
-          width="57.375"
-        />
+        <rect fill={lightSidebar} height="180" width="57.375" />
         <rect
           fill={lightSidebarFg}
           height="3.6"
@@ -444,12 +391,7 @@ function SystemPreferencePreviewSvg({
       <g clipPath={`url(#${clipDark})`}>
         <g clipPath={`url(#${clipOuter})`}>
           <rect fill={darkBg} height="180" rx="3.6" width="288" y="22" />
-          <rect
-            fill={darkGradient ? `url(#${darkGradientId})` : darkSidebar}
-            height="180"
-            width="57.375"
-            y="22"
-          />
+          <rect fill={darkSidebar} height="180" width="57.375" y="22" />
           <rect
             fill={darkSidebarFg}
             height="3.6"
@@ -535,32 +477,6 @@ function SystemPreferencePreviewSvg({
         <clipPath id={clipOuter}>
           <rect fill="white" height="180" rx="3.6" width="288" y="22" />
         </clipPath>
-        {lightGradient ? (
-          <linearGradient
-            gradientUnits="userSpaceOnUse"
-            id={lightGradientId}
-            x1="0"
-            x2="0"
-            y1="0"
-            y2="80"
-          >
-            <stop offset="0" stopColor={lightGradient.top} />
-            <stop offset="1" stopColor={lightGradient.bottom} />
-          </linearGradient>
-        ) : null}
-        {darkGradient ? (
-          <linearGradient
-            gradientUnits="userSpaceOnUse"
-            id={darkGradientId}
-            x1="0"
-            x2="0"
-            y1="22"
-            y2="80"
-          >
-            <stop offset="0" stopColor={darkGradient.top} />
-            <stop offset="1" stopColor={darkGradient.bottom} />
-          </linearGradient>
-        ) : null}
       </defs>
     </svg>
   );
@@ -569,11 +485,9 @@ function SystemPreferencePreviewSvg({
 export function ThemePreviewFrame({
   className,
   vars,
-  sidebarGradient,
 }: {
   className?: string;
   vars: ThemePreviewVars | null;
-  sidebarGradient?: { top: string; bottom: string };
 }) {
   return (
     <div
@@ -587,7 +501,7 @@ export function ThemePreviewFrame({
       }}
     >
       <div className="absolute -bottom-1 -right-1 h-[90%] w-[90%]">
-        <ThemePreviewSvg vars={vars} sidebarGradient={sidebarGradient} />
+        <ThemePreviewSvg vars={vars} />
       </div>
     </div>
   );
@@ -601,14 +515,10 @@ export function SystemPreferencePreviewFrame({
   className,
   darkVars,
   lightVars,
-  lightGradient,
-  darkGradient,
 }: {
   className?: string;
   darkVars: ThemePreviewVars | null;
   lightVars: ThemePreviewVars | null;
-  lightGradient?: { top: string; bottom: string };
-  darkGradient?: { top: string; bottom: string };
 }) {
   return (
     <div
@@ -621,12 +531,7 @@ export function SystemPreferencePreviewFrame({
       }}
     >
       <div className="absolute -bottom-1 -right-1 h-[90%] w-[90%]">
-        <SystemPreferencePreviewSvg
-          darkGradient={darkGradient}
-          darkVars={darkVars}
-          lightGradient={lightGradient}
-          lightVars={lightVars}
-        />
+        <SystemPreferencePreviewSvg darkVars={darkVars} lightVars={lightVars} />
       </div>
     </div>
   );
