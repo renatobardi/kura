@@ -15,52 +15,52 @@ fn appimage_binary_matches_truncated_linux_comm_name() {
 #[test]
 fn identifier_prefix_does_not_match_longer_id() {
     // DMG identifier should NOT match inside a dev desktop's config JSON.
-    let buf = br#""identifier":"xyz.block.kura.app.dev""#;
-    let id = b"xyz.block.kura.app";
+    let buf = br#""identifier":"pro.oute.kura.app.dev""#;
+    let id = b"pro.oute.kura.app";
     assert!(!super::buffer_contains_identifier(buf, id));
 }
 
 #[test]
 fn identifier_prefix_does_not_match_worktree_slug() {
     // Main dev identifier should NOT match inside a worktree desktop's buffer.
-    let buf = br#""identifier":"xyz.block.kura.app.dev.my-branch""#;
-    let id = b"xyz.block.kura.app.dev";
+    let buf = br#""identifier":"pro.oute.kura.app.dev.my-branch""#;
+    let id = b"pro.oute.kura.app.dev";
     assert!(!super::buffer_contains_identifier(buf, id));
 }
 
 #[test]
 fn identifier_exact_match_with_quote_boundary() {
     // Exact match followed by closing quote — should match.
-    let buf = br#""identifier":"xyz.block.kura.app.dev""#;
-    let id = b"xyz.block.kura.app.dev";
+    let buf = br#""identifier":"pro.oute.kura.app.dev""#;
+    let id = b"pro.oute.kura.app.dev";
     assert!(super::buffer_contains_identifier(buf, id));
 }
 
 #[test]
 fn identifier_match_with_null_boundary() {
     // In KERN_PROCARGS2, entries are null-delimited.
-    let mut buf = b"KURA_MANAGED_AGENT=xyz.block.kura.app.dev".to_vec();
+    let mut buf = b"KURA_MANAGED_AGENT=pro.oute.kura.app.dev".to_vec();
     buf.push(0);
     buf.extend_from_slice(b"OTHER_VAR=value");
-    let id = b"xyz.block.kura.app.dev";
+    let id = b"pro.oute.kura.app.dev";
     assert!(super::buffer_contains_identifier(&buf, id));
 }
 
 #[test]
 fn identifier_exact_match_at_end_of_buffer() {
     // Exact match with end-of-buffer as the boundary — Thufir's case 1.
-    let buf = b"xyz.block.kura.app.dev";
-    let id = b"xyz.block.kura.app.dev";
+    let buf = b"pro.oute.kura.app.dev";
+    let id = b"pro.oute.kura.app.dev";
     assert!(super::buffer_contains_identifier(buf, id));
 }
 
 #[test]
 fn longer_id_matches_when_short_prefix_also_present() {
     // The longer ID still matches when a shorter prefix token appears earlier.
-    let mut buf = b"xyz.block.kura.app".to_vec();
+    let mut buf = b"pro.oute.kura.app".to_vec();
     buf.push(0);
-    buf.extend_from_slice(br#""identifier":"xyz.block.kura.app.dev""#);
-    let id = b"xyz.block.kura.app.dev";
+    buf.extend_from_slice(br#""identifier":"pro.oute.kura.app.dev""#);
+    let id = b"pro.oute.kura.app.dev";
     assert!(super::buffer_contains_identifier(&buf, id));
 }
 
@@ -78,12 +78,12 @@ fn marker_entry_is_namespaced_by_instance_id() {
     // format and guards against a dev build (`...app.dev`) matching a
     // release build's (`...app`) agents.
     assert_eq!(
-        super::kura_marker_entry("xyz.block.kura.app"),
-        b"KURA_MANAGED_AGENT=xyz.block.kura.app".to_vec()
+        super::kura_marker_entry("pro.oute.kura.app"),
+        b"KURA_MANAGED_AGENT=pro.oute.kura.app".to_vec()
     );
     assert_ne!(
-        super::kura_marker_entry("xyz.block.kura.app"),
-        super::kura_marker_entry("xyz.block.kura.app.dev")
+        super::kura_marker_entry("pro.oute.kura.app"),
+        super::kura_marker_entry("pro.oute.kura.app.dev")
     );
 }
 

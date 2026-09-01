@@ -240,7 +240,7 @@ mod tests {
             ),
             (
                 "KURA_PUSH_DOGFOOD_APP_ATTEST_APP_ID".into(),
-                "TEAM.xyz.block.kura.dogfood.mobile".into(),
+                "TEAM.pro.oute.kura.dogfood.mobile".into(),
             ),
             (
                 "KURA_PUSH_APP_ATTEST_ROOT_CERT_PATH".into(),
@@ -252,7 +252,7 @@ mod tests {
             ),
             (
                 "KURA_PUSH_DOGFOOD_APNS_TOPIC".into(),
-                "xyz.block.kura.dogfood.mobile".into(),
+                "pro.oute.kura.dogfood.mobile".into(),
             ),
             (
                 "KURA_PUSH_DOGFOOD_APNS_ENVIRONMENT".into(),
@@ -270,7 +270,7 @@ mod tests {
             config.profile.apns_cert_path,
             PathBuf::from("/dogfood-identity.pem")
         );
-        assert_eq!(config.profile.apns_topic, "xyz.block.kura.dogfood.mobile");
+        assert_eq!(config.profile.apns_topic, "pro.oute.kura.dogfood.mobile");
 
         for variable in [
             "KURA_PUSH_DOGFOOD_APNS_CERT_PATH",

@@ -13,7 +13,7 @@ require_canonical_repository() {
   origin_url="$(git config --get remote.origin.url 2>/dev/null)" || \
     fail_release_ruleset "origin is required and must point to block/kura" || return 1
   case "$origin_url" in
-    git@github.com:block/kura.git|ssh://git@github.com/block/kura.git|https://github.com/block/kura.git|https://github.com/block/kura)
+    git@github.com:block/kura.git|ssh://git@github.com/renatobardi/kura.git|https://github.com/renatobardi/kura.git|https://github.com/renatobardi/kura)
       ;;
     *)
       fail_release_ruleset "origin must point to canonical block/kura, not '$origin_url'" || return 1

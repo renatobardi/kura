@@ -15,7 +15,7 @@
 //! relay connection. Everything it wants to do, reading included, is an action.
 //! Actions are named business operations rather than a `sign(bytes)` primitive
 //! so a host can hold per-operation policy; that and the rest of the
-//! [#6467](https://github.com/block/kura/issues/6467) mapping are covered in
+//! upstream issue #6467 mapping are covered in
 //! the spec.
 //!
 //! # Contract-wide rules

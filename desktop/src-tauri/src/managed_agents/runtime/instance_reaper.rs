@@ -18,10 +18,10 @@ pub(super) fn is_desktop_binary(name: &str) -> bool {
 
 /// Check whether `buf` contains `id` as a complete identifier — not as a
 /// prefix of a longer dotted name. The identifier appears in the Tauri config
-/// JSON as `"identifier":"xyz.block.kura.app.dev"` and in environment entries
+/// JSON as `"identifier":"pro.oute.kura.app.dev"` and in environment entries
 /// as `KEY=...app.dev\0`, so a valid match is followed by a non-identifier byte
 /// (not `[A-Za-z0-9._-]`) or sits at the end of the buffer. This prevents
-/// `xyz.block.kura.app` from matching inside `xyz.block.kura.app.dev`.
+/// `pro.oute.kura.app` from matching inside `pro.oute.kura.app.dev`.
 pub(super) fn buffer_contains_identifier(buf: &[u8], id: &[u8]) -> bool {
     if id.is_empty() {
         return false;
