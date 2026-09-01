@@ -9,9 +9,9 @@ description: |
 type: application
 version: 0.1.8
 appVersion: "0.1.0"
-home: https://github.com/block/kura
+home: https://github.com/renatobardi/kura
 sources:
-  - https://github.com/block/kura
+  - https://github.com/renatobardi/kura
 keywords:
   - nostr
   - relay
@@ -20,7 +20,7 @@ keywords:
   - chat
 maintainers:
   - name: Block
-    url: https://github.com/block
+    url: https://github.com/renatobardi
 annotations:
   artifacthub.io/changes: |
     - kind: added

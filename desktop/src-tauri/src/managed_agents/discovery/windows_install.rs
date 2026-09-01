@@ -25,7 +25,7 @@
 //!
 //! # Exit-code fidelity
 //!
-//! [#2892](https://github.com/block/kura/pull/2892) established that an install
+//! [#2892](https://github.com/renatobardi/kura/pull/2892) established that an install
 //! step must not report success when the download failed. Two pieces preserve
 //! that here, and both are load-bearing:
 //!

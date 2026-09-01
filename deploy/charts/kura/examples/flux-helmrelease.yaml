@@ -12,7 +12,7 @@ metadata:
   namespace: kura
 spec:
   type: oci
-  url: oci://ghcr.io/block/kura/charts
+  url: oci://ghcr.io/renatobardi/kura/charts
   interval: 10m
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2

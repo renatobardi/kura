@@ -1,6 +1,6 @@
 replicaCount: 2
 image:
-  repository: ghcr.io/block/kura-push-gateway
+  repository: ghcr.io/renatobardi/kura-push-gateway
   # `main` is published by the push-gateway lane on every main push.
   tag: main
   digest: ""
@@ -23,8 +23,8 @@ maxGrantLifetimeSeconds: 2592000
 profiles:
   dogfood:
     # Production MUST override this with the exact Apple TEAMID.bundle-id.
-    appAttestAppId: TEAMID.xyz.block.kura.dogfood.mobile
-    apnsTopic: xyz.block.kura.dogfood.mobile
+    appAttestAppId: TEAMID.pro.oute.kura.dogfood.mobile
+    apnsTopic: pro.oute.kura.dogfood.mobile
     apnsEnvironment: production
     apnsCert:
       secretName: kura-push-gateway

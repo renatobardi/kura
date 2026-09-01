@@ -10,7 +10,7 @@ helm template push deploy/charts/kura-push-gateway >"$out"
 production_args=(
   -f deploy/charts/kura-push-gateway/values-production.yaml
   --set 'image.digest=sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-  --set 'profiles.dogfood.appAttestAppId=REALTEAM.xyz.block.kura.dogfood.mobile'
+  --set 'profiles.dogfood.appAttestAppId=REALTEAM.pro.oute.kura.dogfood.mobile'
   --set 'httpRoute.parentRefs[0].name=production-gateway'
   --set 'httpRoute.parentRefs[0].namespace=gateway-system'
   --set 'networkPolicy.postgresEgressCidrs[0]=10.42.0.0/16'

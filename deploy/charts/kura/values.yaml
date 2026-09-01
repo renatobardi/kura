@@ -23,7 +23,7 @@ quickstart: false
 
 # ── Image ────────────────────────────────────────────────────────────────────
 image:
-  repository: ghcr.io/block/kura
+  repository: ghcr.io/renatobardi/kura
   tag: ""                        # empty → .Chart.AppVersion
   digest: ""                     # optional sha256:...; when set, overrides tag
   pullPolicy: IfNotPresent

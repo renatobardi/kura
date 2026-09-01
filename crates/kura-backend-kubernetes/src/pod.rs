@@ -210,7 +210,7 @@ mod tests {
     fn provider_config() -> ProviderConfig {
         config::parse(&serde_json::json!({
             "namespace": "kura-agents-test",
-            "image": format!("ghcr.io/block/kura-sprig@sha256:{}", "a".repeat(64)),
+            "image": format!("ghcr.io/renatobardi/kura-sprig@sha256:{}", "a".repeat(64)),
         }))
         .unwrap()
     }

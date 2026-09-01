@@ -204,13 +204,13 @@ tests:
       s3.endpoint: http://minio:9000
       s3.accessKey: a
       s3.secretKey: s
-      image.repository: ghcr.io/block/kura
+      image.repository: ghcr.io/renatobardi/kura
       image.tag: sha-deadbee
       image.digest: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: ghcr.io/block/kura@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          value: ghcr.io/renatobardi/kura@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         template: templates/deployment.yaml
 
   - it: appends generic Pod extensions and overrides the relay command

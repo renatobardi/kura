@@ -18,8 +18,8 @@
 # (the main checkout never reaps a worktree's agents, or vice versa).
 #
 # Usage: cleanup-instance-agents.sh <instance-id>
-#   <instance-id> is the desktop bundle identifier, e.g. `xyz.block.kura.app.dev`
-#   (main checkout) or `xyz.block.kura.app.dev.my-branch` (a worktree).
+#   <instance-id> is the desktop bundle identifier, e.g. `pro.oute.kura.app.dev`
+#   (main checkout) or `pro.oute.kura.app.dev.my-branch` (a worktree).
 
 set -euo pipefail
 

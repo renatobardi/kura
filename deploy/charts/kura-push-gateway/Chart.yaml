@@ -1,5 +1,5 @@
 apiVersion: v2
-# Published to oci://ghcr.io/block/kura/charts via push-chart-release/<version>
+# Published to oci://ghcr.io/renatobardi/kura/charts via push-chart-release/<version>
 # branches (see docs/push-gateway-deployment.md, "Gateway chart release").
 name: kura-push-gateway
 description: Public capability-gated APNs last-hop gateway for Kura

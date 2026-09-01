@@ -21,7 +21,7 @@ spec:
     # form, the `chart` field is ignored for oci:// URLs and the fetch
     # fails with a 403 (`repository:block/kura/charts:pull` denied). The
     # spec validator still requires `path`; use "." for OCI sources.
-    repoURL: oci://ghcr.io/block/kura/charts/kura
+    repoURL: oci://ghcr.io/renatobardi/kura/charts/kura
     path: .
     targetRevision: 0.1.7
     helm:
