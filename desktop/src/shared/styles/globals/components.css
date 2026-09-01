@@ -804,3 +804,21 @@
   box-shadow: none;
   margin: 0;
 }
+
+/* ── Kubo press ─────────────────────────────────────────────────────────
+   Controls sink 1px while held. Done with margins, not a transform: many
+   controls are centered with `-translate-y-1/2`, and a transform-based press
+   would clobber that positioning for as long as the pointer is down. The
+   compensating negative margin keeps the surrounding layout still. */
+
+.kura-press:active:not(:disabled):not([aria-disabled="true"]) {
+  margin-block-end: -1px;
+  margin-block-start: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kura-press:active:not(:disabled):not([aria-disabled="true"]) {
+    margin-block-end: 0;
+    margin-block-start: 0;
+  }
+}

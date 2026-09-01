@@ -5,8 +5,8 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
 import { cn } from "@/shared/lib/cn";
+import { CARD_RING_CLASS } from "@/shared/ui/card";
 import { useTheme } from "@/shared/theme/ThemeProvider";
-import "./card-texture.css";
 import { MODAL_BACKDROP_BLUR_CLASS } from "@/shared/ui/modalBackdrop";
 import {
   MODAL_CONTENT_MOTION_CLASS,
@@ -50,11 +50,9 @@ type DialogContentProps = React.ComponentPropsWithoutRef<
   overlayVariant?: "default" | "transparent";
   showCloseButton?: boolean;
   /**
-   * - `default`: standard opaque dialog panel (rounded, shadowed).
+   * - `default`: the standard flat panel — pill radius, 1px ring, no shadow.
    * - `none`: no surface — the caller composes its own.
-   * - `textured`: the baked nine-slice powder card (`Card variant="textured"`)
-   *   IS the dialog surface. Content and the close button are automatically
-   *   kept on the solid center of the texture via its safe inset.
+   * - `textured`: legacy alias of `default`; the powder texture is gone.
    */
   surface?: "default" | "none" | "textured";
 };
@@ -88,23 +86,18 @@ const DialogContent = React.forwardRef<
       />
       <div
         className={cn(
-          "pointer-events-none fixed inset-0 z-50 grid place-items-center overflow-x-hidden overflow-y-auto",
-          // The textured surface bleeds a 96px powder band beyond its layout
-          // box (see card-texture.css). Give the wrapper enough padding that
-          // the bleed isn't clipped by this scroll container; every other
-          // surface keeps the standard gutter.
-          surface === "textured"
-            ? "p-[calc(6rem+1rem)] max-sm:p-[calc(6rem-1.5rem)]"
-            : "p-4",
+          "pointer-events-none fixed inset-0 z-50 grid place-items-center overflow-x-hidden overflow-y-auto p-4",
         )}
       >
         <DialogPrimitive.Content
           className={cn(
             "pointer-events-auto relative grid w-[calc(100vw-2rem)] max-w-2xl gap-4 outline-hidden",
-            surface === "default" && "rounded-2xl bg-background p-6 shadow-2xl",
+            // Kubo dialogs are flat: the pill radius, a plain surface and the
+            // 1px ring — no drop shadow. `textured` is kept as an alias of the
+            // default surface now that textures are gone.
+            surface !== "none" &&
+              `rounded-dialog bg-background p-6 ${CARD_RING_CLASS}`,
             surface === "none" && "bg-transparent p-0 shadow-none",
-            surface === "textured" &&
-              "kura-card-textured isolate box-border w-full rounded-none border-0 bg-transparent p-[var(--kura-card-textured-safe-inset)] shadow-none",
             MODAL_CONTENT_MOTION_CLASS,
             className,
           )}
@@ -116,12 +109,7 @@ const DialogContent = React.forwardRef<
             <DialogPrimitive.Close
               className={cn(
                 "absolute flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors duration-150 ease-out hover:bg-accent hover:text-accent-foreground focus:outline-hidden focus-visible:ring-1 focus-visible:ring-ring",
-                // On the textured surface the layout edge sits in the powder
-                // fade; dock the close button at the safe-inset corner so it
-                // stays on the solid center of the texture.
-                surface === "textured"
-                  ? "right-[var(--kura-card-textured-safe-inset)] top-[var(--kura-card-textured-safe-inset)] -mr-2 -mt-2"
-                  : "right-4 top-4",
+                "right-4 top-4",
                 closeButtonClassName,
               )}
             >

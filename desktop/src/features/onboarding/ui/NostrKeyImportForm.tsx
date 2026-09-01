@@ -402,7 +402,7 @@ export function NostrKeyImportForm({
           </div>
           {isDragging ? (
             <fieldset
-              className="absolute inset-[var(--kura-card-textured-safe-inset)] z-10 flex items-center justify-center rounded-2xl border-2 border-dashed border-primary/60 bg-background/80 backdrop-blur-sm"
+              className="absolute inset-6 z-10 flex items-center justify-center rounded-2xl border-2 border-dashed border-primary/60 bg-background/80 backdrop-blur-sm"
               data-dragging="true"
               data-testid="nostr-import-backup-drop"
             >

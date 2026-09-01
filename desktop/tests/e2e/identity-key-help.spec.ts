@@ -32,7 +32,8 @@ test("identity key help explains the first-run choice", async ({ page }) => {
   await expect(
     dialog.getByRole("heading", { name: "What’s an identity key?" }),
   ).toBeVisible();
-  await expect(dialog).toHaveClass(/shadow-none/);
+  // Flat Kubo surface: the only shadow is the 1px ring, never a drop shadow.
+  await expect(dialog).toHaveCSS("box-shadow", /0px 0px 0px 1px$/);
   await expect(page.getByTestId("dialog-overlay")).toHaveCSS(
     "background-color",
     "rgba(0, 0, 0, 0)",
