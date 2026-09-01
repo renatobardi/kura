@@ -72,7 +72,7 @@ import {
   listenForDeepLinks,
 } from "@/shared/deep-link";
 import { cn } from "@/shared/lib/cn";
-import { KuraGlyph } from "@/shared/ui/kura-logo/KuraMark";
+import { SakuraDrawIn } from "@/shared/ui/kura-logo/SakuraMark";
 import { StartupWindowDragRegion } from "@/shared/ui/StartupWindowDragRegion";
 
 const LOADING_TEXT = "Setting up your community...";
@@ -136,10 +136,10 @@ function useBootSplashHold(): BootSplashPhase {
   return phase;
 }
 
-// Pulsing Kura mark for the loading gates. Plain SVG (no JS/SMIL), so it
-// paints on the very first frame even before scripting starts, avoiding a
-// blank flash on hard reload.
-function BeeLoader({
+// Kura mark for the loading gates: the sakura draws itself in once. Plain SVG
+// (no JS/SMIL), so it paints on the very first frame even before scripting
+// starts, avoiding a blank flash on hard reload.
+function SakuraLoader({
   ariaLabel,
   className,
   tintClassName = "text-foreground",
@@ -154,13 +154,13 @@ function BeeLoader({
       role="img"
       aria-label={ariaLabel}
     >
-      <KuraGlyph className="block h-auto w-full animate-pulse" />
+      <SakuraDrawIn className="block h-auto w-full" />
     </div>
   );
 }
 
-// Cold boot gate: a flat themed surface with a single centered Kura glyph
-// pulsing over it. Replaces the old "Setting up your community" text, which
+// Cold boot gate: a flat themed surface with a single centered sakura drawing
+// itself in. Replaces the old "Setting up your community" text, which
 // stays as an sr-only caption.
 function AppLoadingGate() {
   return (
@@ -171,10 +171,7 @@ function AppLoadingGate() {
     >
       <StartupWindowDragRegion />
       <span className="sr-only">{LOADING_TEXT}</span>
-      <KuraGlyph
-        aria-hidden="true"
-        className="relative z-10 h-auto w-28 animate-pulse"
-      />
+      <SakuraDrawIn aria-hidden="true" className="relative z-10 h-auto w-28" />
     </div>
   );
 }
@@ -198,7 +195,7 @@ function CommunitySwitchGate() {
       <StartupWindowDragRegion />
       <span className="sr-only">Switching community…</span>
       {showSpinner ? (
-        <BeeLoader
+        <SakuraLoader
           ariaLabel="Switching community…"
           className="h-auto w-20"
           tintClassName="text-muted-foreground"

@@ -3,7 +3,7 @@ import { TerminalSquare } from "lucide-react";
 
 import type { AcpRuntimeCatalogEntry } from "@/shared/api/types";
 import { cn } from "@/shared/lib/cn";
-import { KuraMark } from "@/shared/ui/kura-logo/KuraMark";
+import { SakuraMark } from "@/shared/ui/kura-logo/SakuraMark";
 import claudeLogoUrl from "../assets/harness-logos/claude.png?inline";
 import { RUNTIME_MARKS } from "./HarnessMarks";
 
@@ -59,7 +59,7 @@ export function RuntimeIcon({
   if (isKuraRuntime(runtime)) {
     // The mark's wide viewBox letterboxes inside a square box, so honoring
     // the caller's size keeps it optically in line with the square logos.
-    return <KuraMark className={cn(className, "text-foreground")} />;
+    return <SakuraMark className={cn(className, "text-foreground")} />;
   }
 
   if (Mark) {

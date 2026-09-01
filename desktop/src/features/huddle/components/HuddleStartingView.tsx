@@ -1,4 +1,4 @@
-import { KuraGlyph } from "@/shared/ui/kura-logo/KuraMark";
+import { SakuraDrawIn } from "@/shared/ui/kura-logo/SakuraMark";
 
 /** Immediate feedback shown while the native huddle session is being prepared. */
 export function HuddleStartingView() {
@@ -10,9 +10,9 @@ export function HuddleStartingView() {
       role="status"
     >
       <span className="sr-only">Starting huddle</span>
-      <KuraGlyph
+      <SakuraDrawIn
         aria-hidden="true"
-        className="relative z-10 h-auto w-28 animate-pulse"
+        className="relative z-10 h-auto w-28"
         data-testid="huddle-starting-glyph"
       />
     </div>

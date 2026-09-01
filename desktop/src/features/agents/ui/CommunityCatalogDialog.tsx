@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ChevronDown, Plus, Upload } from "lucide-react";
-import { KuraGlyph } from "@/shared/ui/kura-logo/KuraMark";
+import { SakuraGlyph } from "@/shared/ui/kura-logo/SakuraMark";
 
 import { isCatalogPersonaSelected } from "@/features/agents/lib/catalog";
 import { isCatalogPersona } from "@/features/agents/lib/personaCatalogRelay";
@@ -650,7 +650,7 @@ function CatalogEmptyState() {
       className="flex flex-col items-center px-2 py-6 text-center"
       data-testid="community-catalog-empty-state"
     >
-      <KuraGlyph
+      <SakuraGlyph
         aria-hidden="true"
         className="h-16 w-16 text-muted-foreground/40"
         data-testid="community-catalog-empty-artwork"
