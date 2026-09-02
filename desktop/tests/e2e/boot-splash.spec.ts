@@ -3,13 +3,13 @@ import { installMockBridge } from "../helpers/bridge";
 
 // Cold-boot splash hold: on a real boot the community resolves in well under
 // 100ms — before the hidden Tauri window ever puts a frame on screen — so the
-// loading gate keeps the pulsing Kura glyph up as an overlay above the
-// already mounted app for a minimum visible duration, then fades out. E2E
+// loading gate keeps the Kura sakura up as an overlay above the already
+// mounted app for a minimum visible duration, then fades out. E2E
 // runs skip the hold by default (it would slow every spec's boot and block
 // pointer actionability); this spec opts back in via
 // __KURA_E2E__.bootSplashHoldMs.
 
-test("boot splash overlay holds with a pulsing glyph, then dismisses", async ({
+test("boot splash overlay holds with the animated mark, then dismisses", async ({
   page,
 }) => {
   await installMockBridge(page);
@@ -29,14 +29,14 @@ test("boot splash overlay holds with a pulsing glyph, then dismisses", async ({
   const overlay = page.getByTestId("boot-splash-overlay");
   await expect(overlay).toBeVisible();
 
-  // The glyph is actually animating while the overlay holds — pure CSS pulse.
+  // The mark carries the brand's draw-in animation — one pass by
+  // stroke-dashoffset, not a loop, so it may already have finished here.
   const glyph = overlay.locator("svg.kura-glyph");
   await expect(glyph).toBeVisible();
-  const pulseState = await glyph.evaluate((el) => {
-    const animation = el.getAnimations()[0];
-    return animation?.playState;
-  });
-  expect(pulseState).toBe("running");
+  const animationName = await glyph.evaluate(
+    (el) => getComputedStyle(el).animationName,
+  );
+  expect(animationName).toBe("kura-sakura-fade");
 
   // The app mounts and loads beneath the overlay — boot is not delayed.
   await expect(page.getByTestId("home-inbox-list")).toBeVisible();

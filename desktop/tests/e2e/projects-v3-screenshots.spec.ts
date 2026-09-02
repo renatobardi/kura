@@ -874,7 +874,8 @@ test("projects v3 workspace screenshot states", async ({ page }) => {
   ).toBeVisible();
   await expect(
     workspacePanel.getByTestId("project-repository-entry-icon").first(),
-  ).toHaveCSS("border-radius", "8px");
+    // `rounded-md` = --radius - 2px, and the Kubo base radius is 8px.
+  ).toHaveCSS("border-radius", "6px");
   const repositoryEntryCell = workspacePanel
     .getByTestId("project-repository-entry-row")
     .first()
@@ -1017,7 +1018,8 @@ test("projects v3 workspace screenshot states", async ({ page }) => {
   expect(newIssueBounds?.x).toBeGreaterThan(issuesHeadingBounds?.x ?? 0);
   const issueRow = page.getByTestId("project-issue-row").first();
   await expect(issueRow).toBeVisible({ timeout: 10_000 });
-  await expect(issueRow).toHaveCSS("border-radius", "8px");
+  // `rounded-md` = --radius - 2px, and the Kubo base radius is 8px.
+  await expect(issueRow).toHaveCSS("border-radius", "6px");
   const [issueHeaderBounds, firstIssueBounds, secondIssueBounds] =
     await Promise.all([
       page.getByTestId("project-work-item-group-header").first().boundingBox(),

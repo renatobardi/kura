@@ -1,5 +1,5 @@
 import { cn } from "@/shared/lib/cn";
-import { KuraGlyph } from "@/shared/ui/kura-logo/KuraMark";
+import { SakuraGlyph } from "@/shared/ui/kura-logo/SakuraMark";
 
 /** Centered, low-emphasis loading state for page and panel fetches. */
 export function KuraLoadingState({
@@ -21,7 +21,7 @@ export function KuraLoadingState({
       data-testid="kura-loading-state"
       role="status"
     >
-      <KuraGlyph
+      <SakuraGlyph
         aria-label={label}
         className="animate-pulse"
         style={{ width: "2rem" }}

@@ -46,7 +46,8 @@ export default {
         "message-author": "var(--conversation-author-line-height)",
       },
       boxShadow: {
-        "content-edge": "-1px -1px 0 0 hsl(var(--sidebar-border) / 0.45)",
+        "content-edge":
+          "-1px -1px 0 0 color-mix(in srgb, hsl(var(--sidebar-border)) 45%, transparent)",
         // Edge + elevation for a surface anchored to the right of the content
         // area, whose only exposed edge faces left. Tailwind's stock shadows are
         // all y-offset, so they cast almost nothing sideways — `shadow-xl` on a
@@ -56,12 +57,19 @@ export default {
         // soft layer carries the lift. A left-only `border` can't do this job —
         // it tapers out at each corner instead of turning it.
         "panel-left":
-          "-1px 0 0 0 hsl(var(--border) / 0.8), -16px 0 32px -12px rgb(0 0 0 / 0.18)",
+          "-1px 0 0 0 color-mix(in srgb, hsl(var(--border)) 80%, transparent), -16px 0 32px -12px rgb(0 0 0 / 0.18)",
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        // Kubo component radii. Pill controls (buttons, inputs, selects,
+        // badges) and dialogs share one value; cards and textareas have
+        // their own. Tokens live in styles/globals/theme.css.
+        pill: "var(--radius-pill)",
+        dialog: "var(--radius-dialog)",
+        card: "var(--radius-card)",
+        textarea: "var(--radius-textarea)",
       },
       spacing: {
         4.5: "1.125rem",

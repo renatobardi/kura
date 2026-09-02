@@ -88,7 +88,7 @@ export function AppHuddleShell({
                     : "kura-huddle-app-surface-open"),
               )}
             >
-              <KuraTheme.GradientLayer />
+              <KuraTheme.SurfaceTintLayer />
               {children}
             </div>
             {isRoom || !isCompanionOpen ? (

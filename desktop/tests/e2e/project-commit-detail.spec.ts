@@ -769,13 +769,15 @@ test("latest files commit opens its detail without a divider", async ({
   const repositoryEntryCells = repositoryEntryRow.locator("td");
   await expect(repositoryEntryCells.first()).toHaveCSS("border-radius", "0px");
   await repositoryEntryRow.hover();
+  // `rounded-l-md` / `rounded-r-md` = --radius - 2px, and the Kubo base
+  // radius is 8px.
   await expect(repositoryEntryCells.first()).toHaveCSS(
     "border-top-left-radius",
-    "8px",
+    "6px",
   );
   await expect(repositoryEntryCells.last()).toHaveCSS(
     "border-top-right-radius",
-    "8px",
+    "6px",
   );
   await latestCommit.click();
   await expect(page.getByTestId("project-commit-detail")).toBeVisible();

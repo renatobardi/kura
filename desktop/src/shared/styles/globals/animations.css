@@ -653,9 +653,8 @@
 }
 
 /* ── Setup / cold-boot loading screen ───────────────────────────────────
-   Static seigaiha (wave-circle) pattern background for the "setting up
-   your community" gate. Flat washi paper, no animation — the animated
-   Kura mark is the hero (see AppLoadingGate in app/App.tsx). */
+   Flat surface for the "setting up your community" gate — no texture, no
+   gradient. The animated mark is the hero (see AppLoadingGate in app/App.tsx). */
 
 .kura-setup-loading-shell {
   background-color: hsl(var(--background));
@@ -664,35 +663,57 @@
   position: relative;
 }
 
-.kura-setup-grainient {
-  color: hsl(var(--foreground));
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  position: absolute;
-  z-index: 0;
+/* ── Brand mark: sakura draw-in ─────────────────────────────────────────
+   The five petals and stamens draw themselves once by stroke-dashoffset and
+   hold. Fast and plain: ~600ms ease-out, no loop, no bounce. */
+
+/* The svg itself fades up over the same window, so the mark reads as one
+   gesture (and callers can observe a single animation on the element). */
+.kura-sakura-draw {
+  animation: kura-sakura-fade 600ms ease-out both;
 }
 
-.kura-setup-grainient__wash,
-.kura-setup-grainient__veil {
-  inset: 0;
-  position: absolute;
+.kura-sakura-draw path,
+.kura-sakura-draw line {
+  animation: kura-sakura-draw 600ms ease-out both;
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
 }
 
-.kura-setup-grainient__wash svg {
-  height: 100%;
-  opacity: 0.06;
-  width: 100%;
+.kura-sakura-draw circle {
+  animation: kura-sakura-core 200ms ease-out 480ms both;
 }
 
-.dark .kura-setup-grainient__wash svg {
-  opacity: 0.08;
+@keyframes kura-sakura-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
-.kura-setup-grainient__veil {
-  background: linear-gradient(
-    0deg,
-    hsl(var(--background)) 0%,
-    hsl(var(--background) / 0) 45%
-  );
+@keyframes kura-sakura-fade {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes kura-sakura-core {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kura-sakura-draw,
+  .kura-sakura-draw path,
+  .kura-sakura-draw line,
+  .kura-sakura-draw circle {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
 }

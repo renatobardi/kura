@@ -270,28 +270,24 @@ const LINK_PREVIEW_SAMPLE_BASE: Omit<ResolvedLinkPreview, "imageDataUrl"> = {
 };
 
 /**
- * Build the sample thumbnail as an SVG data URL from the Kura gradient
+ * Build the sample thumbnail as an SVG data URL from the theme surface
  * tokens. Data-URL images cannot resolve CSS variables, so the token values
- * are read from the live stylesheet and baked in per render — if the Kura
- * gradient ever changes in `theme.css`, this preview follows automatically.
+ * are read from the live stylesheet and baked in per render — if the surface
+ * colors ever change in `theme.css`, this preview follows automatically.
+ * Kubo has no gradients: the sample is a flat fill.
  */
-function kuraGradientSampleImage(isDark: boolean): string {
+function themeSampleImage(isDark: boolean): string {
   const styles = globalThis.document
     ? getComputedStyle(document.documentElement)
     : null;
   const readToken = (token: string, fallback: string): string =>
     styles?.getPropertyValue(token).trim() || fallback;
-  const top = isDark
-    ? readToken("--kura-gradient-dark-top", "#1f1d1a")
-    : readToken("--kura-gradient-light-top", "#f7f4ee");
-  const bottom = isDark
-    ? readToken("--kura-gradient-dark-bottom", "#151412")
-    : readToken("--kura-gradient-light-bottom", "#ece7dc");
+  const surface = `hsl(${readToken("--muted", isDark ? "12 6.5% 15.1%" : "60 4.8% 95.9%")})`;
   const shapeToken = isDark ? "--foreground" : "--background";
-  const shapeFallback = isDark ? "0 0% 98%" : "0 0% 100%";
+  const shapeFallback = isDark ? "60 9.1% 97.8%" : "0 0% 100%";
   const shape = `hsl(${readToken(shapeToken, shapeFallback)})`;
   const shapeOpacities = isDark ? [0.5, 0.38, 0.28] : [0.82, 0.68, 0.52];
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 382 200"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bottom}"/></linearGradient></defs><rect width="382" height="200" fill="url(#g)"/><rect x="76" y="64" width="72" height="72" rx="22" fill="${shape}" opacity="${shapeOpacities[0]}"/><rect x="168" y="76" width="96" height="18" rx="9" fill="${shape}" opacity="${shapeOpacities[1]}"/><rect x="168" y="106" width="138" height="18" rx="9" fill="${shape}" opacity="${shapeOpacities[2]}"/></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 382 200"><rect width="382" height="200" fill="${surface}"/><rect x="76" y="64" width="72" height="72" rx="22" fill="${shape}" opacity="${shapeOpacities[0]}"/><rect x="168" y="76" width="96" height="18" rx="9" fill="${shape}" opacity="${shapeOpacities[1]}"/><rect x="168" y="106" width="138" height="18" rx="9" fill="${shape}" opacity="${shapeOpacities[2]}"/></svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
@@ -308,7 +304,7 @@ function LinkPreviewSample({ style }: { style: LinkPreviewStyle }) {
   const preview = React.useMemo<ResolvedLinkPreview>(
     () => ({
       ...LINK_PREVIEW_SAMPLE_BASE,
-      imageDataUrl: kuraGradientSampleImage(isDark),
+      imageDataUrl: themeSampleImage(isDark),
     }),
     [isDark],
   );
@@ -503,15 +499,10 @@ export function GlassBackgroundSetting() {
  */
 function ThreadLayoutDiagram({ mode }: { mode: ThreadViewMode }) {
   const { isDark } = useTheme();
-  const gradientId = React.useId();
-  // Inline SVG resolves CSS variables, so the frame gradient references the
-  // Kura gradient tokens directly and follows theme.css automatically.
-  const gradientTop = isDark
-    ? "var(--kura-gradient-dark-top, #1f1d1a)"
-    : "var(--kura-gradient-light-top, #f7f4ee)";
-  const gradientBottom = isDark
-    ? "var(--kura-gradient-dark-bottom, #151412)"
-    : "var(--kura-gradient-light-bottom, #ece7dc)";
+  // Inline SVG resolves CSS variables, so the frame references the sidebar
+  // surface token directly and follows theme.css automatically. Flat fill —
+  // Kubo has no gradients.
+  const frameSurface = "hsl(var(--sidebar-background))";
   const channelSurface = "hsl(var(--muted))";
   const threadSurface = "hsl(var(--background))";
   const channelOpacity = isDark ? 0.88 : 0.78;
@@ -552,14 +543,8 @@ function ThreadLayoutDiagram({ mode }: { mode: ThreadViewMode }) {
       role="img"
       viewBox="0 0 240 132"
     >
-      <defs>
-        <linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor={gradientTop} />
-          <stop offset="1" stopColor={gradientBottom} />
-        </linearGradient>
-      </defs>
       {/* Frame */}
-      <rect fill={`url(#${gradientId})`} height={132} rx={18} width={240} />
+      <rect fill={frameSurface} height={132} rx={18} width={240} />
       {/* Channel surface */}
       <rect
         fill={channelSurface}

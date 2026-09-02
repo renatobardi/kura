@@ -139,7 +139,7 @@
 
 .rich-text-composer .tiptap pre {
   border-radius: var(--radius);
-  border: 1px solid hsl(var(--border) / 0.7);
+  border: 1px solid color-mix(in srgb, hsl(var(--border)) 70%, transparent);
   background: hsl(var(--muted) / 0.6);
   padding: 0.375rem 0.75rem;
   overflow-x: auto;
@@ -249,7 +249,7 @@
 }
 
 .rich-text-composer .tiptap hr {
-  border-color: hsl(var(--border) / 0.8);
+  border-color: color-mix(in srgb, hsl(var(--border)) 80%, transparent);
   margin: 0.5rem 0;
 }
 

@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
 
 import { cn } from "@/shared/lib/cn";
-import { KuraGlyph } from "@/shared/ui/kura-logo/KuraMark";
+import { SakuraGlyph } from "@/shared/ui/kura-logo/SakuraMark";
 import { useTranscriptAnimationEnabled } from "./transcriptAnimationPreference";
 
 const MARKS = ["first", "second", "third"] as const;
@@ -21,7 +21,7 @@ export function TurnLivenessIndicator({ className }: { className?: string }) {
         data-testid="turn-liveness-indicator"
         role="status"
       >
-        <KuraGlyph
+        <SakuraGlyph
           aria-label="Agent turn in progress"
           className="text-foreground animate-pulse"
         />
@@ -51,7 +51,7 @@ export function TurnLivenessIndicator({ className }: { className?: string }) {
             times: [0, 0.3, 0.7, 1],
           }}
         >
-          <KuraGlyph aria-hidden="true" className="w-5! text-foreground" />
+          <SakuraGlyph aria-hidden="true" className="w-5! text-foreground" />
         </motion.div>
       ))}
     </div>

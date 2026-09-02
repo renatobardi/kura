@@ -32,7 +32,7 @@ import {
   ONBOARDING_INK_ICON_CLASS,
   ONBOARDING_PRIMARY_CTA_CLASS,
 } from "@/features/onboarding/ui/OnboardingChrome";
-import { KuraMark } from "@/shared/ui/kura-logo/KuraMark";
+import { SakuraMark } from "@/shared/ui/kura-logo/SakuraMark";
 import {
   Dialog,
   DialogContent,
@@ -41,7 +41,7 @@ import {
 } from "@/shared/ui/dialog";
 
 const FUZZY_SURFACE_CLASS =
-  "relative left-1/2 w-[min(calc(100%+12rem),calc(100vw-2rem))] max-w-[1040px] -translate-x-1/2 px-20 pb-14 pt-20 !text-[rgb(var(--kura-hosted-community-surface-fg))] [--kura-card-textured-min-height:224px]";
+  "relative left-1/2 w-[min(calc(100%+12rem),calc(100vw-2rem))] min-h-[224px] max-w-[1040px] -translate-x-1/2 px-20 pb-14 pt-20 !text-[rgb(var(--kura-hosted-community-surface-fg))]";
 const COMMUNITY_LIST_CLASS = "mx-auto w-full max-w-[520px] text-left";
 const COMMUNITY_ROW_CLASS =
   "flex min-h-[5.75rem] items-center justify-between gap-8 py-4 text-sm";
@@ -431,7 +431,7 @@ export function HostedCommunityOnboarding({
     ) : (
       <Card
         asChild
-        className={`${FUZZY_SURFACE_CLASS} !py-10 [--kura-card-textured-min-height:176px]`}
+        className={`${FUZZY_SURFACE_CLASS} min-h-[176px] !py-10`}
         data-testid="hosted-community-create-surface"
         variant="textured"
       >
@@ -474,7 +474,7 @@ export function HostedCommunityOnboarding({
         surface="textured"
       >
         <div className="mx-auto flex w-full max-w-sm flex-col items-center py-2 text-center">
-          <KuraMark className="mb-5 h-auto w-9 text-foreground" />
+          <SakuraMark className="mb-5 h-auto w-9 text-foreground" />
 
           {!auth ? (
             <>

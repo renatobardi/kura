@@ -1,58 +1,67 @@
 @layer base {
   :root {
-    /* Kura light — washi paper, sumi ink, shu seal accent */
-    --radius: 0.625rem;
-    --background: 40 36% 95.1%;
-    --foreground: 36 10% 10%;
+    /*
+     * Kubo light — stone neutrals, near-black primary, sakura as the single
+     * brand accent. Color is reserved for meaning: red only in destructive
+     * (always tinted), never in chrome.
+     */
+    --radius: 0.5rem;
+    /* Component radii (Kubo): pill controls, softly rounded cards. */
+    --radius-pill: 20.8px;
+    --radius-card: 14.4px;
+    --radius-textarea: 12px;
+    --radius-dialog: 20.8px;
+    --background: 0 0% 100%;
+    --foreground: 20 14.3% 4.1%;
     --card: 0 0% 100%;
-    --card-foreground: 36 10% 10%;
+    --card-foreground: 20 14.3% 4.1%;
     --popover: 0 0% 100%;
-    --popover-foreground: 36 10% 10%;
-    --primary: 10 61% 44%;
-    --primary-foreground: 40 36% 95.1%;
-    --secondary: 41 30% 89%;
-    --secondary-foreground: 36 10% 10%;
-    --muted: 41 30% 89%;
-    --muted-foreground: 36 9% 33%;
-    --huddle-drawer-surface: 36 10% 10%;
-    --huddle-control-surface: 34 9% 16%;
-    --huddle-control-hover-surface: 33 9% 19%;
-    --huddle-control-chevron-surface: 36 9% 11%;
-    --huddle-control-chevron-hover-surface: 34 9% 16%;
-    --huddle-control-foreground: 41 30% 89%;
-    --huddle-popover-surface: 36 9% 11%;
-    --huddle-popover-border: 33 9% 19%;
-    --huddle-tooltip-surface: 34 9% 16%;
-    --huddle-tooltip-foreground: 41 30% 89%;
-    --accent: 41 30% 89%;
-    --accent-foreground: 36 10% 10%;
-    --destructive: 0 57% 41%;
-    --destructive-foreground: 40 36% 95.1%;
-    --border: 40 26% 87%;
-    --input: 40 26% 87%;
-    --ring: 10 61% 44%;
-    --chart-1: 10 61% 44%;
-    --chart-2: 213 39% 30%;
-    --chart-3: 77 26% 39%;
-    --chart-4: 36 9% 33%;
-    --chart-5: 40 26% 70%;
-    --sidebar: 40 31% 93%;
-    --sidebar-background: 40 31% 93%;
-    --sidebar-foreground: 36 10% 10%;
-    --sidebar-primary: 10 61% 44%;
-    --sidebar-primary-foreground: 40 36% 95.1%;
+    --popover-foreground: 20 14.3% 4.1%;
+    --primary: 24 9.8% 10%;
+    --primary-foreground: 60 9.1% 97.8%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 60 4.8% 95.9%;
+    --muted-foreground: 25 5.3% 44.7%;
+    /* Huddle chrome stays on the dark surfaces in both themes. */
+    --huddle-drawer-surface: 24 9.8% 10%;
+    --huddle-control-surface: 12 6.5% 15.1%;
+    --huddle-control-hover-surface: 24 6% 19%;
+    --huddle-control-chevron-surface: 24 9.8% 10%;
+    --huddle-control-chevron-hover-surface: 12 6.5% 15.1%;
+    --huddle-control-foreground: 60 9.1% 97.8%;
+    --huddle-popover-surface: 24 9.8% 10%;
+    --huddle-popover-border: 24 6% 19%;
+    --huddle-tooltip-surface: 12 6.5% 15.1%;
+    --huddle-tooltip-foreground: 60 9.1% 97.8%;
+    --accent: 60 4.8% 95.9%;
+    --accent-foreground: 24 9.8% 10%;
+    --destructive: 0 72.2% 50.6%;
+    --destructive-foreground: 60 9.1% 97.8%;
+    --border: 20 5.9% 90%;
+    --input: 20 5.9% 90%;
+    --ring: 24 5.7% 63.1%;
+    /* Charts use a mono stone ramp — no hues. */
+    --chart-1: 24 6.7% 83%;
+    --chart-2: 25 5.3% 44.7%;
+    --chart-3: 33 6.3% 32.2%;
+    --chart-4: 30 7.2% 25%;
+    --chart-5: 12 6.5% 15.1%;
+    --sidebar: 60 9.1% 97.8%;
+    --sidebar-background: 60 9.1% 97.8%;
+    --sidebar-foreground: 20 14.3% 4.1%;
+    --sidebar-primary: 24 9.8% 10%;
+    --sidebar-primary-foreground: 60 9.1% 97.8%;
     --sidebar-active: var(--sidebar-primary);
     --sidebar-active-foreground: var(--sidebar-primary-foreground);
-    --sidebar-accent: 41 30% 89%;
-    --sidebar-accent-foreground: 36 10% 10%;
-    --sidebar-border: 40 26% 87%;
-    --sidebar-ring: 10 61% 44%;
-    /* Kura palette tokens (legacy --kura-* names until phase 2); components consume these semantically. */
-    --kura-gradient-light-top: #f7f4ee;
-    --kura-gradient-light-bottom: #ece7dc;
-    --kura-gradient-dark-top: #1f1d1a;
-    --kura-gradient-dark-bottom: #151412;
-    --kura-content-dark: 40 8% 8%;
+    --sidebar-accent: 60 4.8% 95.9%;
+    --sidebar-accent-foreground: 24 9.8% 10%;
+    --sidebar-border: 20 5.9% 90%;
+    --sidebar-ring: 24 5.7% 63.1%;
+    /* Sakura — the only brand accent. Petal fill in light, ink in dark. */
+    --sakura-petal: #f4c9d4;
+    --sakura-ink: hsl(var(--foreground));
+    --kura-content-dark: 20 14.3% 4.1%;
     /* Hosted-community onboarding intentionally keeps this light palette in
        both app themes; semantic tokens keep component code color-agnostic. */
     --kura-hosted-community-surface-fg: 28 26 23;
@@ -66,53 +75,62 @@
   }
 
   .dark {
-    /* Kura dark — sumi-e */
-    --radius: 0.625rem;
-    --background: 40 8% 8%;
-    --foreground: 41 30% 89%;
-    --card: 36 9% 11%;
-    --card-foreground: 41 30% 89%;
-    --popover: 36 9% 11%;
-    --popover-foreground: 41 30% 89%;
-    --primary: 11 62% 53%;
-    --primary-foreground: 40 8% 8%;
-    --secondary: 34 9% 16%;
-    --secondary-foreground: 41 30% 89%;
-    --muted: 34 9% 16%;
-    --muted-foreground: 38 9% 58%;
-    --huddle-drawer-surface: 34 9% 16%;
-    --huddle-control-surface: 33 9% 22%;
-    --huddle-control-hover-surface: 33 9% 26%;
-    --huddle-control-chevron-surface: 33 9% 19%;
-    --huddle-control-chevron-hover-surface: 33 9% 22%;
-    --huddle-control-foreground: 41 30% 89%;
-    --huddle-popover-surface: 33 9% 19%;
-    --huddle-popover-border: 33 9% 26%;
-    --huddle-tooltip-surface: 33 9% 22%;
-    --huddle-tooltip-foreground: 41 30% 89%;
-    --accent: 34 9% 16%;
-    --accent-foreground: 41 30% 89%;
-    --destructive: 4 60% 60%;
-    --destructive-foreground: 40 8% 8%;
-    --border: 33 9% 19%;
-    --input: 33 9% 19%;
-    --ring: 11 62% 53%;
-    --chart-1: 11 62% 53%;
-    --chart-2: 214 34% 63%;
-    --chart-3: 75 25% 55%;
-    --chart-4: 38 9% 58%;
-    --chart-5: 34 9% 30%;
-    --sidebar: 30 6% 7%;
-    --sidebar-background: 30 6% 7%;
-    --sidebar-foreground: 41 30% 89%;
-    --sidebar-primary: 11 62% 53%;
-    --sidebar-primary-foreground: 40 8% 8%;
+    /* Kubo dark — one stone surface, translucent white hairlines. */
+    --radius: 0.5rem;
+    --radius-pill: 20.8px;
+    --radius-card: 14.4px;
+    --radius-textarea: 12px;
+    --radius-dialog: 20.8px;
+    --background: 20 14.3% 4.1%;
+    --foreground: 60 9.1% 97.8%;
+    --card: 24 9.8% 10%;
+    --card-foreground: 60 9.1% 97.8%;
+    --popover: 24 9.8% 10%;
+    --popover-foreground: 60 9.1% 97.8%;
+    --primary: 60 4.8% 89.1%;
+    --primary-foreground: 24 9.8% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 60 9.1% 97.8%;
+    --muted: 12 6.5% 15.1%;
+    --muted-foreground: 24 5.7% 63.1%;
+    --huddle-drawer-surface: 24 9.8% 10%;
+    --huddle-control-surface: 12 6.5% 15.1%;
+    --huddle-control-hover-surface: 24 6% 19%;
+    --huddle-control-chevron-surface: 24 9.8% 10%;
+    --huddle-control-chevron-hover-surface: 12 6.5% 15.1%;
+    --huddle-control-foreground: 60 9.1% 97.8%;
+    --huddle-popover-surface: 24 9.8% 10%;
+    --huddle-popover-border: 24 6% 19%;
+    --huddle-tooltip-surface: 12 6.5% 15.1%;
+    --huddle-tooltip-foreground: 60 9.1% 97.8%;
+    --accent: 12 6.5% 15.1%;
+    --accent-foreground: 60 9.1% 97.8%;
+    --destructive: 0 90.6% 70.8%;
+    --destructive-foreground: 20 14.3% 4.1%;
+    /* Translucent white hairlines, not an opaque grey. */
+    --border: 0 0% 100% / 10%;
+    --input: 0 0% 100% / 15%;
+    --ring: 25 5.3% 44.7%;
+    --chart-1: 24 6.7% 83%;
+    --chart-2: 24 5.7% 63.1%;
+    --chart-3: 25 5.3% 44.7%;
+    --chart-4: 33 6.3% 32.2%;
+    --chart-5: 30 7.2% 25%;
+    /* Sidebar shares the card surface — one plane, no second background. */
+    --sidebar: 24 9.8% 10%;
+    --sidebar-background: 24 9.8% 10%;
+    --sidebar-foreground: 60 9.1% 97.8%;
+    --sidebar-primary: 60 4.8% 89.1%;
+    --sidebar-primary-foreground: 24 9.8% 10%;
     --sidebar-active: var(--sidebar-primary);
     --sidebar-active-foreground: var(--sidebar-primary-foreground);
-    --sidebar-accent: 34 9% 16%;
-    --sidebar-accent-foreground: 41 30% 89%;
-    --sidebar-border: 33 9% 19%;
-    --sidebar-ring: 11 62% 53%;
+    --sidebar-accent: 12 6.5% 15.1%;
+    --sidebar-accent-foreground: 60 9.1% 97.8%;
+    --sidebar-border: 0 0% 100% / 10%;
+    --sidebar-ring: 25 5.3% 44.7%;
+    --sakura-petal: transparent;
+    --sakura-ink: #f4c9d4;
+    --kura-content-dark: 20 14.3% 4.1%;
   }
 
   * {
@@ -229,8 +247,6 @@
  * same hover/selection hierarchy.
  */
 :root[data-kura-sidebar] {
-  --kura-gradient-top: var(--kura-gradient-light-top);
-  --kura-gradient-bottom: var(--kura-gradient-light-bottom);
   --kura-muted-foreground: rgb(0 0 0 / 40%);
   --kura-search-surface: rgb(0 0 0 / 4%);
   --kura-chrome-foreground: rgb(0 0 0 / 50%);
@@ -250,8 +266,6 @@
  * class is set on the document root whenever a dark theme is active.
  */
 :root[data-kura-sidebar].dark {
-  --kura-gradient-top: var(--kura-gradient-dark-top);
-  --kura-gradient-bottom: var(--kura-gradient-dark-bottom);
   --kura-muted-foreground: rgb(255 255 255 / 40%);
   --kura-search-surface: rgb(255 255 255 / 4%);
   --kura-chrome-foreground: rgb(255 255 255 / 50%);
@@ -286,7 +300,8 @@
 :root[data-kura-sidebar]:not(.dark)
   [data-kura-content-surface]:not([data-kura-content-unframed]) {
   box-shadow:
-    -1px -1px 0 0 hsl(var(--sidebar-border) / 0.45),
+    -1px -1px 0 0
+    color-mix(in srgb, hsl(var(--sidebar-border)) 45%, transparent),
     0 0 4px 0 rgb(0 0 0 / 7%);
 }
 
@@ -309,75 +324,6 @@
   background-color: transparent;
   background-image: none;
   isolation: isolate;
-}
-
-/* The Kura theme uses a translucent color wash. Back it with an opaque copy
- * of the same gradient by default so its color remains stable over every app
- * surface, including a lifted huddle. */
-:root[data-kura-sidebar] .kura-theme-gradient-underlay {
-  background-image: linear-gradient(
-    to bottom,
-    var(--kura-gradient-top),
-    var(--kura-gradient-bottom)
-  );
-  background-repeat: no-repeat;
-  background-size: 100vw 100vh;
-}
-
-/*
- * Keep both Kura gradients painted and switch only which layer is visible.
- * WKWebView can retain the old raster when `background-image` is replaced on
- * a translucent surface. The center content already follows `.dark`, so using
- * that same state for layer visibility keeps both surfaces in lockstep.
- */
-:root[data-kura-sidebar] .kura-theme-gradient-layer-light {
-  background-image: linear-gradient(
-    to bottom,
-    var(--kura-gradient-light-top),
-    var(--kura-gradient-light-bottom)
-  );
-  background-size: 100vw 100vh;
-  background-repeat: no-repeat;
-}
-
-:root[data-kura-sidebar] .kura-theme-gradient-layer-dark {
-  background-image: linear-gradient(
-    to bottom,
-    var(--kura-gradient-dark-top),
-    var(--kura-gradient-dark-bottom)
-  );
-  background-size: 100vw 100vh;
-  background-repeat: no-repeat;
-}
-
-:root[data-kura-sidebar]:not(.dark) .kura-theme-gradient-layer-light,
-:root[data-kura-sidebar].dark .kura-theme-gradient-layer-dark {
-  opacity: 1;
-}
-
-/* The mobile sidebar is portaled outside the app surface. */
-:root[data-kura-sidebar]:not(.dark)
-  [data-sidebar="sidebar"][data-mobile="true"].bg-sidebar {
-  background-color: transparent;
-  background-image: linear-gradient(
-    to bottom,
-    var(--kura-gradient-light-top),
-    var(--kura-gradient-light-bottom)
-  );
-  background-size: 100vw 100vh;
-  background-repeat: no-repeat;
-}
-
-:root[data-kura-sidebar].dark
-  [data-sidebar="sidebar"][data-mobile="true"].bg-sidebar {
-  background-color: transparent;
-  background-image: linear-gradient(
-    to bottom,
-    var(--kura-gradient-dark-top),
-    var(--kura-gradient-dark-bottom)
-  );
-  background-size: 100vw 100vh;
-  background-repeat: no-repeat;
 }
 
 /* All in-shell chrome reveals the single gradient painted above. */
@@ -657,173 +603,14 @@
     var(--sidebar-background) /
     var(--glass-background-opacity, 65%)
   );
-  --kura-translucency-gradient-alpha: var(--glass-background-opacity, 65%);
-  --kura-translucency-wash-alpha: 2.4%;
 }
 
-/* The regular Kura theme keeps an opaque copy of the gradient beneath its
- * color layers. Remove that backing while glass is enabled so the translucent
- * wash can reveal the native macOS vibrancy view. */
-:root[data-glass-background] .kura-theme-gradient-underlay {
-  background: transparent;
-}
-
-/* Non-Kura themes use their existing sidebar color as the glass tint. */
-:root[data-glass-background]:not([data-kura-sidebar])
-  .kura-theme-gradient-layer {
+/* Every theme uses its sidebar color as the glass tint — flat, no gradient. */
+:root[data-glass-background] .kura-theme-tint-layer {
   background-color: var(--glass-sidebar-surface);
 }
 
-:root[data-glass-background] .kura-theme-gradient-layer-light {
-  /* Kura color wash above a neutral frost wash. */
-  background-image:
-    linear-gradient(
-      to bottom,
-      color-mix(
-        in srgb,
-        var(--kura-gradient-light-top)
-          var(--kura-translucency-gradient-alpha, 70%),
-        transparent
-      ),
-      color-mix(
-        in srgb,
-        var(--kura-gradient-light-bottom)
-          var(--kura-translucency-gradient-alpha, 70%),
-        transparent
-      )
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(
-        in srgb,
-        #ffffff var(--kura-translucency-wash-alpha, 2.4%),
-        transparent
-      ),
-      color-mix(
-        in srgb,
-        #ffffff var(--kura-translucency-wash-alpha, 2.4%),
-        transparent
-      )
-    );
-  background-size:
-    100vw 100vh,
-    100vw 100vh;
-  background-repeat: no-repeat, no-repeat;
-}
-
-:root[data-glass-background] .kura-theme-gradient-layer-dark {
-  background-image:
-    linear-gradient(
-      to bottom,
-      color-mix(
-        in srgb,
-        var(--kura-gradient-dark-top)
-          var(--kura-translucency-gradient-alpha, 70%),
-        transparent
-      ),
-      color-mix(
-        in srgb,
-        var(--kura-gradient-dark-bottom)
-          var(--kura-translucency-gradient-alpha, 70%),
-        transparent
-      )
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(
-        in srgb,
-        #12161d var(--kura-translucency-wash-alpha, 2.4%),
-        transparent
-      ),
-      color-mix(
-        in srgb,
-        #12161d var(--kura-translucency-wash-alpha, 2.4%),
-        transparent
-      )
-    );
-  background-size:
-    100vw 100vh,
-    100vw 100vh;
-  background-repeat: no-repeat, no-repeat;
-}
-
-:root[data-glass-background][data-kura-sidebar]:not(.dark)
-  [data-sidebar="sidebar"][data-mobile="true"].bg-sidebar {
-  background-color: transparent;
-  background-image:
-    linear-gradient(
-      to bottom,
-      color-mix(
-        in srgb,
-        var(--kura-gradient-light-top)
-          var(--kura-translucency-gradient-alpha, 70%),
-        transparent
-      ),
-      color-mix(
-        in srgb,
-        var(--kura-gradient-light-bottom)
-          var(--kura-translucency-gradient-alpha, 70%),
-        transparent
-      )
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(
-        in srgb,
-        #ffffff var(--kura-translucency-wash-alpha, 2.4%),
-        transparent
-      ),
-      color-mix(
-        in srgb,
-        #ffffff var(--kura-translucency-wash-alpha, 2.4%),
-        transparent
-      )
-    );
-  background-size:
-    100vw 100vh,
-    100vw 100vh;
-  background-repeat: no-repeat, no-repeat;
-}
-
-:root[data-glass-background][data-kura-sidebar].dark
-  [data-sidebar="sidebar"][data-mobile="true"].bg-sidebar {
-  background-color: transparent;
-  background-image:
-    linear-gradient(
-      to bottom,
-      color-mix(
-        in srgb,
-        var(--kura-gradient-dark-top)
-          var(--kura-translucency-gradient-alpha, 70%),
-        transparent
-      ),
-      color-mix(
-        in srgb,
-        var(--kura-gradient-dark-bottom)
-          var(--kura-translucency-gradient-alpha, 70%),
-        transparent
-      )
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(
-        in srgb,
-        #12161d var(--kura-translucency-wash-alpha, 2.4%),
-        transparent
-      ),
-      color-mix(
-        in srgb,
-        #12161d var(--kura-translucency-wash-alpha, 2.4%),
-        transparent
-      )
-    );
-  background-size:
-    100vw 100vh,
-    100vw 100vh;
-  background-repeat: no-repeat, no-repeat;
-}
-
-:root[data-glass-background]:not([data-kura-sidebar])
+:root[data-glass-background]
   [data-sidebar="sidebar"][data-mobile="true"].bg-sidebar {
   background-color: var(--glass-sidebar-surface);
   background-image: none;

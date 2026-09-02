@@ -3,14 +3,31 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/shared/lib/cn";
-import "./card-texture.css";
 
 export type CardTextureTone = "light" | "dark";
 export type CardTextureSize = "regular" | "compact";
 
-export const TEXTURED_SURFACE_CLASS =
-  "kura-card-textured relative isolate rounded-none border-0 bg-transparent p-[var(--kura-card-textured-safe-inset)] shadow-none";
+/**
+ * Kubo cards are flat: `bg-card` plus a 1px ring drawn as a box-shadow, no
+ * border and no drop shadow. The ring keeps the card's own radius without
+ * adding a layout box, so nested content never shifts by a pixel.
+ */
+export const CARD_RING_CLASS =
+  "shadow-[0_0_0_1px_color-mix(in_oklab,hsl(var(--foreground))_10%,transparent)]";
 
+const CARD_SURFACE_CLASS = `rounded-card bg-card ${CARD_RING_CLASS}`;
+
+/**
+ * The onboarding surface. It used to be a baked nine-slice powder texture;
+ * Kubo has no textures, so it is now the flat card. The geometry the texture
+ * imposed is kept deliberately — 5rem of padding (1.75rem compact) and a
+ * 224px floor (136px compact) — because the onboarding layouts are built on
+ * it: content is positioned against that padding, and panels overlap their
+ * own controls without the floor.
+ *
+ * `tone="dark"` used to swap in a separately baked dark fill so its content
+ * stayed bright; it now paints the near-black surface directly.
+ */
 export function texturedSurfaceClasses({
   size = "regular",
   tone = "light",
@@ -19,45 +36,23 @@ export function texturedSurfaceClasses({
   tone?: CardTextureTone;
 } = {}): string {
   return cn(
-    TEXTURED_SURFACE_CLASS,
-    tone === "dark" && "kura-card-textured-dark",
-    size === "compact" && "kura-card-textured-compact",
+    "relative isolate rounded-card",
+    tone === "dark"
+      ? "bg-foreground text-background"
+      : `bg-card ${CARD_RING_CLASS}`,
+    size === "compact"
+      ? "min-h-[136px] min-w-[136px] p-7"
+      : "min-h-56 min-w-56 p-20",
   );
 }
 
-/**
- * `variant="textured"` renders the baked nine-slice powder texture
- * (`card-texture.css`). The asset bakes the card surface INTO the image:
- * a solid white center that feathers out into speckle, with a transparent
- * powder bleed extending 96px beyond the layout box.
- *
- * Usage contract:
- * - The baked white center IS the card surface. Never layer an opaque
- *   background (`bg-card`, `bg-white`, …) on top of the texture — it
- *   covers the feathered edge and reintroduces a visible hard border.
- * - Default padding is the safe inset (`--kura-card-textured-safe-inset`),
- *   which keeps content on the fully opaque center. Add more padding as
- *   the content needs; go below it only if the content tolerates sitting
- *   on the semi-transparent fade (e.g. a transparent input).
- * - The card resizes freely — the nine-slice stretches the solid center
- *   with plain CSS. No image regeneration is ever needed for sizing or
- *   padding changes.
- * - Give the layout around the card room for the 96px outer bleed; an
- *   `overflow: hidden` ancestor will clip it.
- * - For modals, use `DialogContent surface="textured"` instead of
- *   composing this by hand — it places the close button inside the
- *   solid center for you.
- */
+export const TEXTURED_SURFACE_CLASS = texturedSurfaceClasses();
+
 const cardVariants = cva("text-card-foreground", {
   variants: {
     variant: {
-      default: "rounded-xl border border-border/70 bg-card/80 shadow-xs",
-      textured:
-        // flex + justify-center: the variant enforces a min size (see
-        // card-texture.css); when that floor stretches the card beyond its
-        // content, the content stays vertically centered instead of pinning
-        // to the top padding edge.
-        `${TEXTURED_SURFACE_CLASS} flex flex-col justify-center`,
+      default: CARD_SURFACE_CLASS,
+      textured: "flex flex-col justify-center",
     },
   },
   defaultVariants: {
@@ -90,13 +85,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       <Comp
         ref={ref}
         className={cn(
+          variant === "textured" &&
+            texturedSurfaceClasses({ size: textureSize, tone: textureTone }),
           cardVariants({ variant, className }),
-          variant === "textured" &&
-            textureTone === "dark" &&
-            "kura-card-textured-dark",
-          variant === "textured" &&
-            textureSize === "compact" &&
-            "kura-card-textured-compact",
         )}
         {...props}
       />

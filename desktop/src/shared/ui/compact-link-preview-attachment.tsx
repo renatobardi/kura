@@ -12,7 +12,7 @@ import {
   AttachmentTrigger,
 } from "@/shared/ui/attachment";
 import { LinkPreviewControls } from "@/shared/ui/link-preview-controls";
-import { KuraMark } from "@/shared/ui/kura-logo/KuraMark";
+import { SakuraMark } from "@/shared/ui/kura-logo/SakuraMark";
 import { useSmoothCorners } from "@/shared/ui/smoothCorners";
 
 function getHostname(preview: ResolvedLinkPreview): string {
@@ -76,7 +76,7 @@ export function CompactLinkPreviewAttachment({
   const showFallback =
     preview.imageState === "fallback" || Boolean(imageSrc && !showImage);
   const hostname = getHostname(preview);
-  const showKuraMark =
+  const showSakuraMark =
     preview.kind === "kura-pull-request" ||
     preview.kind === "kura-issue" ||
     preview.kind === "kura-repository";
@@ -135,13 +135,13 @@ export function CompactLinkPreviewAttachment({
             rel="noreferrer"
             target="_blank"
           >
-            {showKuraMark ? (
+            {showSakuraMark ? (
               <span
                 aria-hidden="true"
                 className="flex size-3 shrink-0 items-center text-foreground/70"
                 data-link-preview-hostname-kura-mark=""
               >
-                <KuraMark className="h-auto w-full" />
+                <SakuraMark className="h-auto w-full" />
               </span>
             ) : preview.faviconDataUrl ? (
               <img

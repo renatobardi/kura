@@ -26,7 +26,7 @@ import {
 } from "./EncryptedBackupCreator";
 import { IdentityKeyHelpDialog } from "./IdentityKeyHelpDialog";
 import { IdentityRecoveryPairing } from "./IdentityRecoveryPairing";
-import { KuraMark } from "@/shared/ui/kura-logo/KuraMark";
+import { SakuraMark } from "@/shared/ui/kura-logo/SakuraMark";
 import { LandingBees } from "./LandingBees";
 import {
   NostrKeyImportForm,
@@ -313,7 +313,7 @@ export function MachineOnboardingFlow({
               transitionKey={`machine-identity-${transitionDirection}`}
             >
               <div className="flex animate-in flex-col items-center gap-4 fade-in duration-500">
-                <KuraMark className="h-24 w-24" />
+                <SakuraMark className="h-24 w-24" />
                 <span className="text-6xl font-medium tracking-[-0.04em] text-foreground">
                   kura
                 </span>

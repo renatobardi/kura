@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ChevronDown, Plus, Upload } from "lucide-react";
-import { KuraGlyph } from "@/shared/ui/kura-logo/KuraMark";
+import { SakuraGlyph } from "@/shared/ui/kura-logo/SakuraMark";
 
 import { isCatalogPersonaSelected } from "@/features/agents/lib/catalog";
 import { isCatalogPersona } from "@/features/agents/lib/personaCatalogRelay";
@@ -455,7 +455,7 @@ export function CommunityCatalogDialog({
             </div>
 
             {/* Detail pane */}
-            <div className="relative z-10 mb-3 ml-px mr-3 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl bg-background shadow-[-1px_0_0_0_hsl(var(--sidebar-border)/0.45)]">
+            <div className="relative z-10 mb-3 ml-px mr-3 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl bg-background shadow-[-1px_0_0_0_color-mix(in_srgb,hsl(var(--sidebar-border))_45%,transparent)]">
               {isCreateSelected
                 ? createContent({
                     onDirtyChange: handleCreateDirtyChange,
@@ -650,7 +650,7 @@ function CatalogEmptyState() {
       className="flex flex-col items-center px-2 py-6 text-center"
       data-testid="community-catalog-empty-state"
     >
-      <KuraGlyph
+      <SakuraGlyph
         aria-hidden="true"
         className="h-16 w-16 text-muted-foreground/40"
         data-testid="community-catalog-empty-artwork"
