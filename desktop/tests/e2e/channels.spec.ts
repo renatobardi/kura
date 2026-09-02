@@ -730,7 +730,7 @@ test("creates the DM before preparing a persona mention", async ({ page }) => {
     .click();
 
   const input = page.getByTestId("message-input");
-  await input.fill("Ask @fi");
+  await input.fill("Ask @ha");
   await expect(
     page
       .getByTestId("message-composer")
@@ -830,7 +830,7 @@ test("routes an agent mention from an existing DM to the expanded conversation",
 
   const messageTail = "in this DM";
   const input = page.getByTestId("message-input");
-  await input.fill("Ask @fi");
+  await input.fill("Ask @ha");
   await expect(
     page
       .getByTestId("message-composer")
@@ -949,7 +949,7 @@ test("does not reroute an expanded DM after the user navigates away", async ({
   await expect(page.getByTestId("chat-title")).toHaveText("alice-tyler");
 
   const input = page.getByTestId("message-input");
-  await input.fill("Ask @fi");
+  await input.fill("Ask @ha");
   await expect(
     page
       .getByTestId("message-composer")
@@ -981,7 +981,7 @@ test("does not reroute an expanded DM after the channel pane unmounts", async ({
   await expect(page.getByTestId("chat-title")).toHaveText("alice-tyler");
 
   const input = page.getByTestId("message-input");
-  await input.fill("Ask @fi");
+  await input.fill("Ask @ha");
   await expect(
     page
       .getByTestId("message-composer")
@@ -1021,7 +1021,7 @@ test("drops an expanded DM after the first message fails", async ({ page }) => {
     .click();
 
   const input = page.getByTestId("message-input");
-  await input.fill("Ask @fi");
+  await input.fill("Ask @ha");
   await expect(
     page
       .getByTestId("message-composer")
@@ -1103,7 +1103,7 @@ test("drops an expanded DM after agent startup fails", async ({ page }) => {
     .click();
 
   const input = page.getByTestId("message-input");
-  await input.fill("Ask @fi");
+  await input.fill("Ask @ha");
   await expect(
     page
       .getByTestId("message-composer")

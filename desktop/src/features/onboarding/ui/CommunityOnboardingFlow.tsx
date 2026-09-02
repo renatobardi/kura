@@ -27,6 +27,7 @@ import { listPersonas } from "@/shared/api/tauriPersonas";
 import { relayClient } from "@/shared/api/relayClient";
 import type { AgentPersona } from "@/shared/api/types";
 import { cn } from "@/shared/lib/cn";
+import { SakuraPetals } from "@/shared/ui/SakuraPetals";
 import { useSystemColorScheme } from "@/shared/theme/useSystemColorScheme";
 import { Button } from "@/shared/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/shared/ui/dialog";
@@ -473,7 +474,7 @@ export function CommunityOnboardingFlow({
   return (
     <div
       className={cn(
-        "kura-onboarding-neutral-theme kura-startup-shell flex h-dvh justify-center overflow-y-auto px-4 text-foreground",
+        "kura-onboarding-neutral-theme kura-startup-shell relative flex h-dvh justify-center overflow-y-auto px-4 text-foreground",
         isProfileStage || isTeamStage
           ? "items-start pb-36 pt-[106px]"
           : "items-stretch",
@@ -488,6 +489,7 @@ export function CommunityOnboardingFlow({
           : undefined
       }
     >
+      <SakuraPetals className="fixed" />
       <StartupWindowDragRegion />
       {isProfileStage || isTeamStage ? (
         <OnboardingChrome current={isTeamStage ? 7 : 6} />

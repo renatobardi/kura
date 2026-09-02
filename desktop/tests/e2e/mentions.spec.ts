@@ -782,7 +782,7 @@ test("blocks non-participant persona mentions in DM threads", async ({
 
   const threadPanel = page.getByTestId("message-thread-panel");
   const input = threadPanel.getByTestId("message-input");
-  await input.fill("Ask @fi");
+  await input.fill("Ask @ha");
   await expect(
     threadPanel
       .getByTestId("mention-autocomplete")
@@ -1273,7 +1273,7 @@ test("selecting a persona mention creates a channel agent before sending", async
   await expect(page.getByTestId("chat-title")).toHaveText("general");
 
   const input = page.getByTestId("message-input");
-  await input.fill("Ask @fi");
+  await input.fill("Ask @ha");
 
   const dropdown = autocomplete(page);
   const hayateRow = dropdown.locator("button", { hasText: "Hayate" });
@@ -1361,7 +1361,7 @@ test("selecting a persona mention reuses an existing persona agent", async ({
   await expect(page.getByTestId("chat-title")).toHaveText("general");
 
   const input = page.getByTestId("message-input");
-  await input.fill("Ask @fi");
+  await input.fill("Ask @ha");
 
   const dropdown = autocomplete(page);
   const hayateRow = dropdown.locator("button", { hasText: "Hayate" });

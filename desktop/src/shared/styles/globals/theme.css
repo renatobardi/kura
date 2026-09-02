@@ -61,6 +61,9 @@
     /* Sakura — the only brand accent. Petal fill in light, ink in dark. */
     --sakura-petal: #f4c9d4;
     --sakura-ink: hsl(var(--foreground));
+    /* Decorative petals read as the same soft pink on either ground; the 6%
+       opacity that carries them lives with the component. */
+    --sakura-decor: #f4c9d4;
     --kura-content-dark: 20 14.3% 4.1%;
     /* Hosted-community onboarding intentionally keeps this light palette in
        both app themes; semantic tokens keep component code color-agnostic. */
@@ -130,6 +133,7 @@
     --sidebar-ring: 25 5.3% 44.7%;
     --sakura-petal: transparent;
     --sakura-ink: #f4c9d4;
+    --sakura-decor: #f4c9d4;
     --kura-content-dark: 20 14.3% 4.1%;
   }
 
