@@ -349,6 +349,43 @@ test("searches agent avatar emoji with focus on open", async ({ page }) => {
   );
 });
 
+/**
+ * The Kubo preset gallery is the fastest path to a distinctive agent: twenty
+ * inline SVGs that need no upload. It is offered where an agent is defined,
+ * and the pick has to survive as the avatar the dialog will submit.
+ */
+test("picks an agent avatar from the Kubo preset gallery", async ({ page }) => {
+  await gotoApp(page);
+  await page.getByTestId("open-agents-view").click();
+  await page.getByTestId("new-agent-card").click();
+
+  await expect(page.getByTestId("persona-dialog")).toBeVisible();
+  await page.getByLabel("Add avatar").click();
+  await page.getByRole("tab", { name: "Gallery" }).click();
+
+  const grid = page.getByTestId("agent-avatar-preset-grid");
+  await expect(grid.locator("button")).toHaveCount(20);
+
+  const kitsune = page.getByTestId("agent-avatar-preset-kitsune");
+  await expect(kitsune).toHaveAttribute("aria-label", "Kitsune");
+  await kitsune.click();
+
+  // The preview paints the preset, stored inline as a percent-encoded SVG
+  // data URL — the form that reaches the agent without an upload.
+  const preview = page.getByRole("img", { name: "Agent name avatar" });
+  await expect(preview).toHaveAttribute(
+    "src",
+    /^data:image\/svg\+xml,(?!.*;base64)/,
+  );
+
+  // Reopening lands on the gallery with the current pick marked.
+  await page.getByLabel("Edit avatar").click();
+  await expect(page.getByTestId("agent-avatar-preset-kitsune")).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+});
+
 test("agent avatar emoji picker scrolls inside its popover", async ({
   page,
 }) => {

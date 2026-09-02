@@ -44,6 +44,12 @@ import {
   type EmojiMartEmoji,
   isAvatarFileDrag,
 } from "./AgentCreationPreview.utils";
+import {
+  PRESET_AVATARS,
+  type PresetAvatar,
+  parsePresetAvatarDataUrl,
+  presetAvatarDataUrl,
+} from "./presetAvatars";
 
 export function AgentCreationPreview({
   assetLabel = "avatar",
@@ -57,6 +63,7 @@ export function AgentCreationPreview({
   onSelectAvatar,
   processImage,
   shape = "circle",
+  showPresetGallery = false,
   testIdPrefix = "agent-avatar",
   variant = "default",
 }: {
@@ -74,6 +81,9 @@ export function AgentCreationPreview({
   onSelectAvatar: (avatarUrl: string) => void;
   processImage?: (file: File) => Promise<string>;
   shape?: "circle" | "rounded-square";
+  /** Offer the Kubo preset gallery. Agent creation and edit opt in; the
+   *  community icon picker does not — those presets are agent characters. */
+  showPresetGallery?: boolean;
   testIdPrefix?: string;
   variant?: "compact" | "default";
 }) {
@@ -110,6 +120,13 @@ export function AgentCreationPreview({
   const isRoundedSquare = shape === "rounded-square";
   const isCompact = variant === "compact";
   const emojiShape = isRoundedSquare ? "rounded-square" : "circle";
+  // The sliding tab indicator is positioned arithmetically, so it needs the
+  // tab's index rather than a hard-coded "emoji is the second one".
+  const tabCount = showPresetGallery ? 3 : 2;
+  const tabIndex = activeTab === "gallery" ? 2 : activeTab === "emoji" ? 1 : 0;
+  const selectedPresetId = showPresetGallery
+    ? (parsePresetAvatarDataUrl(avatarUrl ?? "")?.id ?? null)
+    : null;
   const {
     inputRef: avatarUploadInputRef,
     isUploading,
@@ -191,10 +208,15 @@ export function AgentCreationPreview({
         setSelectedEmoji(null);
         setSelectedColor(DEFAULT_EMOJI_AVATAR_COLOR);
         setHasChosenColor(false);
-        setActiveTab("image");
+        // A preset avatar opens on its own tile so the current choice is
+        // visible; everything else opens on Image.
+        const preset = showPresetGallery
+          ? parsePresetAvatarDataUrl(avatarUrl ?? "")
+          : null;
+        setActiveTab(preset ? "gallery" : "image");
       }
     }
-  }, [isAvatarMenuOpen, avatarUrl]);
+  }, [isAvatarMenuOpen, avatarUrl, showPresetGallery]);
 
   // Keep the custom color picker in sync when the selected color changes
   React.useEffect(() => {
@@ -232,6 +254,13 @@ export function AgentCreationPreview({
 
   function applyEmojiAvatar(emoji: string, color = selectedColor) {
     const nextAvatarUrl = emojiAvatarDataUrl(emoji, color, emojiShape);
+    onSelectAvatar(nextAvatarUrl);
+    onCommitAvatar?.(nextAvatarUrl);
+    setSquishKey((key) => key + 1);
+  }
+
+  function applyPresetAvatar(preset: PresetAvatar) {
+    const nextAvatarUrl = presetAvatarDataUrl(preset);
     onSelectAvatar(nextAvatarUrl);
     onCommitAvatar?.(nextAvatarUrl);
     setSquishKey((key) => key + 1);
@@ -453,13 +482,18 @@ export function AgentCreationPreview({
           }}
           value={activeTab}
         >
-          <TabsList className="relative isolate mb-3 grid h-9 w-full grid-cols-2 overflow-hidden rounded-lg bg-muted p-0.5">
+          <TabsList
+            className={cn(
+              "relative isolate mb-3 grid h-9 w-full overflow-hidden rounded-lg bg-muted p-0.5",
+              showPresetGallery ? "grid-cols-3" : "grid-cols-2",
+            )}
+          >
             <div
               aria-hidden="true"
               className="absolute bottom-0.5 left-0.5 top-0.5 z-0 rounded-md bg-background shadow-sm transition-transform duration-[250ms] ease-out"
               style={{
-                transform: `translateX(${activeTab === "emoji" ? 100 : 0}%)`,
-                width: "calc((100% - 4px) / 2)",
+                transform: `translateX(${tabIndex * 100}%)`,
+                width: `calc((100% - 4px) / ${tabCount})`,
               }}
             />
             <TabsTrigger
@@ -474,6 +508,14 @@ export function AgentCreationPreview({
             >
               Emoji
             </TabsTrigger>
+            {showPresetGallery ? (
+              <TabsTrigger
+                className="relative z-10 h-full rounded-md bg-transparent text-xs font-medium shadow-none transition-colors data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                value="gallery"
+              >
+                Gallery
+              </TabsTrigger>
+            ) : null}
           </TabsList>
         </Tabs>
 
@@ -565,6 +607,44 @@ export function AgentCreationPreview({
                 Remove {assetLabel}
               </button>
             ) : null}
+          </div>
+        ) : null}
+
+        {activeTab === "gallery" ? (
+          <div
+            className="grid grid-cols-7 gap-1.5"
+            data-testid={`${testIdPrefix}-preset-grid`}
+          >
+            {PRESET_AVATARS.map((preset) => {
+              const isSelected = preset.id === selectedPresetId;
+              return (
+                <button
+                  aria-label={preset.name}
+                  aria-pressed={isSelected}
+                  className={cn(
+                    "flex h-10 w-10 items-center justify-center overflow-hidden bg-muted outline-hidden transition-[box-shadow,opacity] duration-150 ease-out disabled:pointer-events-none disabled:opacity-50",
+                    isRoundedSquare ? "rounded-lg" : "rounded-full",
+                    isSelected
+                      ? "ring-2 ring-primary ring-offset-2 ring-offset-popover"
+                      : "hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring",
+                  )}
+                  data-testid={`${testIdPrefix}-preset-${preset.id}`}
+                  disabled={disabled || isUploading}
+                  key={preset.id}
+                  onClick={() => applyPresetAvatar(preset)}
+                  title={preset.name}
+                  type="button"
+                >
+                  <img
+                    alt=""
+                    className="h-full w-full"
+                    // The tile renders the very data URL the click persists,
+                    // so what the user picks is what the agent gets.
+                    src={presetAvatarDataUrl(preset)}
+                  />
+                </button>
+              );
+            })}
           </div>
         ) : null}
 
