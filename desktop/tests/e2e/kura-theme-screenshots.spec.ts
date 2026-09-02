@@ -1849,3 +1849,73 @@ test("Kura follows native system theme changes without a reload", async ({
   await expectAppliedKuraTheme(page, "kura", "kura");
   await expectKuraFlatPaint(page, "light");
 });
+
+/**
+ * The Kura themes are the app's own identity made selectable: picking them
+ * must paint the Kubo tokens from `globals/theme.css`, not the GitHub
+ * Light/Dark palette the Shiki bundle behind them supplies. Sampling a few
+ * tokens per mode is enough — `kubo-theme.test.mjs` guards the whole map
+ * against the stylesheet.
+ */
+async function expectKuboTokens(page: Page, mode: "light" | "dark") {
+  const tokens = await page.evaluate(() => {
+    const styles = getComputedStyle(document.documentElement);
+    const read = (name: string) => styles.getPropertyValue(name).trim();
+    return {
+      background: read("--background"),
+      card: read("--card"),
+      muted: read("--muted"),
+      border: read("--border"),
+      mutedForeground: read("--muted-foreground"),
+    };
+  });
+
+  if (mode === "light") {
+    expect(tokens).toEqual({
+      background: "0 0% 100%",
+      card: "0 0% 100%",
+      muted: "60 4.8% 95.9%",
+      border: "20 5.9% 90%",
+      mutedForeground: "25 5.3% 44.7%",
+    });
+    return;
+  }
+
+  expect(tokens).toEqual({
+    background: "20 14.3% 4.1%",
+    card: "24 9.8% 10%",
+    muted: "12 6.5% 15.1%",
+    // Dark hairlines are translucent white, not an opaque grey.
+    border: "0 0% 100% / 10%",
+    mutedForeground: "24 5.7% 63.1%",
+  });
+}
+
+test("Kura paints the Kubo tokens in both modes", async ({ page }) => {
+  await seedTheme(page, "kura");
+  await installMockBridge(page);
+  await openAppearance(page, "light");
+  await expectAppliedKuraTheme(page, "kura");
+  await expectKuboTokens(page, "light");
+
+  await page.getByTestId("appearance-mode-dark").click();
+  await expectAppliedKuraTheme(page, "kura-dark");
+  await expectKuboTokens(page, "dark");
+});
+
+test("the Kura picker tile previews the Kubo surface", async ({ page }) => {
+  await seedTheme(page, "kura");
+  await installMockBridge(page);
+  await openAppearance(page, "light");
+  await page.getByTestId("theme-style-trigger").click();
+
+  // The tile paints from the same var map the document gets, so its frame
+  // carries the Kubo muted surface rather than GitHub Light's grey.
+  const frame = page.getByTestId("theme-option-kura").locator("div").first();
+  await expect(frame).toBeVisible();
+  await expect(frame).toHaveCSS("background-color", "rgb(245, 245, 244)");
+  await expect(frame.locator("svg rect").first()).toHaveAttribute(
+    "fill",
+    "hsl(0 0% 100%)",
+  );
+});

@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import { createThemeVars } from "./adaptive-theme";
 import {
   SYNTAX_THEMES,
   type SyntaxThemeName,
-  extractThemeInfo,
   isLightTheme,
-  loadThemeData,
+  loadThemeVars,
 } from "./theme-loader";
 import {
   DARK_PREVIEW_VARS,
@@ -23,13 +21,7 @@ let themePreviewVarsCache: ThemePreviewVarsByTheme | null = null;
 let themePreviewVarsPromise: Promise<ThemePreviewVarsByTheme> | null = null;
 
 async function loadThemePreviewVars(name: SyntaxThemeName) {
-  const themeData = await loadThemeData(name);
-  const info = extractThemeInfo(name, themeData);
-  const { vars } = createThemeVars(info.bg, info.fg, info.comment, {
-    added: info.added,
-    deleted: info.deleted,
-    modified: info.modified,
-  });
+  const { vars } = await loadThemeVars(name);
   return [name, vars] as const;
 }
 
