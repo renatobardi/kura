@@ -124,11 +124,13 @@ test("keeps the drawer open until the huddle is expanded", async ({ page }) => {
 
   await page.goto("/");
 
-  const gradientUnderlay = page.locator(".kura-theme-gradient-underlay");
-  const openGradient = await gradientUnderlay.evaluate(
+  // Kubo paints flat surfaces: the app canvas carries no background image
+  // while the huddle is open, and none after it closes (asserted below).
+  const appSurface = page.locator(".kura-huddle-app-surface");
+  const openSurface = await appSurface.evaluate(
     (element) => getComputedStyle(element).backgroundImage,
   );
-  expect(openGradient).not.toBe("none");
+  expect(openSurface).toBe("none");
 
   const transcriptButton = page.getByRole("button", {
     name: "Stop transcript",
@@ -258,10 +260,10 @@ test("keeps the drawer open until the huddle is expanded", async ({ page }) => {
     "data-huddle-open",
     "false",
   );
-  const closedGradient = await gradientUnderlay.evaluate(
+  const closedSurface = await appSurface.evaluate(
     (element) => getComputedStyle(element).backgroundImage,
   );
-  expect(closedGradient).toBe(openGradient);
+  expect(closedSurface).toBe(openSurface);
 });
 
 test("floats the in-app huddle tray over the glass background", async ({

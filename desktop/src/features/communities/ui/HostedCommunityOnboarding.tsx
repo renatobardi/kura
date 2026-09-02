@@ -41,7 +41,7 @@ import {
 } from "@/shared/ui/dialog";
 
 const FUZZY_SURFACE_CLASS =
-  "relative left-1/2 w-[min(calc(100%+12rem),calc(100vw-2rem))] max-w-[1040px] -translate-x-1/2 px-20 pb-14 pt-20 !text-[rgb(var(--kura-hosted-community-surface-fg))]";
+  "relative left-1/2 w-[min(calc(100%+12rem),calc(100vw-2rem))] min-h-[224px] max-w-[1040px] -translate-x-1/2 px-20 pb-14 pt-20 !text-[rgb(var(--kura-hosted-community-surface-fg))]";
 const COMMUNITY_LIST_CLASS = "mx-auto w-full max-w-[520px] text-left";
 const COMMUNITY_ROW_CLASS =
   "flex min-h-[5.75rem] items-center justify-between gap-8 py-4 text-sm";
@@ -431,7 +431,7 @@ export function HostedCommunityOnboarding({
     ) : (
       <Card
         asChild
-        className={`${FUZZY_SURFACE_CLASS} !py-10`}
+        className={`${FUZZY_SURFACE_CLASS} min-h-[176px] !py-10`}
         data-testid="hosted-community-create-surface"
         variant="textured"
       >

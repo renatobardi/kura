@@ -5,7 +5,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
 import { cn } from "@/shared/lib/cn";
-import { CARD_RING_CLASS } from "@/shared/ui/card";
+import { CARD_RING_CLASS, texturedSurfaceClasses } from "@/shared/ui/card";
 import { useTheme } from "@/shared/theme/ThemeProvider";
 import { MODAL_BACKDROP_BLUR_CLASS } from "@/shared/ui/modalBackdrop";
 import {
@@ -92,12 +92,16 @@ const DialogContent = React.forwardRef<
         <DialogPrimitive.Content
           className={cn(
             "pointer-events-auto relative grid w-[calc(100vw-2rem)] max-w-2xl gap-4 outline-hidden",
-            // Kubo dialogs are flat: the pill radius, a plain surface and the
-            // 1px ring — no drop shadow. `textured` is kept as an alias of the
-            // default surface now that textures are gone.
-            surface !== "none" &&
+            // Kubo dialogs are flat: the dialog radius, a plain surface and
+            // the 1px ring — no drop shadow.
+            surface === "default" &&
               `rounded-dialog bg-background p-6 ${CARD_RING_CLASS}`,
             surface === "none" && "bg-transparent p-0 shadow-none",
+            // `textured` is the onboarding surface: same flat card, but it
+            // keeps the padding and floor the old texture imposed, because
+            // those dialogs lay their content out against them.
+            surface === "textured" &&
+              cn("box-border w-full", texturedSurfaceClasses()),
             MODAL_CONTENT_MOTION_CLASS,
             className,
           )}
@@ -109,7 +113,7 @@ const DialogContent = React.forwardRef<
             <DialogPrimitive.Close
               className={cn(
                 "absolute flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors duration-150 ease-out hover:bg-accent hover:text-accent-foreground focus:outline-hidden focus-visible:ring-1 focus-visible:ring-ring",
-                "right-4 top-4",
+                surface === "textured" ? "right-20 top-20" : "right-4 top-4",
                 closeButtonClassName,
               )}
             >

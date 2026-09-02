@@ -18,24 +18,41 @@ export const CARD_RING_CLASS =
 const CARD_SURFACE_CLASS = `rounded-card bg-card ${CARD_RING_CLASS}`;
 
 /**
- * Kept for callers that used to request the powder-texture surface. The
- * texture is gone with the Kubo rebrand — no textures anywhere — so this now
- * returns the plain card surface. `size` and `tone` no longer change
- * anything; they remain so call sites did not all have to change at once.
+ * The onboarding surface. It used to be a baked nine-slice powder texture;
+ * Kubo has no textures, so it is now the flat card. The geometry the texture
+ * imposed is kept deliberately — 5rem of padding (1.75rem compact) and a
+ * 224px floor (136px compact) — because the onboarding layouts are built on
+ * it: content is positioned against that padding, and panels overlap their
+ * own controls without the floor.
+ *
+ * `tone="dark"` used to swap in a separately baked dark fill so its content
+ * stayed bright; it now paints the near-black surface directly.
  */
-export const TEXTURED_SURFACE_CLASS = CARD_SURFACE_CLASS;
-
-export function texturedSurfaceClasses(
-  _options: { size?: CardTextureSize; tone?: CardTextureTone } = {},
-): string {
-  return CARD_SURFACE_CLASS;
+export function texturedSurfaceClasses({
+  size = "regular",
+  tone = "light",
+}: {
+  size?: CardTextureSize;
+  tone?: CardTextureTone;
+} = {}): string {
+  return cn(
+    "relative isolate rounded-card",
+    tone === "dark"
+      ? "bg-foreground text-background"
+      : `bg-card ${CARD_RING_CLASS}`,
+    size === "compact"
+      ? "min-h-[136px] min-w-[136px] p-7"
+      : "min-h-56 min-w-56 p-20",
+  );
 }
+
+export const TEXTURED_SURFACE_CLASS = texturedSurfaceClasses();
 
 const cardVariants = cva("text-card-foreground", {
   variants: {
     variant: {
       default: CARD_SURFACE_CLASS,
-      textured: `${CARD_SURFACE_CLASS} flex flex-col justify-center`,
+      textured: "flex flex-col justify-center",
     },
   },
   defaultVariants: {
@@ -56,8 +73,8 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     {
       asChild = false,
       className,
-      textureSize: _textureSize,
-      textureTone: _textureTone,
+      textureSize = "regular",
+      textureTone = "light",
       variant,
       ...props
     },
@@ -67,7 +84,11 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     return (
       <Comp
         ref={ref}
-        className={cn(cardVariants({ variant, className }))}
+        className={cn(
+          variant === "textured" &&
+            texturedSurfaceClasses({ size: textureSize, tone: textureTone }),
+          cardVariants({ variant, className }),
+        )}
         {...props}
       />
     );
