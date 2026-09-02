@@ -231,20 +231,20 @@ test("catalog hides built-ins and shows the shared-agent empty state", async ({
 }) => {
   await page.setViewportSize({ width: 1280, height: 420 });
   await installMockBridge(page, {
-    activePersonaIds: ["builtin:fizz", "builtin:honey", "builtin:bumble"],
+    activePersonaIds: ["builtin:hayate", "builtin:kaede", "builtin:rin"],
   });
   await gotoApp(page);
   await page.getByTestId("open-agents-view").click();
 
   await expect(page.getByTestId("agents-library-personas")).toBeVisible();
-  for (const personaName of ["Fizz", "Honey", "Pollen"]) {
+  for (const personaName of ["Hayate", "Kaede", "Rin"]) {
     await expect(page.getByTestId("agents-library-personas")).toContainText(
       personaName,
     );
   }
 
   await openPersonaCatalog(page);
-  for (const personaName of ["Fizz", "Honey", "Pollen"]) {
+  for (const personaName of ["Hayate", "Kaede", "Rin"]) {
     await expect(
       page.getByTestId("community-catalog-dialog"),
     ).not.toContainText(personaName);
@@ -267,7 +267,7 @@ test("catalog hides built-ins and shows the shared-agent empty state", async ({
     .getByTestId("community-catalog-dialog")
     .getByRole("button", { name: "Close" })
     .click();
-  await page.getByLabel("Open actions for Fizz").click();
+  await page.getByLabel("Open actions for Hayate").click();
   await page.getByRole("menuitem", { name: "Share" }).click();
   await expect(page.getByTestId("persona-share-catalog")).toHaveCount(0);
   await expect(page.getByTestId("persona-share-catalog-access")).toHaveCount(0);
@@ -294,7 +294,7 @@ test("catalog empty state remains available after reopening", async ({
 
 test("built-in persona edits persist", async ({ page }) => {
   await installMockBridge(page, {
-    activePersonaIds: ["builtin:fizz"],
+    activePersonaIds: ["builtin:hayate"],
     globalAgentConfig: {
       env_vars: { ANTHROPIC_API_KEY: "sk-ant-test" },
       provider: "anthropic",
@@ -304,25 +304,25 @@ test("built-in persona edits persist", async ({ page }) => {
   await gotoApp(page);
   await page.getByTestId("open-agents-view").click();
 
-  await page.getByLabel("Open actions for Fizz").click();
+  await page.getByLabel("Open actions for Hayate").click();
   await page.getByRole("menuitem", { name: "Edit" }).click();
 
   const dialog = page.getByTestId("persona-dialog");
-  await dialog.getByLabel("Agent name").fill("My Fizz");
+  await dialog.getByLabel("Agent name").fill("My Hayate");
   await dialog.getByLabel("Agent instruction").fill("User-edited instructions");
   await dialog.getByRole("button", { name: "Save changes" }).click();
 
   await expect(dialog).toHaveCount(0);
   await expect(page.getByTestId("agents-library-personas")).toContainText(
-    "My Fizz",
+    "My Hayate",
   );
   const personas = await invokeTauri<
     Array<{ id: string; display_name: string; system_prompt: string }>
   >(page, "list_personas");
   expect(
-    personas.find((persona) => persona.id === "builtin:fizz"),
+    personas.find((persona) => persona.id === "builtin:hayate"),
   ).toMatchObject({
-    display_name: "My Fizz",
+    display_name: "My Hayate",
     system_prompt: "User-edited instructions",
   });
 });
@@ -432,7 +432,7 @@ test("the new agent card opens unified create, catalog, and import flows", async
   page,
 }) => {
   await installMockBridge(page, {
-    activePersonaIds: ["builtin:fizz", "builtin:honey", "builtin:bumble"],
+    activePersonaIds: ["builtin:hayate", "builtin:kaede", "builtin:rin"],
     personas: [
       {
         id: "custom:code-reviewer",
@@ -621,7 +621,7 @@ test("team cards use the thread-style overlapping avatar stack", async ({
   await installMockBridge(page, {
     personas: [
       {
-        avatarUrl: "/onboarding/starter-team/fizz.png",
+        avatarUrl: "/onboarding/starter-team/hayate.png",
         id: personaIds[0],
         displayName: "Design",
         systemPrompt: "You design interfaces.",
@@ -2538,35 +2538,35 @@ test("inactive built-ins cannot be used to create teams", async ({ page }) => {
 
   const error = await invokeTauriExpectError(page, "create_team", {
     input: {
-      name: "Honeys",
-      personaIds: ["builtin:honey"],
+      name: "Kaedes",
+      personaIds: ["builtin:kaede"],
     },
   });
 
-  expect(error).toBe("Honey is not in My Agents.");
+  expect(error).toBe("Kaede is not in My Agents.");
 });
 
 test("built-in removal failures show up from My Agents", async ({ page }) => {
   await installMockBridge(page, {
-    activePersonaIds: ["builtin:honey"],
+    activePersonaIds: ["builtin:kaede"],
   });
   await gotoApp(page);
 
   await page.getByTestId("open-agents-view").click();
   await invokeTauri(page, "create_team", {
     input: {
-      name: "Honeys",
-      personaIds: ["builtin:honey"],
+      name: "Kaedes",
+      personaIds: ["builtin:kaede"],
     },
   });
 
-  await page.getByLabel("Open actions for Honey").click();
+  await page.getByLabel("Open actions for Kaede").click();
   await page.getByRole("menuitem", { name: "Delete" }).click();
 
   await expect(
     page
       .locator("[data-sonner-toast]")
-      .filter({ hasText: "Honey is still referenced by a team." }),
+      .filter({ hasText: "Kaede is still referenced by a team." }),
   ).toBeVisible();
 });
 

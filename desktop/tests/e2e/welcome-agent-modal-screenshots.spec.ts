@@ -4,7 +4,7 @@ import { waitForAnimations } from "../helpers/animations";
 import { installMockBridge, openCreateChannelDialog } from "../helpers/bridge";
 
 const SHOTS = "test-results/welcome-agent-modal";
-const FIZZ_PUBKEY = "f".repeat(64);
+const HAYATE_PUBKEY = "f".repeat(64);
 const SCOUT_PUBKEY = "a".repeat(64);
 const EDITOR_PUBKEY = "b".repeat(64);
 
@@ -52,12 +52,12 @@ async function openAgentPicker(page: Page, channel = "random") {
 test.describe("welcome and channel agent entry points", () => {
   test("welcome offers chat-first creation", async ({ page }) => {
     await installMockBridge(page, {
-      activePersonaIds: ["builtin:fizz"],
+      activePersonaIds: ["builtin:hayate"],
       managedAgents: [
         {
-          pubkey: FIZZ_PUBKEY,
-          name: "Fizz",
-          personaId: "builtin:fizz",
+          pubkey: HAYATE_PUBKEY,
+          name: "Hayate",
+          personaId: "builtin:hayate",
           status: "running",
           channelNames: ["Welcome"],
         },
@@ -87,7 +87,7 @@ test.describe("welcome and channel agent entry points", () => {
     await page.getByTestId("welcome-create-agent-in-chat").click();
     await expect(dialog).not.toBeVisible();
     await expect(page.getByTestId("message-timeline")).toContainText(
-      "Fizz, help me create a new agent.",
+      "Hayate, help me create a new agent.",
     );
   });
 
@@ -95,12 +95,12 @@ test.describe("welcome and channel agent entry points", () => {
     page,
   }) => {
     await installMockBridge(page, {
-      activePersonaIds: ["builtin:fizz"],
+      activePersonaIds: ["builtin:hayate"],
       managedAgents: [
         {
-          pubkey: FIZZ_PUBKEY,
-          name: "Fizz",
-          personaId: "builtin:fizz",
+          pubkey: HAYATE_PUBKEY,
+          name: "Hayate",
+          personaId: "builtin:hayate",
           status: "running",
           channelNames: ["Welcome"],
         },
@@ -204,14 +204,14 @@ test.describe("welcome and channel agent entry points", () => {
     await expect(page.getByTestId("chat-title")).toHaveText("random");
   });
 
-  test("only Fizz is already in the channel", async ({ page }) => {
+  test("only Hayate is already in the channel", async ({ page }) => {
     await installMockBridge(page, {
-      activePersonaIds: ["builtin:fizz"],
+      activePersonaIds: ["builtin:hayate"],
       managedAgents: [
         {
-          pubkey: FIZZ_PUBKEY,
-          name: "Fizz",
-          personaId: "builtin:fizz",
+          pubkey: HAYATE_PUBKEY,
+          name: "Hayate",
+          personaId: "builtin:hayate",
           status: "running",
           channelNames: ["random"],
         },
@@ -221,18 +221,18 @@ test.describe("welcome and channel agent entry points", () => {
     await expect(dialog).toContainText(
       "All of your agents are already in this channel.",
     );
-    await dialog.screenshot({ path: `${SHOTS}/02-only-fizz-in-channel.png` });
+    await dialog.screenshot({ path: `${SHOTS}/02-only-hayate-in-channel.png` });
   });
 
   test("some personal agents are available", async ({ page }) => {
     await installMockBridge(page, {
-      activePersonaIds: ["builtin:fizz"],
+      activePersonaIds: ["builtin:hayate"],
       personas: [scoutPersona, editorPersona],
       managedAgents: [
         {
-          pubkey: FIZZ_PUBKEY,
-          name: "Fizz",
-          personaId: "builtin:fizz",
+          pubkey: HAYATE_PUBKEY,
+          name: "Hayate",
+          personaId: "builtin:hayate",
           status: "running",
           channelNames: ["random"],
         },
@@ -259,13 +259,13 @@ test.describe("welcome and channel agent entry points", () => {
 
   test("all personal agents are already in the channel", async ({ page }) => {
     await installMockBridge(page, {
-      activePersonaIds: ["builtin:fizz"],
+      activePersonaIds: ["builtin:hayate"],
       personas: [scoutPersona, editorPersona],
       managedAgents: [
         {
-          pubkey: FIZZ_PUBKEY,
-          name: "Fizz",
-          personaId: "builtin:fizz",
+          pubkey: HAYATE_PUBKEY,
+          name: "Hayate",
+          personaId: "builtin:hayate",
           status: "running",
           channelNames: ["random"],
         },

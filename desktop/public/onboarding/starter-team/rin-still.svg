@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" width="200" height="262">
+        <ellipse cx="100" cy="246" rx="48" ry="8" fill="#2b2724" opacity="0.16"></ellipse>
+        <g style="animation-delay: -1.2s;">
+          <!-- cauda -->
+          <g style="animation-duration: 4.4s; transform-origin: 10% 80%;">
+            <path d="M128,168 C164,166 184,132 172,94 C176,124 162,150 128,152 Z" fill="#fdfbf7" stroke="#2b2724" stroke-width="3" stroke-linejoin="round"></path>
+            <path d="M132,162 C158,158 172,134 168,108 C168,128 156,148 130,154 Z" fill="#f4e9df"></path>
+            <path d="M172,94 C174,102 174,110 172,118" stroke="#b4432b" stroke-width="3" fill="none" stroke-linecap="round"></path>
+            <path d="M148,158 l4,-6 M158,150 l5,-5 M166,138 l5,-4" stroke="#2b2724" stroke-width="1.8" stroke-linecap="round" opacity="0.6"></path>
+          </g>
+          <!-- hakama vermelho -->
+          <path d="M74,176 L66,238 L94,238 L96,180 Z" fill="#8c3226" stroke="#2b2724" stroke-width="3" stroke-linejoin="round"></path>
+          <path d="M126,176 L134,238 L106,238 L104,180 Z" fill="#8c3226" stroke="#2b2724" stroke-width="3" stroke-linejoin="round"></path>
+          <path d="M80,184 L74,234 M87,184 L84,236 M120,184 L126,234 M113,184 L116,236" stroke="#5a2019" stroke-width="2" fill="none"></path>
+          <path d="M96,180 L104,180 L104,196 L96,196 Z" fill="#5a2019"></path>
+          <path d="M68,238 L92,238 L92,246 L66,246 Z M132,238 L108,238 L108,246 L134,246 Z" fill="#2b2724"></path>
+          <path d="M76,238 L78,243 M124,238 L122,243" stroke="#fdfbf7" stroke-width="2"></path>
+          <!-- kosode branco -->
+          <path d="M72,116 Q100,106 128,116 L132,180 Q100,190 68,180 Z" fill="#fdfbf7" stroke="#2b2724" stroke-width="3" stroke-linejoin="round"></path>
+          <path d="M84,118 L100,142 L116,118" fill="none" stroke="#2b2724" stroke-width="2.4" stroke-linejoin="round"></path>
+          <path d="M87,117 L100,136 L113,117" fill="none" stroke="#b4432b" stroke-width="2" stroke-linejoin="round"></path>
+          <path d="M90,150 Q100,154 110,150 M88,162 Q100,166 112,162" stroke="#e6ddd0" stroke-width="1.8" fill="none"></path>
+          <!-- haori índigo -->
+          <path d="M72,114 L62,178 L80,182 L88,122 Z" fill="#3f5573" stroke="#2b2724" stroke-width="2.8" stroke-linejoin="round"></path>
+          <path d="M128,114 L138,178 L120,182 L112,122 Z" fill="#3f5573" stroke="#2b2724" stroke-width="2.8" stroke-linejoin="round"></path>
+          <path d="M86,124 L79,180 M114,124 L121,180" stroke="#c9a227" stroke-width="1.6" opacity="0.9"></path>
+          <path d="M66,140 l12,-8 M64,156 l13,-8 M134,140 l-12,-8 M136,156 l-13,-8" stroke="#fdfbf7" stroke-width="1.2" opacity="0.35"></path>
+          <!-- mangas -->
+          <g style="transform-origin: 85% 15%;">
+            <path d="M72,122 Q42,132 34,162 Q50,174 72,166 L78,132 Z" fill="#3f5573" stroke="#2b2724" stroke-width="3" stroke-linejoin="round"></path>
+            <path d="M40,152 Q52,162 68,160" fill="none" stroke="#c9a227" stroke-width="1.8"></path>
+            <path d="M36,160 Q50,170 70,164" fill="none" stroke="#fdfbf7" stroke-width="3"></path>
+            <path d="M46,134 l8,-5 M42,144 l9,-6" stroke="#fdfbf7" stroke-width="1.2" opacity="0.35"></path>
+          </g>
+          <g style="animation-delay: -1.8s; transform-origin: 15% 15%;">
+            <path d="M128,122 Q158,132 166,162 Q150,174 128,166 L122,132 Z" fill="#3f5573" stroke="#2b2724" stroke-width="3" stroke-linejoin="round"></path>
+            <path d="M160,152 Q148,162 132,160" fill="none" stroke="#c9a227" stroke-width="1.8"></path>
+            <path d="M164,160 Q150,170 130,164" fill="none" stroke="#fdfbf7" stroke-width="3"></path>
+            <path d="M154,134 l-8,-5 M158,144 l-9,-6" stroke="#fdfbf7" stroke-width="1.2" opacity="0.35"></path>
+          </g>
+          <!-- obi + sino + ofuda -->
+          <path d="M70,168 L130,168 L131,180 Q100,188 69,180 Z" fill="#b4432b" stroke="#2b2724" stroke-width="2.4"></path>
+          <path d="M70,172 L130,172" stroke="#c9a227" stroke-width="1.8"></path>
+          <path d="M92,168 L90,186 L96,182 L100,188 L104,182 L110,186 L108,168" fill="#8c3226" stroke="#2b2724" stroke-width="2" stroke-linejoin="round"></path>
+          <g style="animation-duration: 2.8s; transform-origin: 50% 0%;"><path d="M114,180 L114,188" stroke="#c9a227" stroke-width="1.6"></path><circle cx="114" cy="192" r="4.5" fill="#c9a227" stroke="#2b2724" stroke-width="1.8"></circle><path d="M112,193.5 L116,193.5" stroke="#2b2724" stroke-width="1.4"></path></g>
+          <g transform="rotate(6 84 176)"><rect x="80" y="164" width="9" height="22" rx="1.5" fill="#fdfbf7" stroke="#2b2724" stroke-width="1.8"></rect><path d="M84.5,168 L84.5,180 M82.5,171 L86.5,171 M82.5,176 L86.5,176" stroke="#b4432b" stroke-width="1.4"></path></g>
+          <!-- cabeça -->
+          <g style="animation-duration: 4.6s;">
+            <path d="M64,80 Q56,110 70,126 L80,118 Q70,104 74,86 Z" fill="#2b2724"></path>
+            <path d="M136,80 Q144,110 130,126 L120,118 Q130,104 126,86 Z" fill="#2b2724"></path>
+            <circle cx="72" cy="122" r="2.6" fill="#b4432b"></circle><circle cx="128" cy="122" r="2.6" fill="#b4432b"></circle>
+            <g><path d="M66,58 L50,16 L88,40 Z" fill="#fdfbf7" stroke="#2b2724" stroke-width="3" stroke-linejoin="round"></path><path d="M66,54 L56,26 L80,40 Z" fill="#b4432b"></path><path d="M66,54 L60,34" stroke="#8c3226" stroke-width="1.6"></path></g>
+            <g style="animation-delay: -3.2s;"><path d="M134,58 L150,16 L112,40 Z" fill="#fdfbf7" stroke="#2b2724" stroke-width="3" stroke-linejoin="round"></path><path d="M134,54 L144,26 L120,40 Z" fill="#b4432b"></path><path d="M134,54 L140,34" stroke="#8c3226" stroke-width="1.6"></path></g>
+            <path d="M58,56 Q100,38 142,56 Q150,96 100,132 Q50,96 58,56 Z" fill="#fdfbf7" stroke="#2b2724" stroke-width="3" stroke-linejoin="round"></path>
+            <path d="M64,64 Q100,50 136,64" fill="none" stroke="#e6ddd0" stroke-width="2" opacity="0.8"></path>
+            <path d="M100,54 m0,-3 a3,3 0 1,1 0,6 a3,3 0 1,1 0,-6" fill="#f4c9d4"></path><circle cx="100" cy="49" r="1.6" fill="#f4c9d4"></circle><circle cx="104.8" cy="52.5" r="1.6" fill="#f4c9d4"></circle><circle cx="103" cy="58.1" r="1.6" fill="#f4c9d4"></circle><circle cx="97" cy="58.1" r="1.6" fill="#f4c9d4"></circle><circle cx="95.2" cy="52.5" r="1.6" fill="#f4c9d4"></circle><circle cx="100" cy="54" r="1.3" fill="#c9a227"></circle>
+            <path d="M70,72 Q80,66 90,70" fill="none" stroke="#c9a227" stroke-width="2.5" stroke-linecap="round"></path>
+            <path d="M130,72 Q120,66 110,70" fill="none" stroke="#c9a227" stroke-width="2.5" stroke-linecap="round"></path>
+            <g style="animation-delay: -0.8s;"><path d="M74,82 L94,88" stroke="#2b2724" stroke-width="4" stroke-linecap="round"></path><path d="M126,82 L106,88" stroke="#2b2724" stroke-width="4" stroke-linecap="round"></path></g>
+            <path d="M76,90 L90,94 M124,90 L110,94" stroke="#b4432b" stroke-width="2" stroke-linecap="round"></path>
+            <path d="M64,98 q7,-5 14,0 q-5,7 -14,4" fill="none" stroke="#b4432b" stroke-width="2.2" stroke-linecap="round"></path>
+            <path d="M136,98 q-7,-5 -14,0 q5,7 14,4" fill="none" stroke="#b4432b" stroke-width="2.2" stroke-linecap="round"></path>
+            <path d="M96,104 L100,110 L104,104 L100,100 Z" fill="#b4432b" stroke="#2b2724" stroke-width="1.6" stroke-linejoin="round"></path>
+            <path d="M100,110 L100,116 M96,118 Q100,121 104,118" stroke="#2b2724" stroke-width="1.8" fill="none" stroke-linecap="round"></path>
+            <path d="M60,106 l10,2 M62,112 l9,1 M140,106 l-10,2 M138,112 l-9,1" stroke="#2b2724" stroke-width="1.3" stroke-linecap="round" opacity="0.65"></path>
+          </g>
+        </g>
+      </svg>

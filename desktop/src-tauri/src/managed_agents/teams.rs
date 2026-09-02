@@ -35,7 +35,7 @@ const BUILT_IN_TEAMS: &[BuiltInTeam] = &[BuiltInTeam {
     id: "builtin-team:welcome",
     name: "Welcome Team",
     description: Some("A friendly starter trio ready to help you plan, create, and ship."),
-    persona_ids: &["builtin:fizz", "builtin:honey", "builtin:bumble"],
+    persona_ids: &["builtin:hayate", "builtin:kaede", "builtin:rin"],
 }];
 
 // Built-in teams that have been retired. A stored copy that still exactly
@@ -48,6 +48,10 @@ const RETIRED_BUILT_IN_TEAMS: &[BuiltInTeam] = &[BuiltInTeam {
     description: Some("Fizz works carefully and collaboratively."),
     persona_ids: &["builtin:fizz"],
 }];
+
+// NOTE: the retired entries above keep their original bee names on purpose —
+// they exist to recognize and purge stored copies written by older builds,
+// so their text has to match what those builds wrote.
 
 fn built_in_team_records(built_ins: &[BuiltInTeam], now: &str) -> Vec<TeamRecord> {
     built_ins

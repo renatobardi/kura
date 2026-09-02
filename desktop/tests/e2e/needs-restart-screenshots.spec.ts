@@ -74,7 +74,7 @@ const STANDALONE_AGENT = {
 const PERSONA_AGENT = {
   pubkey: TEST_IDENTITIES.bob.pubkey,
   name: "Persona Agent",
-  personaId: "builtin:fizz",
+  personaId: "builtin:hayate",
   status: "running" as const,
   needsRestart: true,
   restartDiff: DIFF_ENTRIES,
@@ -254,7 +254,7 @@ test.describe("restart-diff screenshots", () => {
 
   test("02-grid-persona-restart-badge", async ({ page }) => {
     await installMockBridge(page, {
-      activePersonaIds: ["builtin:fizz"],
+      activePersonaIds: ["builtin:hayate"],
       managedAgents: [PERSONA_AGENT],
     });
 
