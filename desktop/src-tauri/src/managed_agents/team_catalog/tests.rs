@@ -857,10 +857,14 @@ run_fixture_table!(
 
 #[test]
 fn test_real_builtin_without_avatar_mutation_projects_successfully() {
-    // A real built-in (hayate) has a ~170 KiB oversized avatar that is stripped in member_projection.
-    let builtin =
-        crate::managed_agents::built_in_persona_definition("builtin:hayate", "2026-07-30T00:00:00Z")
-            .expect("builtin:hayate must exist");
+    // The projection must survive a real built-in whatever its avatar weighs:
+    // the Kubo presets are small SVG data URLs, but an oversized one is omitted
+    // rather than rejecting the whole member (asserted both ways below).
+    let builtin = crate::managed_agents::built_in_persona_definition(
+        "builtin:hayate",
+        "2026-07-30T00:00:00Z",
+    )
+    .expect("builtin:hayate must exist");
     let has_large_avatar = builtin
         .avatar_url
         .as_deref()
