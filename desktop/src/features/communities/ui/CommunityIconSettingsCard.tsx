@@ -105,6 +105,7 @@ export function CommunityIconSettingsCard({
       data-testid="community-icon-settings"
     >
       <AgentCreationPreview
+        showPresetGallery={false}
         assetLabel="community icon"
         avatarUrl={draftIcon || null}
         label={activeCommunity?.name ?? "Community"}

@@ -756,7 +756,6 @@ export function AgentDefinitionDialog({
           setHasUserChanges(true);
           setAvatarUrl(nextAvatarUrl);
         }}
-        showPresetGallery
       />
 
       <div className="space-y-5">

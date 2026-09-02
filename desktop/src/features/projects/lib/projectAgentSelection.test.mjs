@@ -9,7 +9,10 @@ test("prefers Hayate over the first running agent", () => {
     personaId: "custom:implementation",
   };
   const hayate = { name: "Hayate", personaId: "builtin:hayate" };
-  assert.equal(pickDefaultProjectsAgent([implementationPartner, hayate]), hayate);
+  assert.equal(
+    pickDefaultProjectsAgent([implementationPartner, hayate]),
+    hayate,
+  );
 });
 
 test("ignores an unmanaged agent using the Hayate display name", () => {

@@ -304,7 +304,10 @@ async function expectWelcomePersonaMention(page: Page) {
   const banner = page.getByTestId("welcome-composer-guide-banner");
   const personaMention = page.getByTestId("welcome-composer-persona-mention");
   await expect(personaMention).toBeVisible();
-  await expect(personaMention).toHaveAttribute("data-persona-options", "Hayate");
+  await expect(personaMention).toHaveAttribute(
+    "data-persona-options",
+    "Hayate",
+  );
   await expect(personaMention).toHaveAttribute("data-active-persona", "Hayate");
   await expect(personaMention).toHaveAttribute(
     "data-animation-target",
@@ -641,7 +644,8 @@ async function expectWelcomeGuideIntro(
         >(page, "list_managed_agents"),
       ]);
       const hayate = agents.find(
-        (agent) => agent.name === "Hayate" && agent.persona_id === "builtin:hayate",
+        (agent) =>
+          agent.name === "Hayate" && agent.persona_id === "builtin:hayate",
       );
       const hayateMember = hayate
         ? members.members.find((member) => member.pubkey === hayate.pubkey)
