@@ -12,14 +12,13 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { invokeTauri } from "@/shared/api/tauri";
 import { isMacPlatform } from "@/shared/lib/platform";
 import { getStorageItem } from "@/shared/lib/safeStorage";
-import { createThemeVars, hexToHsl } from "./adaptive-theme";
+import { hexToHsl } from "./adaptive-theme";
 import {
   SYNTAX_THEMES,
   type SyntaxThemeName,
   type ThemeInfo,
-  extractThemeInfo,
   getThemePair,
-  loadThemeData,
+  loadThemeVars,
   resolveSystemTheme,
 } from "./theme-loader";
 
@@ -425,21 +424,14 @@ function applyCachedVars(): string | null {
 /** The latest theme load is the only one allowed to write document styles. */
 let themeApplyRequest = 0;
 
-/** Apply a theme: load data, derive CSS vars, set them on :root. */
+/** Apply a theme: load its CSS vars (Kubo or Shiki-derived) and set them on :root. */
 async function applyTheme(name: SyntaxThemeName): Promise<{
   isDark: boolean;
   terminalPalette: ThemeInfo["terminalPalette"];
 } | null> {
   const requestToken = ++themeApplyRequest;
-  const themeData = await loadThemeData(name);
+  const { isDark, vars, terminalPalette } = await loadThemeVars(name);
   if (requestToken !== themeApplyRequest) return null;
-
-  const info = extractThemeInfo(name, themeData);
-  const { isDark, vars } = createThemeVars(info.bg, info.fg, info.comment, {
-    added: info.added,
-    deleted: info.deleted,
-    modified: info.modified,
-  });
 
   const root = document.documentElement;
   for (const [key, value] of Object.entries(vars)) {
@@ -474,7 +466,7 @@ async function applyTheme(name: SyntaxThemeName): Promise<{
     // Storage full — non-critical
   }
 
-  return { isDark, terminalPalette: info.terminalPalette };
+  return { isDark, terminalPalette };
 }
 
 export function ThemeProvider({

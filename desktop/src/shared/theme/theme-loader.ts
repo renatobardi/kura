@@ -6,28 +6,30 @@
  */
 
 import type { ThemeRegistrationRaw } from "shiki";
+import { createThemeVars } from "./adaptive-theme";
+import { getKuboThemeVars } from "./kubo-theme";
 import {
   type TerminalPalette,
   extractTerminalPalette,
 } from "./terminal-palette";
 
 /**
- * Kura theme name. Kura is a first-party light theme that reuses GitHub
- * Light for every base color (backgrounds, text, borders, code) — the
- * message area and containers are indistinguishable from GitHub Light. Its
- * one distinguishing feature is a branded gradient painted across the
- * sidebar/nav canvas, replacing GitHub Light's flat grey. The gradient is
- * applied by {@link ThemeProvider} toggling a `data-kura-sidebar` attribute
- * on the document root; the CSS lives in `shared/styles/globals/theme.css`.
+ * Kura theme name. Kura is the app's first-party light theme: it paints the
+ * Kubo tokens (stone neutrals, near-black primary, hairline borders) declared
+ * in `shared/styles/globals/theme.css`, so choosing it in the picker matches
+ * the app's default appearance exactly. See `kubo-theme.ts`.
+ *
+ * Only its syntax highlighting and terminal ANSI ramp are borrowed — from
+ * GitHub Light, via {@link KURA_BASE_THEME}. {@link ThemeProvider} also
+ * toggles a `data-kura-sidebar` attribute on the document root that scopes the
+ * theme's chrome treatment (neutral hover/selection tints).
  */
 export const KURA_THEME_NAME = "kura";
 
 /**
  * Kura Dark theme name. The dark-mode counterpart to {@link KURA_THEME_NAME}:
- * reuses the GitHub Dark palette for every base color, with the same branded
- * sidebar gradient (dark-tuned colors, see `shared/styles/globals/theme.css`).
- * {@link ThemeProvider} toggles the shared `data-kura-sidebar` attribute for
- * this theme too; the `.dark` root class selects the dark gradient values.
+ * the Kubo `.dark` tokens — one stone surface, translucent white hairlines —
+ * with the GitHub Dark syntax/terminal palette behind them.
  *
  * Kura and Kura Dark are paired in {@link THEME_PAIRS}, so the picker shows a
  * combined "Kura" tile under System mode (follow-OS) plus a single "Kura" tile
@@ -35,18 +37,18 @@ export const KURA_THEME_NAME = "kura";
  */
 export const KURA_DARK_THEME_NAME = "kura-dark";
 
-/** The Shiki bundle Kura borrows its base palette from. */
+/** The Shiki bundle Kura borrows its syntax + terminal palette from. */
 export const KURA_BASE_THEME: SyntaxThemeName = "github-light";
 
-/** The Shiki bundle Kura Dark borrows its base palette from. */
+/** The Shiki bundle Kura Dark borrows its syntax + terminal palette from. */
 export const KURA_DARK_BASE_THEME: SyntaxThemeName = "github-dark";
 
 /**
  * Resolve a theme name to the real Shiki bundled theme it maps to.
  *
  * Most themes map to themselves, but the Kura aliases (`kura` / `kura-dark`)
- * are not bundled Shiki themes — they reuse the GitHub Light / GitHub Dark
- * palettes. The Shiki highlighter engine (used for fenced code blocks in
+ * are not bundled Shiki themes — their syntax colors come from GitHub Light /
+ * GitHub Dark. The Shiki highlighter engine (used for fenced code blocks in
  * `CodeBlock.tsx`) only understands bundled names, so callers that hand a
  * theme name to `loadTheme` / `codeToTokens` must resolve it through here
  * first; passing a raw Kura alias makes Shiki throw and code blocks fall
@@ -58,9 +60,8 @@ export function resolveShikiThemeName(name: string): SyntaxThemeName {
   return name as SyntaxThemeName;
 }
 
-// Available themes. "kura" is a Kura-branded theme that reuses the
-// github-light palette plus a sidebar gradient; the rest are the Shiki
-// bundled syntax themes, alphabetically sorted.
+// Available themes. "kura" / "kura-dark" are the first-party Kubo themes;
+// the rest are the Shiki bundled syntax themes, alphabetically sorted.
 export const SYNTAX_THEMES = [
   "kura",
   "kura-dark",
@@ -157,9 +158,10 @@ const themeImports: Record<
   SyntaxThemeName,
   () => Promise<{ default: ThemeRegistrationRaw }>
 > = {
-  // Kura reuses the github-light palette; its gradient is applied separately.
+  // Kura's chrome is Kubo (kubo-theme.ts); github-light supplies only its
+  // syntax colors and terminal ANSI ramp.
   kura: () => import("shiki/themes/github-light.mjs"),
-  // Kura Dark reuses the github-dark palette; dark gradient applied separately.
+  // Same for Kura Dark, on the github-dark syntax palette.
   "kura-dark": () => import("shiki/themes/github-dark.mjs"),
   andromeeda: () => import("shiki/themes/andromeeda.mjs"),
   "aurora-x": () => import("shiki/themes/aurora-x.mjs"),
@@ -417,4 +419,39 @@ export async function loadThemeData(
   const loader = themeImports[name];
   const { default: theme } = await loader();
   return theme;
+}
+
+/**
+ * Load a theme and return the CSS vars to apply, plus its terminal palette.
+ *
+ * This is the single entry point for "what does theme X look like": the
+ * ThemeProvider applies the result to the document and the appearance picker
+ * paints its preview tiles from it, so both must agree.
+ *
+ * `kura` / `kura-dark` short-circuit to the Kubo tokens; every other theme
+ * derives its chrome from the Shiki editor colors as before. Shiki data is
+ * still loaded for the Kura themes because the terminal ANSI ramp (and the
+ * fenced-code highlighting, via `resolveShikiThemeName`) comes from there.
+ */
+export async function loadThemeVars(name: SyntaxThemeName): Promise<{
+  isDark: boolean;
+  vars: Record<string, string>;
+  terminalPalette: ThemeInfo["terminalPalette"];
+}> {
+  const info = extractThemeInfo(name, await loadThemeData(name));
+  const kubo = getKuboThemeVars(name);
+  if (kubo) {
+    return {
+      isDark: kubo.isDark,
+      vars: { ...kubo.vars },
+      terminalPalette: info.terminalPalette,
+    };
+  }
+
+  const { isDark, vars } = createThemeVars(info.bg, info.fg, info.comment, {
+    added: info.added,
+    deleted: info.deleted,
+    modified: info.modified,
+  });
+  return { isDark, vars, terminalPalette: info.terminalPalette };
 }
