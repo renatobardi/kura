@@ -1,0 +1,38 @@
+[package]
+name = "kurad"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Headless Kura daemon: keeps managed agents running without a UI"
+
+[[bin]]
+name = "kurad"
+path = "src/main.rs"
+
+[dependencies]
+# The host-agnostic desktop backend. `kurad` adds no managed-agent logic of its
+# own — it only supplies a `Host` and calls the same runtime commands the
+# desktop's `#[tauri::command]` wrappers call.
+kura-host = { path = "../kura-host" }
+
+# CLI argument parsing — same derive+env house style as kura-cli/kura-acp.
+clap = { version = "4", features = ["derive", "env"] }
+
+# Async runtime. `Host::spawn` routes to `tokio::spawn`, which requires an
+# ambient runtime — hence `#[tokio::main]`. `signal` backs the Ctrl+C wait.
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal"] }
+
+# `Host::emit` payloads and the `status` JSON output.
+serde_json = { workspace = true }
+
+# Logging to stderr, RUST_LOG-driven.
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# Platform app-data dir resolution when --data-dir is omitted.
+dirs = "6"
+
+# Error plumbing in main.
+anyhow = { workspace = true }
