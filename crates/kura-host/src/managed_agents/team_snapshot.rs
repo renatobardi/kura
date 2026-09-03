@@ -30,9 +30,6 @@
 //! decode paths (JSON via `validate_team_snapshot`, PNG via
 //! `decode_team_snapshot_png` → JSON round-trip) so the rule is single-sourced.
 
-// Items are `pub(crate)` for P4.2 callers; suppress dead-code lint until then.
-#![allow(dead_code)]
-
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use png::Decoder;
 use serde::{Deserialize, Serialize};
