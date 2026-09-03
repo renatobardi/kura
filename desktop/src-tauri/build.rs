@@ -3,7 +3,7 @@
 include!("src/commands/reconnect_hook_config.rs");
 // Same source of truth the runtime filters with, so a baked build env cannot
 // carry a reserved key the runtime believes it already rejected.
-include!("src/managed_agents/reserved_env_keys.rs");
+include!("../../crates/kura-host/src/managed_agents/reserved_env_keys.rs");
 
 use base64::Engine as _;
 

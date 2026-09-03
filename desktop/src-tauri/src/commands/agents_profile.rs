@@ -301,3 +301,167 @@ pub(super) fn profile_needs_sync(
 // Async so the blocking body (disk reads/writes + process termination) runs off
 // the main UI thread via spawn_blocking. State is re-derived from the owned
 // AppHandle inside the closure (`State<'_, _>` is borrowed, MutexGuard is !Send).
+
+// ── Launch-restore hooks ─────────────────────────────────────────────────────
+//
+// `kura_host::managed_agents::restore_managed_agents_on_launch` delegates the
+// two things it cannot own — the mesh-LLM bootstrap dial (behind this crate's
+// `mesh-llm` feature and its git dependencies) and kind:0 profile
+// reconciliation (a desktop command) — through
+// [`kura_host::managed_agents::RestoreHooks`]. This is that implementation.
+
+/// The desktop's [`RestoreHooks`]. Carries the `AppHandle` so the hooks can
+/// re-derive state and spawn on the Tauri runtime.
+pub(crate) struct DesktopRestoreHooks {
+    app: AppHandle,
+}
+
+impl DesktopRestoreHooks {
+    pub(crate) fn new(app: AppHandle) -> Self {
+        Self { app }
+    }
+}
+
+impl kura_host::managed_agents::RestoreHooks for DesktopRestoreHooks {
+    #[cfg(feature = "mesh-llm")]
+    fn mesh_preflight<'a>(
+        &'a self,
+        app: &'a kura_host::HostHandle,
+        candidates: &'a [crate::managed_agents::ManagedAgentRecord],
+    ) -> kura_host::managed_agents::MeshPreflightFuture<'a> {
+        Box::pin(async move {
+            // Preflight against the same resolution spawn uses —
+            // `resolve_effective_config` (definition → global fallback). A
+            // linked instance's own `provider`/`model`/`relay_mesh` bytes never
+            // contribute. See `start_local_agent_with_preflight` for the
+            // identical rationale on the interactive path.
+            let personas = crate::managed_agents::load_personas(app).unwrap_or_default();
+            let global = crate::managed_agents::load_global_agent_config(app).unwrap_or_default();
+            let mut failures = Vec::new();
+            for record in candidates {
+                let Some(mesh_model_id) =
+                    crate::managed_agents::effective_config::resolve_effective_relay_mesh_model_id(
+                        record, &personas, &global,
+                    )
+                else {
+                    continue;
+                };
+                // Auto-start after relaunch: re-resolve a live bootstrap target
+                // and dial it. Skip (with an actionable error) only when no
+                // live target serves this model right now.
+                if let Err(error) = crate::commands::ensure_relay_mesh_for_record(
+                    &self.app,
+                    Some(mesh_model_id.as_str()),
+                    false,
+                )
+                .await
+                {
+                    failures.push((record.pubkey.clone(), error));
+                }
+            }
+            failures
+        })
+    }
+
+    fn reconcile_profiles(&self, app: &kura_host::HostHandle, spawned: &[(String, String)]) {
+        if spawned.is_empty() {
+            return;
+        }
+        let records = match crate::managed_agents::load_managed_agents(app) {
+            Ok(records) => records,
+            Err(error) => {
+                eprintln!("kura-desktop: profile reconciliation skipped: {error}");
+                return;
+            }
+        };
+        let personas = crate::managed_agents::load_personas(app).unwrap_or_default();
+        for (pubkey, spawn_relay) in spawned {
+            let Some(record) = records.iter().find(|r| r.pubkey == *pubkey) else {
+                continue;
+            };
+            // Resolve the effective harness for the avatar-fallback derivation
+            // (the snapshot may be empty/stale for an inherited harness).
+            // Mirrors the UI start path.
+            let mut data = profile_reconcile_data(record, &personas);
+            // Pin the relay this spawn was keyed to so the deferred task cannot
+            // resolve a post-switch workspace.
+            data.target_relay_url = Some(spawn_relay.clone());
+            let reconcile_app = self.app.clone();
+            let pubkey = pubkey.clone();
+            tauri::async_runtime::spawn(async move {
+                let state = reconcile_app.state::<AppState>();
+                if let Err(e) =
+                    reconcile_agent_profile(&state, &reconcile_app, &pubkey, &data).await
+                {
+                    eprintln!(
+                        "kura-desktop: profile reconciliation failed for agent {pubkey}: {e}"
+                    );
+                }
+            });
+        }
+    }
+}
+
+fn profile_reconcile_completed(outcome: ProfileReconcileOutcome) -> bool {
+    outcome == ProfileReconcileOutcome::Reconciled
+}
+
+/// Republish the kind:0 profiles queued by a rename that happened while the
+/// agent was stopped. Moved here from `managed_agents::restore` when the
+/// backend split: every step is a desktop command.
+pub(crate) fn spawn_pending_profile_reconciliations(app: &AppHandle, workspace_relay: &str) {
+    let state = app.state::<AppState>();
+    if !state
+        .managed_agent_profile_reconcile_enabled
+        .load(std::sync::atomic::Ordering::Acquire)
+    {
+        return;
+    }
+    let items = match load_pending_profile_reconciliations(app, workspace_relay) {
+        Ok(items) => items,
+        Err(error) => {
+            eprintln!("kura-desktop: failed to load pending profile reconciliations: {error}");
+            return;
+        }
+    };
+
+    for (pubkey, data) in items {
+        let reconcile_app = app.clone();
+        let relay_url = data
+            .target_relay_url
+            .clone()
+            .unwrap_or_else(|| data.relay_url.clone());
+        tauri::async_runtime::spawn(async move {
+            let state = reconcile_app.state::<AppState>();
+            match reconcile_agent_profile(&state, &reconcile_app, &pubkey, &data).await {
+                Ok(outcome) if profile_reconcile_completed(outcome) => {
+                    if let Err(error) = mark_profile_reconciled(&reconcile_app, &pubkey, &relay_url)
+                    {
+                        eprintln!(
+                            "kura-desktop: failed to record profile reconciliation for agent {pubkey}: {error}"
+                        );
+                    }
+                }
+                Ok(_) => {}
+                Err(error) => eprintln!(
+                    "kura-desktop: profile reconciliation failed for agent {pubkey}: {error}"
+                ),
+            }
+        });
+    }
+}
+
+#[cfg(test)]
+mod profile_reconcile_tests {
+    use super::{profile_reconcile_completed, ProfileReconcileOutcome};
+
+    #[test]
+    fn skipped_reconciliation_never_retires_pending_work() {
+        assert!(profile_reconcile_completed(
+            ProfileReconcileOutcome::Reconciled
+        ));
+        assert!(!profile_reconcile_completed(
+            ProfileReconcileOutcome::SkippedDisabled
+        ));
+    }
+}

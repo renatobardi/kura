@@ -333,7 +333,8 @@ fn reserved_keys_are_covered() {
     // The list lives in its own file because `build.rs` `include!`s the same
     // source (see `managed_agents/reserved_env_keys.rs`); read it there rather
     // than through the module that includes it.
-    let source = include_str!("../../../src/managed_agents/reserved_env_keys.rs");
+    let source =
+        include_str!("../../../../../crates/kura-host/src/managed_agents/reserved_env_keys.rs");
     let declared: Vec<&str> = source
         .lines()
         .skip_while(|line| !line.contains("RESERVED_ENV_KEYS"))

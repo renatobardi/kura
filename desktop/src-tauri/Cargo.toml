@@ -23,10 +23,10 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [features]
 default = ["system-keyring"]
-mesh-llm = ["dep:iroh", "dep:mesh-llm-sdk", "dep:mesh-llm-host-runtime", "dep:mesh-llm-client", "dep:mesh-llm-node", "dep:mesh-llm-system", "dep:mesh-llm-events"]
+mesh-llm = ["kura-host/mesh-llm", "dep:iroh", "dep:mesh-llm-sdk", "dep:mesh-llm-host-runtime", "dep:mesh-llm-client", "dep:mesh-llm-node", "dep:mesh-llm-system", "dep:mesh-llm-events"]
 # OS keyring backing for desktop secret storage (nsec private keys). When
 # disabled, secrets fall back to 0o600 files. On by default for real builds.
-system-keyring = ["dep:keyring"]
+system-keyring = ["dep:keyring", "kura-host/system-keyring"]
 
 [build-dependencies]
 base64 = "0.22"
@@ -103,6 +103,7 @@ reqwest = { version = "0.13", features = ["json", "query", "stream", "blocking"]
 rustls = { version = "0.23", default-features = false, features = ["aws_lc_rs", "std"] }
 url = "2"
 kura_core_pkg = { package = "kura-core", path = "../../crates/kura-core" }
+kura-host = { path = "../../crates/kura-host", default-features = false }
 kura_persona_pkg = { package = "kura-persona", path = "../../crates/kura-persona" }
 kura_sdk_pkg = { package = "kura-sdk", path = "../../crates/kura-sdk" }
 kura_agent_pkg = { package = "kura-agent", path = "../../crates/kura-agent" }
@@ -149,6 +150,10 @@ strip-ansi-escapes = "0.2"
 tracing = "0.1"
 
 [dev-dependencies]
+# `test-support` re-exposes the backend's `#[cfg(test)]`-only helpers (path
+# mutex, admission-gate reset, retention readers) to this crate's tests, which
+# used to reach them directly when the backend lived here.
+kura-host = { path = "../../crates/kura-host", features = ["test-support"] }
 tauri = { version = "2", features = ["test"] }
 tauri-utils = "2"
 # `test-util` enables tokio's paused-clock (`start_paused`) so the relay
