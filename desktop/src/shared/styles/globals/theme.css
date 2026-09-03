@@ -324,8 +324,21 @@
   background-color: hsl(var(--background));
 }
 
+/*
+ * The app surface is the one opaque plane of the Kura shell. It used to be
+ * transparent so the sidebar gradient painted behind it showed through; Kubo
+ * removed every gradient, so transparency here exposed `.kura-huddle-shell`
+ * instead — the huddle drawer plane, which is a fixed near-black in BOTH
+ * themes because it is only ever meant to peek out under the lifted app's
+ * rounded corners. In dark that near-black happens to equal --sidebar, so the
+ * shell looked right; in light the whole chrome turned black.
+ *
+ * Painting the sidebar color here keeps the drawer plane hidden until a huddle
+ * actually lifts the app, and the descendant chrome below stays transparent so
+ * the sidebar, rail, top chrome and inset margin remain one continuous plane.
+ */
 :root[data-kura-sidebar] .kura-huddle-app-surface {
-  background-color: transparent;
+  background-color: hsl(var(--sidebar-background));
   background-image: none;
   isolation: isolate;
 }

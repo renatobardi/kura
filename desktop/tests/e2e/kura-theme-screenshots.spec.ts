@@ -68,6 +68,12 @@ async function expectKuraSidebarPalette(page: Page, mode: "light" | "dark") {
     mode === "light" ? "rgba(0, 0, 0, 0.07)" : "rgba(255, 255, 255, 0.16)";
   const chromeColor =
     mode === "light" ? "rgba(0, 0, 0, 0.5)" : "rgba(255, 255, 255, 0.5)";
+  // The app surface is the shell's only opaque plane. Transparent here exposes
+  // `.kura-huddle-shell`, the huddle drawer plane, which is a fixed near-black
+  // in BOTH themes: invisible under dark (it equals --sidebar there) and a
+  // black chrome under every light theme.
+  const appSurfaceColor =
+    mode === "light" ? "rgb(250, 250, 249)" : "rgb(28, 25, 23)";
   const search = page.getByTestId("open-search");
   const pinnedHeader = page.getByTestId("sidebar-pinned-header");
   const sidebarScroller = page.locator(".kura-sidebar-scrollbar");
@@ -78,6 +84,10 @@ async function expectKuraSidebarPalette(page: Page, mode: "light" | "dark") {
     .filter({ hasText: "Channels" })
     .first();
 
+  await expect(page.locator(".kura-huddle-app-surface")).toHaveCSS(
+    "background-color",
+    appSurfaceColor,
+  );
   await expect(sectionLabel).toHaveCSS("color", mutedColor);
   await expect(search).toHaveCSS("background-color", searchSurface);
   await expect(search.locator("svg").first()).toHaveCSS("color", mutedColor);
