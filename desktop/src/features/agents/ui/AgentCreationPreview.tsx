@@ -37,13 +37,14 @@ import {
   PopoverTrigger,
 } from "@/shared/ui/popover";
 import { Spinner } from "@/shared/ui/spinner";
-import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import {
   AVATAR_APPLY_MOTION_TRANSITION,
   type AvatarTab,
   type EmojiMartEmoji,
   isAvatarFileDrag,
 } from "./AgentCreationPreview.utils";
+import { AvatarPickerTabs, AvatarPresetGallery } from "./AgentAvatarPicker";
+import { parsePresetAvatarDataUrl } from "./presetAvatars";
 
 export function AgentCreationPreview({
   assetLabel = "avatar",
@@ -57,6 +58,7 @@ export function AgentCreationPreview({
   onSelectAvatar,
   processImage,
   shape = "circle",
+  showPresetGallery = true,
   testIdPrefix = "agent-avatar",
   variant = "default",
 }: {
@@ -74,6 +76,9 @@ export function AgentCreationPreview({
   onSelectAvatar: (avatarUrl: string) => void;
   processImage?: (file: File) => Promise<string>;
   shape?: "circle" | "rounded-square";
+  /** Offer the Kubo preset gallery. On by default for agent avatars; the
+   *  community icon picker opts out — those presets are agent characters. */
+  showPresetGallery?: boolean;
   testIdPrefix?: string;
   variant?: "compact" | "default";
 }) {
@@ -191,10 +196,15 @@ export function AgentCreationPreview({
         setSelectedEmoji(null);
         setSelectedColor(DEFAULT_EMOJI_AVATAR_COLOR);
         setHasChosenColor(false);
-        setActiveTab("image");
+        // A preset avatar opens on its own tile so the current choice is
+        // visible; everything else opens on Image.
+        const preset = showPresetGallery
+          ? parsePresetAvatarDataUrl(avatarUrl ?? "")
+          : null;
+        setActiveTab(preset ? "gallery" : "image");
       }
     }
-  }, [isAvatarMenuOpen, avatarUrl]);
+  }, [isAvatarMenuOpen, avatarUrl, showPresetGallery]);
 
   // Keep the custom color picker in sync when the selected color changes
   React.useEffect(() => {
@@ -445,37 +455,12 @@ export function AgentCreationPreview({
         onDragOver={handlePopoverDragOver}
         onDrop={handlePopoverDrop}
       >
-        <Tabs
-          className="w-full"
-          onValueChange={(tab) => {
-            setActiveTab(tab as AvatarTab);
-            setIsCustomColorPickerOpen(false);
-          }}
-          value={activeTab}
-        >
-          <TabsList className="relative isolate mb-3 grid h-9 w-full grid-cols-2 overflow-hidden rounded-lg bg-muted p-0.5">
-            <div
-              aria-hidden="true"
-              className="absolute bottom-0.5 left-0.5 top-0.5 z-0 rounded-md bg-background shadow-sm transition-transform duration-[250ms] ease-out"
-              style={{
-                transform: `translateX(${activeTab === "emoji" ? 100 : 0}%)`,
-                width: "calc((100% - 4px) / 2)",
-              }}
-            />
-            <TabsTrigger
-              className="relative z-10 h-full rounded-md bg-transparent text-xs font-medium shadow-none transition-colors data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-              value="image"
-            >
-              Image
-            </TabsTrigger>
-            <TabsTrigger
-              className="relative z-10 h-full rounded-md bg-transparent text-xs font-medium shadow-none transition-colors data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-              value="emoji"
-            >
-              Emoji
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <AvatarPickerTabs
+          activeTab={activeTab}
+          onCloseCustomColorPicker={() => setIsCustomColorPickerOpen(false)}
+          onTabChange={setActiveTab}
+          showPresetGallery={showPresetGallery}
+        />
 
         {activeTab === "image" ? (
           <div className="grid gap-2.5">
@@ -566,6 +551,20 @@ export function AgentCreationPreview({
               </button>
             ) : null}
           </div>
+        ) : null}
+
+        {activeTab === "gallery" ? (
+          <AvatarPresetGallery
+            avatarUrl={avatarUrl}
+            disabled={disabled || isUploading}
+            isRoundedSquare={isRoundedSquare}
+            onSelect={(nextAvatarUrl) => {
+              onSelectAvatar(nextAvatarUrl);
+              onCommitAvatar?.(nextAvatarUrl);
+              setSquishKey((key) => key + 1);
+            }}
+            testIdPrefix={testIdPrefix}
+          />
         ) : null}
 
         {activeTab === "emoji" ? (

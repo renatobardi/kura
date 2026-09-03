@@ -304,8 +304,11 @@ async function expectWelcomePersonaMention(page: Page) {
   const banner = page.getByTestId("welcome-composer-guide-banner");
   const personaMention = page.getByTestId("welcome-composer-persona-mention");
   await expect(personaMention).toBeVisible();
-  await expect(personaMention).toHaveAttribute("data-persona-options", "Fizz");
-  await expect(personaMention).toHaveAttribute("data-active-persona", "Fizz");
+  await expect(personaMention).toHaveAttribute(
+    "data-persona-options",
+    "Hayate",
+  );
+  await expect(personaMention).toHaveAttribute("data-active-persona", "Hayate");
   await expect(personaMention).toHaveAttribute(
     "data-animation-target",
     "per-character",
@@ -339,8 +342,11 @@ async function expectWelcomePersonaMention(page: Page) {
       property: styles.transitionProperty,
     };
   });
+  // The width transition is the per-character enter plus its stagger, so the
+  // band scales with the agent's name — "@Hayate" runs longer than a shorter
+  // one. What matters is that it stays under a second.
   expect(transition.durationMs).toBeGreaterThanOrEqual(700);
-  expect(transition.durationMs).toBeLessThanOrEqual(740);
+  expect(transition.durationMs).toBeLessThanOrEqual(800);
   expect(Math.round(Number.parseFloat(transition.duration) * 1000)).toBe(
     transition.durationMs,
   );
@@ -452,7 +458,7 @@ async function expectWelcomeComposerBannerCompletesAfterPersonaMention(
     throw new Error("Could not measure the Welcome composer");
   }
 
-  await page.getByTestId("message-input").fill("Thanks @Fizz");
+  await page.getByTestId("message-input").fill("Thanks @Hayate");
   await page.getByTestId("send-message").click();
 
   await expect(banner).toHaveAttribute("data-state", "complete");
@@ -637,31 +643,32 @@ async function expectWelcomeGuideIntro(
           Array<{ pubkey: string; name: string; persona_id: string | null }>
         >(page, "list_managed_agents"),
       ]);
-      const fizz = agents.find(
-        (agent) => agent.name === "Fizz" && agent.persona_id === "builtin:fizz",
+      const hayate = agents.find(
+        (agent) =>
+          agent.name === "Hayate" && agent.persona_id === "builtin:hayate",
       );
-      const fizzMember = fizz
-        ? members.members.find((member) => member.pubkey === fizz.pubkey)
+      const hayateMember = hayate
+        ? members.members.find((member) => member.pubkey === hayate.pubkey)
         : null;
-      const profileAvatarUrl = fizz
+      const profileAvatarUrl = hayate
         ? (
             await invokeMockCommand<{
               profiles: Record<string, { avatar_url: string | null }>;
             }>(page, "get_users_batch", {
-              pubkeys: [fizz.pubkey],
+              pubkeys: [hayate.pubkey],
             })
-          ).profiles[fizz.pubkey]?.avatar_url
+          ).profiles[hayate.pubkey]?.avatar_url
         : null;
 
       return {
-        fizzIsBot: fizzMember?.role === "bot" && fizzMember.is_agent,
-        fizzPersonaId: fizz?.persona_id ?? null,
+        hayateIsBot: hayateMember?.role === "bot" && hayateMember.is_agent,
+        hayatePersonaId: hayate?.persona_id ?? null,
         profileAvatarUrl,
       };
     })
     .toEqual({
-      fizzIsBot: true,
-      fizzPersonaId: "builtin:fizz",
+      hayateIsBot: true,
+      hayatePersonaId: "builtin:hayate",
       profileAvatarUrl: null,
     });
 
@@ -3196,7 +3203,7 @@ test("failed public starter channel setup does not show a retry toast", async ({
   expect(await commandCount(page, "ensure_starter_channels")).toBe(2);
 });
 
-test("first-run onboarding posts the live Fizz kickoff", async ({ page }) => {
+test("first-run onboarding posts the live Hayate kickoff", async ({ page }) => {
   await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
   await installMockBridge(
     page,
@@ -3218,10 +3225,10 @@ test("first-run onboarding posts the live Fizz kickoff", async ({ page }) => {
   // Greeted by the name typed above — the @mention pill also files the opener
   // into the new user's Inbox mentions feed.
   await expect(page.getByTestId("message-timeline")).toContainText(
-    "Hi Morty QA, I'm Fizz. Welcome to Kura.",
+    "Hi Morty QA, I'm Hayate. Welcome to Kura.",
   );
   await expect(page.getByTestId("message-timeline")).toContainText(
-    "Honey and Pollen, introduce yourselves",
+    "Kaede and Rin, introduce yourselves",
   );
 });
 
@@ -3242,7 +3249,7 @@ test("first-run onboarding lands before Welcome team bootstrap completes", async
   await expectPrivateWelcomeLanding(page);
   await expect(page.getByTestId("app-loading-gate")).toHaveCount(0);
   await expect(page.getByTestId("message-timeline")).toContainText(
-    "Hi Morty QA, I'm Fizz. Welcome to Kura.",
+    "Hi Morty QA, I'm Hayate. Welcome to Kura.",
   );
   await page.waitForTimeout(1_500);
   expect(await commandCount(page, "create_managed_agent")).toBe(3);

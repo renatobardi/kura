@@ -28,6 +28,7 @@ import type { UserNote } from "@/shared/api/socialTypes";
 import type { ChannelMember, UserProfileSummary } from "@/shared/api/types";
 import { Input } from "@/shared/ui/input";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { SakuraPetals } from "@/shared/ui/SakuraPetals";
 import { UserAvatar } from "@/shared/ui/UserAvatar";
 import { VirtualizedList } from "@/shared/ui/VirtualizedList";
 import { truncatePubkey } from "@/shared/lib/pubkey";
@@ -49,8 +50,9 @@ type PulseViewProps = {
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border/60 px-4 py-12 text-center">
-      <p className="text-sm text-muted-foreground">{message}</p>
+    <div className="relative flex flex-1 flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border border-dashed border-border/60 px-4 py-12 text-center">
+      <SakuraPetals />
+      <p className="relative text-sm text-muted-foreground">{message}</p>
     </div>
   );
 }

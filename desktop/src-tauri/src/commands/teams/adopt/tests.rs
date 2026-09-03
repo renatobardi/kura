@@ -679,14 +679,14 @@ fn test_allowlist_respond_to_is_normalized_to_owner_only_on_adoption() {
 
 #[test]
 fn test_real_builtin_round_trips_through_publish_and_plan_add() {
-    // End-to-end reuse fix: fizz (with its ~170 KiB avatar) is published via
+    // End-to-end reuse fix: hayate (with its ~170 KiB avatar) is published via
     // build_team_catalog_event, parsed on the recipient side, and plan_add
     // reuses the local built-in rather than minting a copy.
     use crate::managed_agents::team_catalog::{
         build_team_catalog_event, team_catalog_content_from_event, MAX_AVATAR_URL_BYTES,
     };
-    let local = crate::managed_agents::built_in_persona_definition("builtin:fizz", NOW)
-        .expect("builtin:fizz must exist");
+    let local = crate::managed_agents::built_in_persona_definition("builtin:hayate", NOW)
+        .expect("builtin:hayate must exist");
     let t = team_fixture(vec![local.id.clone()]);
     let keys = nostr::Keys::generate();
     let event = build_team_catalog_event(&t, std::slice::from_ref(&local), true)

@@ -2482,22 +2482,22 @@ function resetMockPersonas(config?: E2eConfig) {
   const activePersonaIds = new Set(config?.mock?.activePersonaIds ?? []);
   const builtInPersonas = [
     {
-      id: "builtin:fizz",
-      display_name: "Fizz",
+      id: "builtin:hayate",
+      display_name: "Hayate",
       avatar_url: null,
-      system_prompt: "You are Fizz.",
+      system_prompt: "You are Hayate.",
     },
     {
-      id: "builtin:honey",
-      display_name: "Honey",
+      id: "builtin:kaede",
+      display_name: "Kaede",
       avatar_url: null,
-      system_prompt: "You are Honey.",
+      system_prompt: "You are Kaede.",
     },
     {
-      id: "builtin:bumble",
-      display_name: "Pollen",
+      id: "builtin:rin",
+      display_name: "Rin",
       avatar_url: null,
-      system_prompt: "You are Pollen.",
+      system_prompt: "You are Rin.",
     },
   ];
   mockPersonas = builtInPersonas.map((persona) => ({

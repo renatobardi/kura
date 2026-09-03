@@ -272,8 +272,10 @@ fn agents_referencing_team_empty_when_no_matches() {
 
 #[test]
 fn migration_pristine_fizz_is_purged() {
-    // A stored record that exactly matches the retired Fizz seed is dropped
-    // on load — the user never touched it, so nothing is lost.
+    // A stored record that exactly matches the retired seed is dropped on
+    // load — the user never touched it, so nothing is lost. The retired ids
+    // and copy keep their original bee names: they exist to recognize what
+    // older builds wrote.
     let pristine = TeamRecord {
         id: "builtin-team:fizz".to_string(),
         name: "Fizz".to_string(),
@@ -299,14 +301,14 @@ fn migration_pristine_fizz_is_purged() {
 
 #[test]
 fn migration_customized_fizz_is_demoted_to_user_team() {
-    // A stored Fizz that was renamed (or had a persona added) is retained
+    // A stored Hayate that was renamed (or had a persona added) is retained
     // but demoted to a user-owned team so the user can edit or delete it.
     let customized = TeamRecord {
         id: "builtin-team:fizz".to_string(),
-        name: "Fizz (customized)".to_string(),
-        description: Some("Fizz works carefully and collaboratively.".to_string()),
+        name: "Hayate (customized)".to_string(),
+        description: Some("Hayate works carefully and collaboratively.".to_string()),
         instructions: None,
-        persona_ids: vec!["builtin:fizz".to_string(), "extra:persona".to_string()],
+        persona_ids: vec!["builtin:hayate".to_string(), "extra:persona".to_string()],
         is_builtin: true,
         shared: false,
         catalog_source: None,
@@ -324,7 +326,7 @@ fn migration_customized_fizz_is_demoted_to_user_team() {
     let demoted = records
         .iter()
         .find(|t| t.id == "builtin-team:fizz")
-        .expect("customized fizz should be retained as a user-owned team");
+        .expect("customized hayate should be retained as a user-owned team");
     assert!(!demoted.is_builtin);
     assert_eq!(demoted.updated_at, "2026-07-01T00:00:00Z");
 }
@@ -345,9 +347,9 @@ fn welcome_team_is_seeded_and_idempotent() {
     assert_eq!(
         welcome.persona_ids,
         vec![
-            "builtin:fizz".to_string(),
-            "builtin:honey".to_string(),
-            "builtin:bumble".to_string(),
+            "builtin:hayate".to_string(),
+            "builtin:kaede".to_string(),
+            "builtin:rin".to_string(),
         ]
     );
     assert!(welcome.is_builtin);
@@ -370,7 +372,7 @@ fn welcome_team_seed_does_not_overwrite_customization() {
         .expect("welcome team should be seeded");
     welcome.name = "My Welcome Team".to_string();
     welcome.description = Some("My customized starter team.".to_string());
-    welcome.persona_ids = vec!["builtin:honey".to_string()];
+    welcome.persona_ids = vec!["builtin:kaede".to_string()];
 
     let (records, changed) = merge_teams(records, "2026-07-02T00:00:00Z");
 
@@ -384,7 +386,7 @@ fn welcome_team_seed_does_not_overwrite_customization() {
         welcome.description.as_deref(),
         Some("My customized starter team.")
     );
-    assert_eq!(welcome.persona_ids, vec!["builtin:honey".to_string()]);
+    assert_eq!(welcome.persona_ids, vec!["builtin:kaede".to_string()]);
     assert!(welcome.is_builtin);
 }
 
@@ -524,7 +526,7 @@ fn test_deactivate_catalog_member_copies_skips_different_d_tag() {
 fn test_deactivate_catalog_member_copies_skips_builtins() {
     // Built-in substitutions are local records, not copies — deleting the team
     // must never deactivate them.
-    let mut personas = vec![builtin_copy("builtin:fizz")];
+    let mut personas = vec![builtin_copy("builtin:hayate")];
     let changed =
         deactivate_catalog_member_copies_with_ref_check(&mut personas, OWNER, D_TAG, &[], &[]);
     assert!(!changed, "built-in should not be deactivated");

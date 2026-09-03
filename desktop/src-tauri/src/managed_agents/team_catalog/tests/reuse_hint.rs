@@ -18,11 +18,11 @@ use super::{builtin_record, signed_event_with_content, team};
 
 #[test]
 fn test_a_reuse_hash_covering_different_fields_than_the_member_is_rejected() {
-    // A publisher pairs fizz's slug and fizz's GENUINE projection hash with a
+    // A publisher pairs hayate's slug and hayate's GENUINE projection hash with a
     // member carrying unrelated reviewed fields. The boundary must recompute
     // the hint-free hash from the member's own fields and reject the mismatch,
-    // so `reusable_builtin` never substitutes fizz for the reviewed projection.
-    let genuine_fizz_hash = local_member_projection_hash(&builtin_record("builtin:fizz"));
+    // so `reusable_builtin` never substitutes hayate for the reviewed projection.
+    let genuine_fizz_hash = local_member_projection_hash(&builtin_record("builtin:hayate"));
     let tampered = TeamCatalogMember {
         member_key: "k".to_string(),
         display_name: "One".to_string(),
@@ -34,7 +34,7 @@ fn test_a_reuse_hash_covering_different_fields_than_the_member_is_rejected() {
         name_pool: Vec::new(),
         respond_to: None,
         parallelism: None,
-        builtin_slug: Some("fizz".to_string()),
+        builtin_slug: Some("hayate".to_string()),
         projection_hash: Some(genuine_fizz_hash),
     };
     let content = TeamCatalogContent {
@@ -59,7 +59,7 @@ fn test_an_honest_builtin_projection_still_passes_the_boundary() {
     // The recompute gate must not reject a legitimate publisher: the hash it
     // stamps is computed from the same fields it publishes, so it always
     // matches on the recipient's recompute.
-    let content = build_team_catalog_content(&team(), &[builtin_record("builtin:fizz")]).unwrap();
+    let content = build_team_catalog_content(&team(), &[builtin_record("builtin:hayate")]).unwrap();
     let body = team_catalog_content_json(&content).unwrap();
 
     assert!(
@@ -74,7 +74,7 @@ fn test_uppercase_reuse_hash_of_the_true_projection_is_accepted() {
     // an uppercased form of a publisher's genuine hash still passes the boundary.
     // That the uppercase hint also drives built-in reuse (not a copy) is asserted
     // at the adoption seam in `commands/teams/adopt/tests/reuse.rs`.
-    let content = build_team_catalog_content(&team(), &[builtin_record("builtin:fizz")]).unwrap();
+    let content = build_team_catalog_content(&team(), &[builtin_record("builtin:hayate")]).unwrap();
     let mut upper = content;
     upper.members[0].projection_hash = upper.members[0]
         .projection_hash

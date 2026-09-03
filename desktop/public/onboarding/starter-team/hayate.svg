@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" width="200" height="262"><style>@keyframes km-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } } @keyframes km-shadow { 0%, 100% { transform: scaleX(1); opacity: 0.16; } 50% { transform: scaleX(0.94); opacity: 0.11; } } @keyframes km-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.06); } } @keyframes km-sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(4deg); } } @keyframes km-tilt { 0%, 100% { transform: rotate(0deg); } 60% { transform: rotate(-2deg); } } @keyframes km-sleeve { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(2.5deg); } } @keyframes km-twitch { 0%, 84%, 100% { transform: rotate(0deg); } 88% { transform: rotate(-8deg); } 92% { transform: rotate(3deg); } } @keyframes km-fan { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(5deg); } } @keyframes km-petal { 0% { transform: translate(0, -14px) rotate(0deg); opacity: 0; } 10% { opacity: 0.9; } 85% { opacity: 0.9; } 100% { transform: translate(-34px, 250px) rotate(290deg); opacity: 0; } } .km-bob { animation: km-bob 3.6s ease-in-out infinite; } .km-shadow { animation: km-shadow 3.6s ease-in-out infinite; transform-origin: center; transform-box: fill-box; } .km-blink { animation: km-blink 4.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; } .km-sway { animation: km-sway 3.2s ease-in-out infinite; transform-origin: 50% 100%; transform-box: fill-box; } .km-tilt { animation: km-tilt 5s ease-in-out infinite; transform-origin: 50% 90%; transform-box: fill-box; } .km-sleeve { animation: km-sleeve 3.6s ease-in-out infinite; transform-origin: 80% 10%; transform-box: fill-box; } .km-twitch { animation: km-twitch 6s ease-in-out infinite; transform-origin: 50% 100%; transform-box: fill-box; } .km-fan { animation: km-fan 3s ease-in-out infinite; transform-origin: 10% 90%; transform-box: fill-box; } .km-bob { animation-duration: 1.8s; } .km-shadow { animation-duration: 1.8s; } .km-fan { animation-duration: 1.6s; }</style>
+        <ellipse class="km-shadow" cx="100" cy="246" rx="52" ry="8" fill="#2b2724" opacity="0.16"></ellipse>
+        <g class="km-bob" style="animation-delay: -2.4s;">
+          <!-- hakama listrado -->
+          <path d="M76,174 L64,238 L96,238 L97,178 Z" fill="#4a4440" stroke="#2b2724" stroke-width="3" stroke-linejoin="round"></path>
+          <path d="M124,174 L136,238 L104,238 L103,178 Z" fill="#4a4440" stroke="#2b2724" stroke-width="3" stroke-linejoin="round"></path>
+          <path d="M82,180 L72,234 M89,181 L84,236 M96,182 L92,236 M118,180 L128,234 M111,181 L116,236 M104,182 L108,236" stroke="#efece8" stroke-width="1.8" fill="none" opacity="0.75"></path>
+          <path d="M66,238 L94,238 L94,246 L64,246 Z M134,238 L106,238 L106,246 L136,246 Z" fill="#2b2724"></path>
+          <path d="M78,238 L80,243 M122,238 L120,243" stroke="#fdfbf7" stroke-width="2"></path>
+          <!-- braço esquerdo (punho no quadril) -->
+          <path d="M70,140 Q52,152 56,172 L74,176 Q70,158 78,148 Z" fill="#2b2724" stroke="#1c1917" stroke-width="2.5"></path>
+          <path d="M58,164 L74,168 M57,169 L73,172" stroke="#fdfbf7" stroke-width="2.4"></path>
+          <path d="M58,160 L73,164" stroke="#b4432b" stroke-width="2.4"></path>
+          <circle cx="66" cy="180" r="7" fill="#f0d9bd" stroke="#2b2724" stroke-width="2.5"></circle>
+          <path d="M62,178 l8,1" stroke="#c9a688" stroke-width="1.4"></path>
+          <!-- torso kimono -->
+          <path d="M74,114 Q100,104 126,114 L132,178 Q100,188 68,178 Z" fill="#2b2724" stroke="#1c1917" stroke-width="3" stroke-linejoin="round"></path>
+          <path d="M84,116 L100,140 L116,116" fill="none" stroke="#fdfbf7" stroke-width="2.6" stroke-linejoin="round"></path>
+          <path d="M87,115 L100,134 L113,115" fill="none" stroke="#b4432b" stroke-width="2.2" stroke-linejoin="round"></path>
+          <circle cx="100" cy="152" r="11" fill="#fdfbf7" stroke="#2b2724" stroke-width="2"></circle>
+          <path d="M100,152 C96,149.5 94.5,144.5 96.5,140.5 M100,152 C104,149.5 105.5,144.5 103.5,140.5 M100,152 C95,151 92,147 92.5,142.5 M100,152 C105,151 108,147 107.5,142.5" fill="none" stroke="#b4432b" stroke-width="1.5" transform="translate(0,6)"></path>
+          <circle cx="100" cy="153.5" r="1.8" fill="#b4432b"></circle>
+          <!-- kataginu (asas) -->
+          <path d="M76,116 L40,134 L74,148 Z" fill="#8c3226" stroke="#2b2724" stroke-width="2.8" stroke-linejoin="round"></path>
+          <path d="M124,116 L160,134 L126,148 Z" fill="#8c3226" stroke="#2b2724" stroke-width="2.8" stroke-linejoin="round"></path>
+          <path d="M72,120 L46,133 M128,120 L154,133" stroke="#c9a227" stroke-width="1.8"></path>
+          <!-- obi dourado -->
+          <path d="M69,170 L131,170 L132,181 Q100,189 68,181 Z" fill="#c9a227" stroke="#2b2724" stroke-width="2.4"></path>
+          <path d="M76,174 l6,3 M88,173 l6,3 M100,174 l6,3 M112,173 l6,3" stroke="#2b2724" stroke-width="1.6"></path>
+          <!-- braço direito erguido com leque -->
+          <path d="M124,128 Q146,120 156,112 L162,124 Q150,134 132,140 Z" fill="#2b2724" stroke="#1c1917" stroke-width="2.5"></path>
+          <path d="M128,142 Q142,152 140,166 Q126,168 118,158 L122,144 Z" fill="#2b2724" stroke="#1c1917" stroke-width="2.5"></path>
+          <path d="M124,162 Q132,166 138,164" stroke="#b4432b" stroke-width="2.4" fill="none"></path>
+          <path d="M126,166 Q133,169 139,167" stroke="#fdfbf7" stroke-width="2.4" fill="none"></path>
+          <circle cx="160" cy="116" r="6.5" fill="#f0d9bd" stroke="#2b2724" stroke-width="2.5"></circle>
+          <g class="km-fan" style="transform-origin: 20% 95%;">
+            <path d="M160,112 L138,66 L184,84 Z" fill="#c9a227" stroke="#2b2724" stroke-width="2.5" stroke-linejoin="round"></path>
+            <path d="M160,112 L142,72 M160,112 L152,68 M160,112 L164,68 M160,112 L176,76" stroke="#2b2724" stroke-width="1.4" opacity="0.7"></path>
+            <circle cx="158" cy="84" r="6" fill="#b4432b"></circle>
+            <path d="M138,66 Q162,58 184,84" fill="none" stroke="#2b2724" stroke-width="2.5"></path>
+          </g>
+          <!-- cabeça -->
+          <g class="km-tilt" style="animation-duration: 4s;">
+            <path d="M72,58 Q60,68 62,90 L74,92 Q70,72 80,62 Z" fill="#2b2724"></path>
+            <path d="M128,58 Q140,68 138,90 L126,92 Q130,72 120,62 Z" fill="#2b2724"></path>
+            <path d="M66,74 Q68,64 76,60 M134,74 Q132,64 124,60" stroke="#4a4440" stroke-width="1.6" fill="none"></path>
+            <ellipse cx="100" cy="84" rx="27" ry="26" fill="#fdfbf7" stroke="#2b2724" stroke-width="3"></ellipse>
+            <path d="M70,64 Q100,46 130,64 L126,52 Q100,40 74,52 Z" fill="#2b2724"></path>
+            <path d="M80,58 Q100,48 120,58" stroke="#4a4440" stroke-width="1.6" fill="none"></path>
+            <rect x="90" y="24" width="20" height="16" rx="5" fill="#2b2724"></rect>
+            <path d="M90,32 L110,32" stroke="#3f5573" stroke-width="3.5"></path>
+            <path d="M84,64 C76,58 71,50 69,42" fill="none" stroke="#b4432b" stroke-width="5" stroke-linecap="round"></path>
+            <path d="M116,64 C124,58 129,50 131,42" fill="none" stroke="#b4432b" stroke-width="5" stroke-linecap="round"></path>
+            <path d="M90,62 C86,56 84,50 84,44" fill="none" stroke="#b4432b" stroke-width="3" stroke-linecap="round"></path>
+            <path d="M110,62 C114,56 116,50 116,44" fill="none" stroke="#b4432b" stroke-width="3" stroke-linecap="round"></path>
+            <path d="M74,94 C70,100 70,108 75,113" fill="none" stroke="#b4432b" stroke-width="3.5" stroke-linecap="round"></path>
+            <path d="M126,94 C130,100 130,108 125,113" fill="none" stroke="#b4432b" stroke-width="3.5" stroke-linecap="round"></path>
+            <path d="M78,70 L96,64 M122,70 L104,64" stroke="#2b2724" stroke-width="5.5" stroke-linecap="round"></path>
+            <path d="M79,65 L95,60 M121,65 L105,60" stroke="#b4432b" stroke-width="2" stroke-linecap="round"></path>
+            <ellipse cx="88" cy="78" rx="7" ry="5" fill="#fdfbf7" stroke="#2b2724" stroke-width="2.4"></ellipse>
+            <ellipse cx="112" cy="78" rx="7" ry="5" fill="#fdfbf7" stroke="#2b2724" stroke-width="2.4"></ellipse>
+            <g class="km-blink" style="animation-delay: -2s;"><circle cx="90.5" cy="79" r="3" fill="#2b2724"></circle><circle cx="109.5" cy="79" r="3" fill="#2b2724"></circle><circle cx="91.5" cy="78" r="0.9" fill="#fdfbf7"></circle><circle cx="110.5" cy="78" r="0.9" fill="#fdfbf7"></circle></g>
+            <path d="M100,86 l-3,8 l6,0" fill="none" stroke="#c9a688" stroke-width="2" stroke-linejoin="round"></path>
+            <path d="M90,102 Q100,96 110,102" fill="none" stroke="#2b2724" stroke-width="4" stroke-linecap="round"></path>
+            <path d="M92,105 Q100,100 108,105" fill="none" stroke="#b4432b" stroke-width="2" stroke-linecap="round"></path>
+          </g>
+        </g>
+      </svg>

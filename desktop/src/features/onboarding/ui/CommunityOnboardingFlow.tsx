@@ -27,6 +27,7 @@ import { listPersonas } from "@/shared/api/tauriPersonas";
 import { relayClient } from "@/shared/api/relayClient";
 import type { AgentPersona } from "@/shared/api/types";
 import { cn } from "@/shared/lib/cn";
+import { SakuraPetals } from "@/shared/ui/SakuraPetals";
 import { useSystemColorScheme } from "@/shared/theme/useSystemColorScheme";
 import { Button } from "@/shared/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/shared/ui/dialog";
@@ -53,10 +54,12 @@ function isRelayMembershipDeniedError(error: unknown): boolean {
   );
 }
 
+// Animated SVGs: the same figures the design kit draws, with their keyframes
+// inlined so an <img> plays them. They replaced ~3 MB of APNG.
 const STARTER_PERSONA_ANIMATIONS: Record<string, string> = {
-  Fizz: "/onboarding/starter-team/fizz.png",
-  Honey: "/onboarding/starter-team/honey.png",
-  Pollen: "/onboarding/starter-team/pollen.png",
+  Hayate: "/onboarding/starter-team/hayate.svg",
+  Kaede: "/onboarding/starter-team/kaede.svg",
+  Rin: "/onboarding/starter-team/rin.svg",
 };
 
 /** Fade duration for the "entering" curtain over the mounting app. */
@@ -205,7 +208,7 @@ export function CommunityOnboardingFlow({
     void listPersonas()
       .then((personas) =>
         setStarterPersonas(
-          ["Fizz", "Honey", "Pollen"].flatMap((name) => {
+          ["Hayate", "Kaede", "Rin"].flatMap((name) => {
             const persona = personas.find(
               (candidate) => candidate.displayName === name,
             );
@@ -471,7 +474,7 @@ export function CommunityOnboardingFlow({
   return (
     <div
       className={cn(
-        "kura-onboarding-neutral-theme kura-startup-shell flex h-dvh justify-center overflow-y-auto px-4 text-foreground",
+        "kura-onboarding-neutral-theme kura-startup-shell relative flex h-dvh justify-center overflow-y-auto px-4 text-foreground",
         isProfileStage || isTeamStage
           ? "items-start pb-36 pt-[106px]"
           : "items-stretch",
@@ -486,6 +489,7 @@ export function CommunityOnboardingFlow({
           : undefined
       }
     >
+      <SakuraPetals className="fixed" />
       <StartupWindowDragRegion />
       {isProfileStage || isTeamStage ? (
         <OnboardingChrome current={isTeamStage ? 7 : 6} />

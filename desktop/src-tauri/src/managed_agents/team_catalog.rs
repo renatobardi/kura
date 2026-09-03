@@ -312,7 +312,7 @@ fn member_projection(record: &AgentDefinition) -> TeamCatalogMember {
 /// The canonical catalog slug of a local built-in, or `None` for any record
 /// that is not one.
 ///
-/// Real built-ins have ids like `builtin:fizz` and `source_team_persona_slug:
+/// Real built-ins have ids like `builtin:hayate` and `source_team_persona_slug:
 /// None`, so keying the reuse hint on `source_team_persona_slug` matched no
 /// real built-in on either side. The `builtin:` id prefix is the actual
 /// canonical identity, identical across installs — exactly what a

@@ -50,6 +50,7 @@ import { DropdownMenuItem } from "@/shared/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip";
 import { UserAvatar } from "@/shared/ui/UserAvatar";
 import { CopyShareLinkMenuItem } from "./CopyShareLinkMenuItem";
+import { SakuraPetals } from "@/shared/ui/SakuraPetals";
 import { ProjectEntityListRow } from "./ProjectEntityListRow";
 import { PROJECT_GRID_CARD_BODY_CLASS } from "./projectGridCardStyles";
 import { ProjectListRowMenu } from "./ProjectListRowMenu";
@@ -311,8 +312,9 @@ export function EmptyState({
   onCreateProject: () => void;
 }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-16 text-center">
-      <Folders className="h-10 w-10 text-muted-foreground/40" />
+    <div className="relative flex flex-1 flex-col items-center justify-center gap-3 px-4 py-16 text-center">
+      <SakuraPetals />
+      <Folders className="relative h-10 w-10 text-muted-foreground/40" />
       <div className="space-y-1">
         <p className="text-sm font-medium text-foreground">No projects yet</p>
         <p className="text-sm text-muted-foreground">
