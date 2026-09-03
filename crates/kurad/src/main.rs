@@ -16,6 +16,14 @@
 //! It also does not *create* agents. The agent set is whatever
 //! `<data-dir>/agents/managed-agents.json` already holds — the same store the
 //! desktop writes when the user adds an agent through the UI.
+//!
+//! `run` boots agents through `restore_managed_agents_on_launch`, the exact
+//! function the desktop calls at launch. That buys the orphan sweep for free: a
+//! `kurad` killed with SIGKILL leaves its `kura-acp` children running, and the
+//! next `kurad run` reconciles them (adopting what is still tracked, reaping
+//! what is stale) instead of blindly spawning a second competing child. It also
+//! means `kurad` honours the store's `start_on_app_launch` flag, exactly like
+//! the desktop does.
 
 mod host;
 
@@ -26,10 +34,12 @@ use clap::{Args, Parser, Subcommand};
 use kura_host::app_state::{build_app_state, resolve_persisted_identity};
 use kura_host::host::HostHandle;
 use kura_host::managed_agents::runtime_commands::{
-    list_managed_agent_runtimes, start_managed_agent_runtime, stop_managed_agent_runtime,
+    list_managed_agent_runtimes, stop_managed_agent_runtime,
 };
 use kura_host::managed_agents::{
-    load_managed_agents, process_is_running, read_all_agent_runtime_receipts,
+    backfill_persona_snapshots, load_managed_agents, process_is_running,
+    read_all_agent_runtime_receipts, restore_managed_agents_on_launch,
+    ManagedAgentRuntimeLifecycle, NoRestoreHooks,
 };
 use tracing_subscriber::EnvFilter;
 
@@ -72,8 +82,11 @@ struct RunArgs {
     #[command(flatten)]
     host: HostArgs,
 
-    /// Relay URL to run every agent against. Overrides the per-agent
-    /// `relay_url` in the store; without it each agent uses its own.
+    /// Relay URL to run every agent against, set as the workspace relay
+    /// override. Without it the relay comes from `KURA_RELAY_URL`, then the
+    /// build-time default. The per-agent `relay_url` in the store is *not* a
+    /// fallback: `kura-host` resolves every agent to the workspace relay
+    /// (agents-everywhere), and `kurad` does not diverge from that.
     #[arg(long, env = "KURA_RELAY_URL")]
     relay: Option<String>,
 }
@@ -146,62 +159,90 @@ fn build_host(args: &HostArgs) -> Result<HostHandle> {
     Ok(host)
 }
 
-/// The relay this agent should run against: `--relay` if given, else the
-/// agent's own stored `relay_url`. Mirrors the store's shape instead of
-/// inventing a workspace-relay concept the daemon has no UI to configure.
-fn agent_relay_url(override_url: Option<&str>, record_relay: &str) -> Option<String> {
-    let candidate = override_url.unwrap_or(record_relay).trim();
+/// Normalise a `--relay` value: blank means "not given".
+fn relay_override(value: Option<&str>) -> Option<String> {
+    let candidate = value?.trim();
     (!candidate.is_empty()).then(|| candidate.to_string())
+}
+
+/// Pairs `stop_managed_agent_runtime` should be called on at shutdown: every
+/// runtime this process still tracks as live. `Stopped` rows are the ones
+/// `list_managed_agent_runtimes` reports for a child it just reaped, so
+/// stopping them again would be pure noise.
+fn live_pairs(
+    runtimes: &[kura_host::managed_agents::ManagedAgentRuntimeStatus],
+) -> Vec<(String, String)> {
+    runtimes
+        .iter()
+        .filter(|status| !matches!(status.lifecycle, ManagedAgentRuntimeLifecycle::Stopped))
+        .map(|status| (status.pubkey.clone(), status.relay_url.clone()))
+        .collect()
 }
 
 async fn run(args: RunArgs) -> Result<()> {
     let host = build_host(&args.host)?;
+
+    // `--relay` is applied as the *workspace* relay override, the single knob
+    // `kura-host` resolves every agent's relay through
+    // (`relay_ws_url_with_override` → `effective_agent_relay_url`). Mutating
+    // each record's `relay_url` would have been a no-op: that field is parsed
+    // and persisted but deliberately ignored at spawn time.
+    if let Some(relay) = relay_override(args.relay.as_deref()) {
+        match host.state().relay_url_override.lock() {
+            Ok(mut guard) => {
+                tracing::info!(relay_url = %relay, "workspace relay override from --relay");
+                *guard = Some(relay);
+            }
+            Err(error) => {
+                tracing::error!(%error, "could not set the relay override; using default")
+            }
+        }
+    }
+
     let records = load_managed_agents(&host).map_err(anyhow::Error::msg)?;
     if records.is_empty() {
         tracing::warn!("no managed agents configured; kurad has nothing to start");
     }
 
-    // Started pairs, so shutdown stops exactly what this process spawned.
-    let mut started: Vec<(String, String)> = Vec::new();
-    for record in &records {
-        let Some(relay_url) = agent_relay_url(args.relay.as_deref(), &record.relay_url) else {
-            tracing::warn!(
-                agent = %record.name,
-                pubkey = %record.pubkey,
-                "no relay URL for this agent; pass --relay or set relay_url in the store"
-            );
-            continue;
-        };
-        match start_managed_agent_runtime(record.pubkey.clone(), relay_url.clone(), host.clone()) {
-            Ok(status) => {
-                tracing::info!(
-                    agent = %record.name,
-                    pubkey = %status.pubkey,
-                    relay_url = %status.relay_url,
-                    pid = ?status.pid,
-                    lifecycle = ?status.lifecycle,
-                    "started managed agent"
-                );
-                started.push((status.pubkey, status.relay_url));
-            }
-            Err(error) => tracing::error!(
-                agent = %record.name,
-                pubkey = %record.pubkey,
-                %relay_url,
-                %error,
-                "failed to start managed agent"
-            ),
-        }
+    // The desktop runs this before its own restore, and so must `kurad`: a data
+    // dir copied from an older desktop install can hold agents with a
+    // `persona_id` but no snapshot, and `spawn_agent_child` would boot them from
+    // an empty config. `kurad` never *creates* an agent, so it cannot produce
+    // that shape itself — but it can very well inherit it. Best effort: a
+    // backfill failure is not a reason to refuse to start the healthy agents.
+    if let Err(error) = backfill_persona_snapshots(&host) {
+        tracing::warn!(%error, "persona snapshot backfill failed; continuing");
+    }
+
+    // The desktop's launch path, verbatim: it syncs tracked runtimes against
+    // on-disk PID receipts, sweeps orphans left by a previous process, and
+    // spawns only what is not already alive — which is exactly the crash
+    // recovery a bare `start_managed_agent_runtime` loop never did.
+    restore_managed_agents_on_launch(&host, &host.state().shutdown_started, &NoRestoreHooks)
+        .await
+        .map_err(anyhow::Error::msg)?;
+
+    // Restore returns no per-agent list, so ask the runtime map what is live.
+    let started = live_pairs(
+        &list_managed_agent_runtimes(host.clone())
+            .await
+            .map_err(anyhow::Error::msg)?,
+    );
+    for (pubkey, relay_url) in &started {
+        tracing::info!(%pubkey, %relay_url, "managed agent running");
     }
 
     println!(
-        "kurad running ({} agent(s) started), Ctrl+C to stop",
+        "kurad running ({} agent(s) live), Ctrl+C to stop",
         started.len()
     );
     tokio::signal::ctrl_c()
         .await
         .context("failed to listen for Ctrl+C")?;
     println!("kurad shutting down");
+    host.state()
+        .shutdown_started
+        .store(true, std::sync::atomic::Ordering::SeqCst);
 
     // Best effort: a failed stop is logged, never fatal — the remaining agents
     // still deserve their turn at a clean teardown.
@@ -278,22 +319,61 @@ mod tests {
         Cli::command().debug_assert();
     }
 
-    #[test]
-    fn relay_override_wins_over_the_stored_url() {
-        assert_eq!(
-            agent_relay_url(Some("wss://cli.example"), "wss://stored.example").as_deref(),
-            Some("wss://cli.example")
-        );
+    fn status(
+        pubkey: &str,
+        relay_url: &str,
+        lifecycle: ManagedAgentRuntimeLifecycle,
+    ) -> kura_host::managed_agents::ManagedAgentRuntimeStatus {
+        kura_host::managed_agents::ManagedAgentRuntimeStatus {
+            pubkey: pubkey.into(),
+            relay_url: relay_url.into(),
+            requested_relay_url: None,
+            local_setup: true,
+            lifecycle,
+            pid: None,
+            error: None,
+            log_path: None,
+        }
     }
 
     #[test]
-    fn stored_relay_is_the_fallback_and_blank_means_skip() {
+    fn relay_override_is_trimmed_and_blank_means_unset() {
         assert_eq!(
-            agent_relay_url(None, "wss://stored.example").as_deref(),
-            Some("wss://stored.example")
+            relay_override(Some(" wss://cli.example ")).as_deref(),
+            Some("wss://cli.example")
         );
-        assert_eq!(agent_relay_url(None, "   "), None);
-        assert_eq!(agent_relay_url(Some("  "), "wss://stored.example"), None);
+        assert_eq!(relay_override(Some("   ")), None);
+        assert_eq!(relay_override(None), None);
+    }
+
+    #[test]
+    fn shutdown_targets_every_runtime_that_is_not_stopped() {
+        let runtimes = vec![
+            status("aa", "wss://a.example", ManagedAgentRuntimeLifecycle::Ready),
+            status(
+                "bb",
+                "wss://b.example",
+                ManagedAgentRuntimeLifecycle::Starting,
+            ),
+            status(
+                "cc",
+                "wss://c.example",
+                ManagedAgentRuntimeLifecycle::Stopped,
+            ),
+            status(
+                "dd",
+                "wss://d.example",
+                ManagedAgentRuntimeLifecycle::Failed,
+            ),
+        ];
+        assert_eq!(
+            live_pairs(&runtimes),
+            vec![
+                ("aa".to_string(), "wss://a.example".to_string()),
+                ("bb".to_string(), "wss://b.example".to_string()),
+                ("dd".to_string(), "wss://d.example".to_string()),
+            ]
+        );
     }
 
     #[test]
