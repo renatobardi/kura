@@ -1,4 +1,5 @@
 import * as React from "react";
+import { isTauri } from "@tauri-apps/api/core";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 
 import { hasPrimaryShortcutModifier } from "@/shared/lib/platform";
@@ -101,17 +102,21 @@ export function useWebviewZoomShortcuts() {
   const zoomFactorRef = React.useRef(DEFAULT_ZOOM_FACTOR);
 
   React.useLayoutEffect(() => {
-    const webview = getCurrentWebview();
     const storedZoomFactor = readStoredZoomFactor();
 
     zoomFactorRef.current = storedZoomFactor;
     applyTextScale(storedZoomFactor);
 
     // Pin the native webview zoom so the rem root is the only zoom dial and
-    // window/coordinate math stays stable.
-    void webview.setZoom(DEFAULT_ZOOM_FACTOR).catch((error) => {
-      console.error("Failed to reset webview zoom", error);
-    });
+    // window/coordinate math stays stable. Outside Tauri (e.g. a browser
+    // build) there is no native webview to pin — the browser's own zoom is
+    // out of scope here, and the rem-based shortcuts below still work.
+    if (isTauri()) {
+      const webview = getCurrentWebview();
+      void webview.setZoom(DEFAULT_ZOOM_FACTOR).catch((error) => {
+        console.error("Failed to reset webview zoom", error);
+      });
+    }
 
     function handleKeyDown(event: KeyboardEvent) {
       const action = getZoomAction(event);

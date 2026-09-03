@@ -1,3 +1,4 @@
+import { isTauri } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import * as React from "react";
 
@@ -8,11 +9,18 @@ import * as React from "react";
  * `onResized` (macOS native fullscreen, Windows F11, and Linux fullscreen all
  * fire a resize on transition). Each consumer owns one listener cleaned up on
  * unmount.
+ *
+ * Outside Tauri (e.g. a browser build) there is no native window to query;
+ * always reports `false`.
  */
 export function useIsFullscreen(): boolean {
   const [isFullscreen, setIsFullscreen] = React.useState(false);
 
   React.useEffect(() => {
+    if (!isTauri()) {
+      return;
+    }
+
     let unlisten: (() => void) | undefined;
     let cancelled = false;
 
