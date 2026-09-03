@@ -169,6 +169,7 @@ pub fn save_managed_agents(
     kura_host::managed_agents::save_managed_agents(&app.as_host(), records)
 }
 
+#[cfg(debug_assertions)]
 pub fn migrate_agent_keys_to_dev_service(app: impl crate::host::AsHost) {
     kura_host::managed_agents::migrate_agent_keys_to_dev_service(&app.as_host())
 }

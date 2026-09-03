@@ -1,3 +1,4 @@
+#[cfg(unix)]
 use super::*;
 
 /// Binary names for the Kura desktop/Tauri process. Used by dead-instance

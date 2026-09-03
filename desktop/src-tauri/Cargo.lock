@@ -4690,6 +4690,7 @@ dependencies = [
  "hex",
  "image",
  "keyring",
+ "kura-agent",
  "kura-core",
  "kura-sdk",
  "kura-ws-client",

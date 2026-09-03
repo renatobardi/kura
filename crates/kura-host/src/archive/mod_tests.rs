@@ -7,6 +7,7 @@ use super::pipeline::BucketWithResult;
 use super::*;
 use nostr::{EventBuilder, JsonUtil, Keys, Kind, Tag};
 use rusqlite::Connection;
+#[cfg(not(target_os = "windows"))]
 use uuid::Uuid;
 
 // ── Helpers ──────────────────────────────────────────────────────────────
