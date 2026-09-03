@@ -26,11 +26,11 @@ class ThemeColors {
 
   /// Human-readable display name: 'catppuccin-mocha' → 'Catppuccin Mocha'.
   ///
-  /// The first-party theme ids ('buzz' / 'buzz-dark', kept for phase 1) are
+  /// The first-party theme ids ('kura' / 'kura-dark') are
   /// shown to users as 'Kura' / 'Kura Dark'.
   String get displayName {
-    if (name == 'buzz') return 'Kura';
-    if (name == 'buzz-dark') return 'Kura Dark';
+    if (name == 'kura') return 'Kura';
+    if (name == 'kura-dark') return 'Kura Dark';
     return name
         .split('-')
         .map((w) => w.isNotEmpty ? '${w[0].toUpperCase()}${w.substring(1)}' : w)
@@ -40,7 +40,7 @@ class ThemeColors {
 
 /// Known light theme names — used to show sun/moon icons before loading.
 const lightThemeNames = <String>{
-  'buzz',
+  'kura',
   'catppuccin-latte',
   'everforest-light',
   'github-light',
@@ -87,23 +87,24 @@ const themeCatalog = <ThemeColors>[
     added: Color(0xFF70BF56),
     deleted: Color(0xFFF26D78),
   ),
-  // Kura and Kura Dark are first-party: washi/sumi palette with a single shu
-  // (vermilion) accent. See buzz_theme.dart for identifiers (kept for phase 1).
+  // Kura and Kura Dark are first-party: the Kubo stone neutrals, the same
+  // values `desktop/src/shared/styles/globals/theme.css` declares. Color is
+  // reserved for meaning, so only the git status colors carry a hue.
   ThemeColors(
-    name: 'buzz',
-    bg: Color(0xFFF7F4EE),
-    fg: Color(0xFF1C1A17),
-    comment: Color(0xFF5C564D),
-    added: Color(0xFF6F7D4A),
-    deleted: Color(0xFFB4432B),
+    name: 'kura',
+    bg: Color(0xFFFFFFFF),
+    fg: Color(0xFF0C0A09),
+    comment: Color(0xFF78716C),
+    added: Color(0xFF1A7F37),
+    deleted: Color(0xFFCF222E),
   ),
   ThemeColors(
-    name: 'buzz-dark',
-    bg: Color(0xFF151412),
-    fg: Color(0xFFECE7DC),
-    comment: Color(0xFF9D968A),
-    added: Color(0xFF9AA86E),
-    deleted: Color(0xFFD1583D),
+    name: 'kura-dark',
+    bg: Color(0xFF0C0A09),
+    fg: Color(0xFFFAFAF9),
+    comment: Color(0xFFA8A29E),
+    added: Color(0xFF3FB950),
+    deleted: Color(0xFFF85149),
   ),
   ThemeColors(
     name: 'catppuccin-frappe',

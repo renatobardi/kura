@@ -65,9 +65,9 @@ void main() {
     test('Buzz is first and remaining themes are sorted by display name', () {
       final groups = themeGroups();
 
-      expect(groups.paired.first.name, buzzThemeName);
-      expect(groups.light.first.name, buzzThemeName);
-      expect(groups.dark.first.name, buzzDarkThemeName);
+      expect(groups.paired.first.name, kuraThemeName);
+      expect(groups.light.first.name, kuraThemeName);
+      expect(groups.dark.first.name, kuraDarkThemeName);
 
       for (final list in [groups.paired, groups.light, groups.dark]) {
         final names = list.skip(1).map((t) => t.displayName).toList();
@@ -155,8 +155,8 @@ void main() {
 
       expect(resolved.forcedMode, ThemeMode.dark);
       expect(resolved.dark.brightness, Brightness.dark);
-      expect(resolved.darkTheme?.name, buzzDarkThemeName);
-      expect(resolved.dark, generateColorScheme(findTheme(buzzDarkThemeName)!));
+      expect(resolved.darkTheme?.name, kuraDarkThemeName);
+      expect(resolved.dark, generateColorScheme(findTheme(kuraDarkThemeName)!));
     });
 
     test('light mode falls back to the default pair when pick is unpaired', () {
@@ -164,8 +164,8 @@ void main() {
 
       expect(resolved.forcedMode, ThemeMode.light);
       expect(resolved.light.brightness, Brightness.light);
-      expect(resolved.lightTheme?.name, buzzThemeName);
-      expect(resolved.light, generateColorScheme(findTheme(buzzThemeName)!));
+      expect(resolved.lightTheme?.name, kuraThemeName);
+      expect(resolved.light, generateColorScheme(findTheme(kuraThemeName)!));
     });
 
     test('an unknown scheme name falls back to the default theme', () {

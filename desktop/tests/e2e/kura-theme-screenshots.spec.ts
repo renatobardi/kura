@@ -1789,12 +1789,16 @@ test("accent picker reveals/hides when toggling Kura", async ({ page }) => {
     "overflow-x",
     "auto",
   );
-  await expect(page.getByTestId("accent-color-kura")).toHaveAttribute(
+  // A profile that never picked an accent is on Neutral: Kubo reserves color
+  // for meaning, so the app does not ship a hue selected.
+  await expect(page.getByTestId("accent-color-neutral")).toHaveAttribute(
     "aria-pressed",
     "true",
   );
   await expect(
-    page.getByTestId("accent-color-kura").getByTestId("accent-color-selection"),
+    page
+      .getByTestId("accent-color-neutral")
+      .getByTestId("accent-color-selection"),
   ).toBeVisible();
   await waitForAnimations(page);
   await page.getByTestId("settings-theme").screenshot({

@@ -2,14 +2,14 @@ import { cn } from "@/shared/lib/cn";
 import { type VariantProps, cva } from "class-variance-authority";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-pill border px-2 py-0.5 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {
         default: "border-transparent bg-primary text-primary-foreground",
         secondary: "border-transparent bg-secondary text-secondary-foreground",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground",
+        // Tinted, not a solid slab — the same treatment the desktop badge uses.
+        destructive: "border-transparent bg-destructive/10 text-destructive",
         outline: "text-foreground",
       },
     },

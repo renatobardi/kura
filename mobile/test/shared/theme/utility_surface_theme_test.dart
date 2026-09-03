@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('utility containers use the stronger grouped-surface radius', () {
-    expect(Radii.container, 22);
-    expect(Radii.card, Radii.container);
+  test('utility containers share the Kubo card radius', () {
+    expect(Radii.container, Radii.card);
+    expect(Radii.card, 14.4);
   });
 
   test('exchanges utility canvas and container surface roles once', () {

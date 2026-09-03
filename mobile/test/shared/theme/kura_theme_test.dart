@@ -4,49 +4,49 @@ import 'package:buzz/shared/theme/theme.dart';
 import 'package:buzz/shared/widgets/frosted_app_bar.dart';
 
 void main() {
-  group('Buzz theme catalog entries', () {
+  group('Kura theme catalog entries', () {
     test('both halves are in the catalog', () {
-      expect(findTheme(buzzThemeName), isNotNull);
-      expect(findTheme(buzzDarkThemeName), isNotNull);
+      expect(findTheme(kuraThemeName), isNotNull);
+      expect(findTheme(kuraDarkThemeName), isNotNull);
     });
 
-    test('use the Kura washi and sumi palettes', () {
-      final kura = findTheme(buzzThemeName)!;
-      expect(kura.bg, const Color(0xFFF7F4EE));
-      expect(kura.fg, const Color(0xFF1C1A17));
+    test('use the Kubo stone palette', () {
+      final kura = findTheme(kuraThemeName)!;
+      expect(kura.bg, const Color(0xFFFFFFFF));
+      expect(kura.fg, const Color(0xFF0C0A09));
       expect(kura.displayName, 'Kura');
 
-      final kuraDark = findTheme(buzzDarkThemeName)!;
-      expect(kuraDark.bg, const Color(0xFF151412));
-      expect(kuraDark.fg, const Color(0xFFECE7DC));
+      final kuraDark = findTheme(kuraDarkThemeName)!;
+      expect(kuraDark.bg, const Color(0xFF0C0A09));
+      expect(kuraDark.fg, const Color(0xFFFAFAF9));
       expect(kuraDark.displayName, 'Kura Dark');
     });
 
     test('are a light/dark pair', () {
-      expect(findTheme(buzzThemeName)!.isDark, isFalse);
-      expect(findTheme(buzzDarkThemeName)!.isDark, isTrue);
-      expect(themePairFor(buzzThemeName), buzzDarkThemeName);
-      expect(themePairFor(buzzDarkThemeName), buzzThemeName);
+      expect(findTheme(kuraThemeName)!.isDark, isFalse);
+      expect(findTheme(kuraDarkThemeName)!.isDark, isTrue);
+      expect(themePairFor(kuraThemeName), kuraDarkThemeName);
+      expect(themePairFor(kuraDarkThemeName), kuraThemeName);
     });
 
     test('appear as a single System-mode option labelled "Kura"', () {
       final paired = themeGroups().paired.map((t) => t.name);
-      expect(paired, contains(buzzThemeName));
-      expect(paired, isNot(contains(buzzDarkThemeName)));
-      expect(pairedThemeLabel(buzzThemeName), 'Kura');
-      expect(themeSelectionLabel(buzzThemeName, ThemeMode.system), 'Kura');
-      expect(themeSelectionLabel(buzzDarkThemeName, ThemeMode.system), 'Kura');
+      expect(paired, contains(kuraThemeName));
+      expect(paired, isNot(contains(kuraDarkThemeName)));
+      expect(pairedThemeLabel(kuraThemeName), 'Kura');
+      expect(themeSelectionLabel(kuraThemeName, ThemeMode.system), 'Kura');
+      expect(themeSelectionLabel(kuraDarkThemeName, ThemeMode.system), 'Kura');
     });
 
     test('forces neutral rendering without changing the stored accent', () {
       const storedAccent = '#ef4444';
 
       expect(
-        effectiveAccentIndex(buzzThemeName, storedAccent),
+        effectiveAccentIndex(kuraThemeName, storedAccent),
         neutralAccentIndex,
       );
       expect(
-        effectiveAccentIndex(buzzDarkThemeName, storedAccent),
+        effectiveAccentIndex(kuraDarkThemeName, storedAccent),
         neutralAccentIndex,
       );
       expect(
@@ -57,30 +57,30 @@ void main() {
     });
 
     test('resolve across brightnesses like any other pair', () {
-      final resolved = resolveSchemes(buzzThemeName, ThemeMode.system);
+      final resolved = resolveSchemes(kuraThemeName, ThemeMode.system);
       expect(resolved.forcedMode, isNull);
       expect(resolved.light.brightness, Brightness.light);
       expect(resolved.dark.brightness, Brightness.dark);
-      expect(resolved.lightTheme?.name, buzzThemeName);
-      expect(resolved.darkTheme?.name, buzzDarkThemeName);
+      expect(resolved.lightTheme?.name, kuraThemeName);
+      expect(resolved.darkTheme?.name, kuraDarkThemeName);
 
       expect(
-        effectiveTheme(buzzThemeName, ThemeMode.dark)?.name,
-        buzzDarkThemeName,
+        effectiveTheme(kuraThemeName, ThemeMode.dark)?.name,
+        kuraDarkThemeName,
       );
       expect(
-        effectiveTheme(buzzDarkThemeName, ThemeMode.light)?.name,
-        buzzThemeName,
+        effectiveTheme(kuraDarkThemeName, ThemeMode.light)?.name,
+        kuraThemeName,
       );
     });
 
     test(
-      'fallbacks expose the effective Buzz theme for gradient selection',
+      'fallbacks expose the effective Kura theme for gradient selection',
       () {
         final coerced = resolveSchemes('nord', ThemeMode.light);
-        expect(coerced.lightTheme?.name, buzzThemeName);
+        expect(coerced.lightTheme?.name, kuraThemeName);
         expect(
-          buzzTopSectionGradient(
+          kuraTopSectionGradient(
             coerced.lightTheme!.name,
             coerced.light.brightness,
           ),
@@ -88,9 +88,9 @@ void main() {
         );
 
         final unknown = resolveSchemes('not-a-theme', ThemeMode.light);
-        expect(unknown.lightTheme?.name, buzzThemeName);
+        expect(unknown.lightTheme?.name, kuraThemeName);
         expect(
-          buzzTopSectionGradient(
+          kuraTopSectionGradient(
             unknown.lightTheme!.name,
             unknown.light.brightness,
           ),
@@ -100,15 +100,15 @@ void main() {
     );
   });
 
-  group('buzzTopSectionGradient', () {
-    test('is null for non-Buzz themes', () {
-      expect(buzzTopSectionGradient('github-light', Brightness.light), isNull);
-      expect(buzzTopSectionGradient('nord', Brightness.dark), isNull);
+  group('kuraTopSectionGradient', () {
+    test('is null for non-Kura themes', () {
+      expect(kuraTopSectionGradient('github-light', Brightness.light), isNull);
+      expect(kuraTopSectionGradient('nord', Brightness.dark), isNull);
     });
 
     test('paints top to bottom for both halves of the pair', () {
-      for (final name in [buzzThemeName, buzzDarkThemeName]) {
-        final gradient = buzzTopSectionGradient(name, Brightness.light);
+      for (final name in [kuraThemeName, kuraDarkThemeName]) {
+        final gradient = kuraTopSectionGradient(name, Brightness.light);
         expect(gradient, isNotNull, reason: '$name should be gradient-backed');
         expect(gradient!.begin, Alignment.topCenter);
         expect(gradient.end, Alignment.bottomCenter);
@@ -119,23 +119,23 @@ void main() {
     test('brightness selects the stops, not the theme name', () {
       // Both halves enable the gradient, so System mode keeps it on across an
       // OS switch — the applied brightness alone decides which stops are used.
-      final light = buzzTopSectionGradient(buzzThemeName, Brightness.light)!;
-      final dark = buzzTopSectionGradient(buzzThemeName, Brightness.dark)!;
+      final light = kuraTopSectionGradient(kuraThemeName, Brightness.light)!;
+      final dark = kuraTopSectionGradient(kuraThemeName, Brightness.dark)!;
 
       expect(light.colors, isNot(dark.colors));
       expect(
-        buzzTopSectionGradient(buzzDarkThemeName, Brightness.dark)!.colors,
+        kuraTopSectionGradient(kuraDarkThemeName, Brightness.dark)!.colors,
         dark.colors,
       );
       expect(
-        buzzTopSectionGradient(buzzDarkThemeName, Brightness.light)!.colors,
+        kuraTopSectionGradient(kuraDarkThemeName, Brightness.light)!.colors,
         light.colors,
       );
     });
 
     test('is opaque so the color replaces the frosted fill', () {
       for (final brightness in Brightness.values) {
-        final gradient = buzzTopSectionGradient(buzzThemeName, brightness)!;
+        final gradient = kuraTopSectionGradient(kuraThemeName, brightness)!;
         for (final color in gradient.colors) {
           expect(color.a, 1.0);
         }
@@ -176,8 +176,8 @@ void main() {
       await tester.pumpWidget(
         harness(
           AppTheme.light(
-            topSectionGradient: buzzTopSectionGradient(
-              buzzThemeName,
+            topSectionGradient: kuraTopSectionGradient(
+              kuraThemeName,
               Brightness.light,
             ),
           ),
@@ -190,7 +190,7 @@ void main() {
       expect(decoration.color, isNull);
     });
 
-    testWidgets('non-Buzz themes keep the frosted surface fill', (
+    testWidgets('non-Kura themes keep the frosted surface fill', (
       tester,
     ) async {
       await tester.pumpWidget(harness(AppTheme.light()));
@@ -200,14 +200,14 @@ void main() {
       expect(decoration.color, isNotNull);
     });
 
-    testWidgets('Buzz section labels use 80% neutral foreground', (
+    testWidgets('Kura section labels use 80% neutral foreground', (
       tester,
     ) async {
       await tester.pumpWidget(
         harness(
           AppTheme.light(
-            topSectionGradient: buzzTopSectionGradient(
-              buzzThemeName,
+            topSectionGradient: kuraTopSectionGradient(
+              kuraThemeName,
               Brightness.light,
             ),
           ),
@@ -221,7 +221,7 @@ void main() {
       );
     });
 
-    testWidgets('navigation roles inherit non-Buzz theme tokens', (
+    testWidgets('navigation roles inherit non-Kura theme tokens', (
       tester,
     ) async {
       const primaryForeground = Color(0xFF123456);
@@ -254,12 +254,12 @@ void main() {
     });
   });
 
-  group('isBuzzTheme', () {
-    test('matches only the Buzz pair', () {
-      expect(isBuzzTheme(buzzThemeName), isTrue);
-      expect(isBuzzTheme(buzzDarkThemeName), isTrue);
-      expect(isBuzzTheme('github-light'), isFalse);
-      expect(isBuzzTheme(''), isFalse);
+  group('isKuraTheme', () {
+    test('matches only the Kura pair', () {
+      expect(isKuraTheme(kuraThemeName), isTrue);
+      expect(isKuraTheme(kuraDarkThemeName), isTrue);
+      expect(isKuraTheme('github-light'), isFalse);
+      expect(isKuraTheme(''), isFalse);
     });
   });
 }

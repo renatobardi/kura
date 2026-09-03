@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   const local = CommunityThemePreference(
-    theme: 'buzz',
+    theme: 'kura',
     accent: '#3b82f6',
     followSystem: true,
   );
@@ -115,7 +115,7 @@ void main() {
       );
 
       await manager.initialize();
-      expect(applied.single.theme, 'buzz');
+      expect(applied.single.theme, 'kura');
 
       session.emit(
         _event(

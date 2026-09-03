@@ -310,11 +310,11 @@ class App extends HookConsumerWidget {
     // Derive the gradient from the themes that produced each color scheme.
     // This keeps fallbacks and pinned brightness changes aligned with the
     // rendered palette rather than the raw persisted selection.
-    final buzzLightGradient = buzzTopSectionGradient(
+    final buzzLightGradient = kuraTopSectionGradient(
       resolved.lightTheme?.name ?? '',
       lightScheme.brightness,
     );
-    final buzzDarkGradient = buzzTopSectionGradient(
+    final buzzDarkGradient = kuraTopSectionGradient(
       resolved.darkTheme?.name ?? '',
       darkScheme.brightness,
     );

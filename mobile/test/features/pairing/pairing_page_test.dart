@@ -92,8 +92,8 @@ void main() {
       final backgroundGradient =
           backgroundDecoration.gradient! as LinearGradient;
       expect(backgroundGradient.colors, const [
-        Color(0xFFD7D72E),
-        Color(0xFFD7E7F6),
+        Color(0xFFF7F4EE),
+        Color(0xFFECE7DC),
       ]);
       expect(
         tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
@@ -464,9 +464,9 @@ void main() {
         );
       }
 
-      const onboardingInk = Color(0xFF111111);
-      const onboardingMutedInk = Color(0xB3111111);
-      const onboardingCtaLabel = Color(0xFFD7E6F0);
+      const onboardingInk = Color(0xFF1C1917);
+      const onboardingMutedInk = Color(0xB31C1917);
+      const onboardingCtaLabel = Color(0xFFF7F4EE);
       final theme = AppTheme.dark();
       final protectionTile = tester.widget<CheckboxListTile>(
         find.byKey(const Key('protect-sensitive-actions-checkbox')),
@@ -562,8 +562,8 @@ void main() {
       tester,
     ) async {
       const errorMessage = 'Identity confirmation failed. Nothing transferred.';
-      const errorInk = Color(0xFF7A1025);
-      const gradientColors = [Color(0xFFD7D72E), Color(0xFFD7E7F6)];
+      const errorInk = Color(0xFFB4432B);
+      const gradientColors = [Color(0xFFF7F4EE), Color(0xFFECE7DC)];
 
       for (final theme in [AppTheme.light(), AppTheme.dark()]) {
         await tester.pumpWidget(

@@ -4,18 +4,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'accent_colors.dart';
 import 'adaptive_theme.dart';
-import 'buzz_theme.dart';
+import 'kura_theme.dart';
 import 'color_scheme.dart';
 import 'theme_catalog.dart';
 import 'theme_pairs.dart';
 
+// Storage keys keep their original spelling: renaming them would orphan every
+// saved preference for no user-visible gain.
 const _themeModeKey = 'buzz_theme_mode';
 const _accentKey = 'buzz_accent_color';
 const _schemeKey = 'buzz_color_scheme';
 
-/// Buzz ships as the default: the first-party pair, so a fresh install gets the
-/// branded top-section gradient without picking a theme first.
-const defaultSchemeName = buzzThemeName;
+/// Kura ships as the default: the first-party pair, so a fresh install gets the
+/// branded treatment without picking a theme first.
+const defaultSchemeName = kuraThemeName;
 const defaultSchemeDisplayName = 'Kura';
 
 /// Pre-loaded SharedPreferences instance, overridden in main().

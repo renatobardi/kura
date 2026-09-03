@@ -53,7 +53,10 @@ export const ACCENT_COLORS = [
   { name: "Indigo", value: "#6366f1" },
 ] as const;
 
-const DEFAULT_ACCENT = "#b4432b";
+// Kubo reserves color for meaning, so a fresh install is monochrome: the
+// neutral accent, matching the mobile app's own default. The shu that used to
+// ship as the default stays in the picker as "Kura".
+const DEFAULT_ACCENT = NEUTRAL_ACCENT;
 
 type ThemeContextValue = {
   themeName: string;

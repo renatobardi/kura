@@ -8,9 +8,11 @@ import 'theme_catalog.dart';
 import 'theme_provider.dart' show effectiveTheme, schemeForAppearanceMode;
 
 const communityThemeDTag = 'community-theme';
+// Neutral, like the app's own default and the desktop client's — a community
+// that never picked an accent should not push a hue onto its members.
 const defaultCommunityTheme = CommunityThemePreference(
-  theme: 'buzz',
-  accent: '#3b82f6',
+  theme: 'kura',
+  accent: 'neutral',
   followSystem: true,
 );
 
@@ -148,7 +150,7 @@ class CommunityThemeStorage {
         ThemeMode.values.where((value) => value.name == modeName).firstOrNull ??
         ThemeMode.system;
     final storedTheme = prefs.getString(_legacySchemeKey);
-    final theme = findTheme(storedTheme ?? 'buzz')?.name ?? 'buzz';
+    final theme = findTheme(storedTheme ?? 'kura')?.name ?? 'kura';
     final legacyAccent = prefs.getInt(_legacyAccentKey);
     final resolvedTheme = switch (mode) {
       ThemeMode.system => schemeForAppearanceMode(theme, mode) ?? theme,
