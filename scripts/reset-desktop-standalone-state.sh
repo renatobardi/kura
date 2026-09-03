@@ -5,7 +5,10 @@ set -euo pipefail
 instance_id="${1:-}"
 keyring_service="${2:-}"
 
-if [[ "$instance_id" != "xyz.block.kura.app.dev" && "$instance_id" != xyz.block.kura.app.dev.* ]]; then
+# Dev bundle identifiers only. The production app is `pro.oute.kura.app`, so
+# the guard has to match the dev identifier exactly or as a dot-delimited
+# worktree variant — never as a prefix, which would let prod through.
+if [[ "$instance_id" != "pro.oute.kura.app.dev" && "$instance_id" != pro.oute.kura.app.dev.* ]]; then
     echo "reset-desktop-standalone-state: refusing non-dev bundle identifier: $instance_id" >&2
     exit 1
 fi

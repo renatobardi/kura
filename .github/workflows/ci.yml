@@ -1033,6 +1033,11 @@ jobs:
             exit 1
           fi
           echo "No dead token references found."
+      - name: Destructive-script guards
+        # The reset scripts are scoped by bundle identifier. A stale one is
+        # invisible in normal use — the script matches nothing and reports
+        # success — so its test runs on every PR, cheaply, right here.
+        run: bash scripts/test-reset-desktop-standalone-state.sh
 
   server-cross-compile:
     name: Server Cross-Compile

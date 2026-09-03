@@ -93,7 +93,14 @@ build-release:
     cargo build --workspace --release
 
 # Run repo lint, formatting, and repository policy checks
-check: fmt-check clippy desktop-check desktop-tauri-fmt-check desktop-tauri-clippy web-check mobile-check file-size-check
+check: fmt-check clippy desktop-check desktop-tauri-fmt-check desktop-tauri-clippy web-check mobile-check file-size-check script-check
+
+# A stale bundle identifier in a reset script fails silently — it simply
+# matches nothing and reports success — so these tests are the only thing that
+# catches one.
+# Test the shell scripts that guard destructive operations
+script-check:
+    bash scripts/test-reset-desktop-standalone-state.sh
 
 # Run the repository-wide differential file-size ratchet and its policy tests.
 # The ratchet inspects only files changed from the merge base, so this stays
