@@ -72,22 +72,22 @@ void main() {
           findsNothing,
         );
         expect(
-          find.byKey(const ValueKey('theme-preview-name-buzz')),
+          find.byKey(const ValueKey('theme-preview-name-kura')),
           findsOneWidget,
         );
 
         final nameBounds = tester.getRect(
-          find.byKey(const ValueKey('theme-preview-name-buzz')),
+          find.byKey(const ValueKey('theme-preview-name-kura')),
         );
         final previewBounds = tester.getRect(
-          find.byKey(const ValueKey('theme-device-pair-preview-buzz')),
+          find.byKey(const ValueKey('theme-device-pair-preview-kura')),
         );
         expect(nameBounds.bottom, lessThan(previewBounds.bottom));
         expect(previewBounds.top - nameBounds.bottom, closeTo(Grid.md, 1));
         expect(
           tester
               .widget<FittedBox>(
-                find.byKey(const ValueKey('theme-full-preview-buzz')),
+                find.byKey(const ValueKey('theme-full-preview-kura')),
               )
               .alignment,
           Alignment.center,
@@ -118,10 +118,10 @@ void main() {
       await _pumpPicker(tester);
 
       final nameBounds = tester.getRect(
-        find.byKey(const ValueKey('theme-preview-name-buzz')),
+        find.byKey(const ValueKey('theme-preview-name-kura')),
       );
       final cardBounds = tester.getRect(
-        find.byKey(const ValueKey('theme-preview-page-buzz')),
+        find.byKey(const ValueKey('theme-preview-page-kura')),
       );
       expect(cardBounds.contains(nameBounds.topLeft), isTrue);
       expect(cardBounds.contains(nameBounds.bottomRight), isTrue);
@@ -148,7 +148,7 @@ void main() {
         final chatFrame = tester.widget<Container>(
           find
               .descendant(
-                of: find.byKey(const ValueKey('theme-full-chat-buzz')),
+                of: find.byKey(const ValueKey('theme-full-chat-kura')),
                 matching: find.byType(Container),
               )
               .first,
@@ -185,7 +185,7 @@ void main() {
       await tester.pump();
 
       final titleMotion = tester.widget<Transform>(
-        find.byKey(const ValueKey('theme-preview-name-motion-buzz')),
+        find.byKey(const ValueKey('theme-preview-name-motion-kura')),
       );
       expect(titleMotion.transform.getTranslation().x, lessThan(0));
 
@@ -202,7 +202,7 @@ void main() {
       await tester.pump();
 
       final titleMotion = tester.widget<Transform>(
-        find.byKey(const ValueKey('theme-preview-name-motion-buzz')),
+        find.byKey(const ValueKey('theme-preview-name-motion-kura')),
       );
       expect(titleMotion.transform.getTranslation().x, 0);
 
@@ -275,7 +275,7 @@ void main() {
           .byKey(const ValueKey('theme-preview-community-identity'))
           .first;
       final home = tester.getRect(
-        find.byKey(const ValueKey('theme-full-home-buzz')),
+        find.byKey(const ValueKey('theme-full-home-kura')),
       );
       final identityBounds = tester.getRect(identity);
       expect(
@@ -305,7 +305,7 @@ void main() {
         find.byKey(const ValueKey('theme-chat-header-title')).first,
       );
       final chatFrame = tester.getRect(
-        find.byKey(const ValueKey('theme-full-chat-buzz')),
+        find.byKey(const ValueKey('theme-full-chat-kura')),
       );
       expect(
         (title.left - chatFrame.left) / chatFrame.width * 393,
@@ -405,13 +405,13 @@ void main() {
     ) async {
       final instance = await _pumpPicker(
         tester,
-        prefs: {'buzz_theme_mode': 'system', 'buzz_color_scheme': 'buzz'},
+        prefs: {'buzz_theme_mode': 'system', 'buzz_color_scheme': 'kura'},
       );
 
       await _swipeToNextTheme(tester);
-      expect(instance.getString('buzz_color_scheme'), 'buzz');
+      expect(instance.getString('buzz_color_scheme'), 'kura');
       expect(
-        find.byKey(const ValueKey('theme-preview-name-buzz')),
+        find.byKey(const ValueKey('theme-preview-name-kura')),
         findsNothing,
       );
 
@@ -431,7 +431,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(notifier.preferenceWrites, 1);
-      expect(notifier.lastPreference?.theme, isNot('buzz'));
+      expect(notifier.lastPreference?.theme, isNot('kura'));
       expect(notifier.lastPreference?.followSystem, isTrue);
       expect(notifier.lastPreference?.accent, defaultCommunityTheme.accent);
     });
@@ -445,7 +445,7 @@ void main() {
         tester,
         prefs: {
           'buzz_theme_mode': 'system',
-          'buzz_color_scheme': 'buzz',
+          'buzz_color_scheme': 'kura',
           'buzz_accent_color': legacyGreen,
         },
       );
@@ -463,7 +463,7 @@ void main() {
     ) async {
       await _pumpPicker(
         tester,
-        prefs: {'buzz_theme_mode': 'system', 'buzz_color_scheme': 'buzz'},
+        prefs: {'buzz_theme_mode': 'system', 'buzz_color_scheme': 'kura'},
       );
 
       expect(
@@ -742,7 +742,7 @@ void main() {
     });
 
     testWidgets('Buzz keeps the accent action unavailable', (tester) async {
-      await _pumpPicker(tester, prefs: {'buzz_color_scheme': 'buzz'});
+      await _pumpPicker(tester, prefs: {'buzz_color_scheme': 'kura'});
       expect(
         find.byKey(const ValueKey('theme-preview-accent-action-button')),
         findsNothing,

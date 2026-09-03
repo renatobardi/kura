@@ -4,21 +4,21 @@ import 'package:buzz/shared/theme/theme.dart';
 import 'package:buzz/shared/widgets/frosted_app_bar.dart';
 
 void main() {
-  group('Buzz theme catalog entries', () {
+  group('Kura theme catalog entries', () {
     test('both halves are in the catalog', () {
       expect(findTheme(kuraThemeName), isNotNull);
       expect(findTheme(kuraDarkThemeName), isNotNull);
     });
 
-    test('use the Kura washi and sumi palettes', () {
+    test('use the Kubo stone palette', () {
       final kura = findTheme(kuraThemeName)!;
-      expect(kura.bg, const Color(0xFFF7F4EE));
-      expect(kura.fg, const Color(0xFF1C1A17));
+      expect(kura.bg, const Color(0xFFFFFFFF));
+      expect(kura.fg, const Color(0xFF0C0A09));
       expect(kura.displayName, 'Kura');
 
       final kuraDark = findTheme(kuraDarkThemeName)!;
-      expect(kuraDark.bg, const Color(0xFF151412));
-      expect(kuraDark.fg, const Color(0xFFECE7DC));
+      expect(kuraDark.bg, const Color(0xFF0C0A09));
+      expect(kuraDark.fg, const Color(0xFFFAFAF9));
       expect(kuraDark.displayName, 'Kura Dark');
     });
 
@@ -75,7 +75,7 @@ void main() {
     });
 
     test(
-      'fallbacks expose the effective Buzz theme for gradient selection',
+      'fallbacks expose the effective Kura theme for gradient selection',
       () {
         final coerced = resolveSchemes('nord', ThemeMode.light);
         expect(coerced.lightTheme?.name, kuraThemeName);
@@ -101,7 +101,7 @@ void main() {
   });
 
   group('kuraTopSectionGradient', () {
-    test('is null for non-Buzz themes', () {
+    test('is null for non-Kura themes', () {
       expect(kuraTopSectionGradient('github-light', Brightness.light), isNull);
       expect(kuraTopSectionGradient('nord', Brightness.dark), isNull);
     });
@@ -190,7 +190,7 @@ void main() {
       expect(decoration.color, isNull);
     });
 
-    testWidgets('non-Buzz themes keep the frosted surface fill', (
+    testWidgets('non-Kura themes keep the frosted surface fill', (
       tester,
     ) async {
       await tester.pumpWidget(harness(AppTheme.light()));
@@ -200,7 +200,7 @@ void main() {
       expect(decoration.color, isNotNull);
     });
 
-    testWidgets('Buzz section labels use 80% neutral foreground', (
+    testWidgets('Kura section labels use 80% neutral foreground', (
       tester,
     ) async {
       await tester.pumpWidget(
@@ -221,7 +221,7 @@ void main() {
       );
     });
 
-    testWidgets('navigation roles inherit non-Buzz theme tokens', (
+    testWidgets('navigation roles inherit non-Kura theme tokens', (
       tester,
     ) async {
       const primaryForeground = Color(0xFF123456);
@@ -255,7 +255,7 @@ void main() {
   });
 
   group('isKuraTheme', () {
-    test('matches only the Buzz pair', () {
+    test('matches only the Kura pair', () {
       expect(isKuraTheme(kuraThemeName), isTrue);
       expect(isKuraTheme(kuraDarkThemeName), isTrue);
       expect(isKuraTheme('github-light'), isFalse);
