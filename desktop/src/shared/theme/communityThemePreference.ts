@@ -1,5 +1,5 @@
 import { normalizeRelayUrl } from "@/features/profile/lib/selfProfileStorage";
-import { ACCENT_COLORS } from "./ThemeProvider";
+import { ACCENT_COLORS, NEUTRAL_ACCENT } from "./ThemeProvider";
 import { SYNTAX_THEMES, type SyntaxThemeName } from "./theme-loader";
 
 const STORAGE_KEY_PREFIX = "kura-community-theme.v1";
@@ -16,7 +16,9 @@ export type CommunityThemePreference = {
 export const DEFAULT_COMMUNITY_THEME: CommunityThemePreference = Object.freeze({
   version: 1,
   theme: "kura",
-  accent: "#b4432b",
+  // Neutral, like the app's own default and the mobile client's — a community
+  // that never picked an accent should not push a hue onto its members.
+  accent: NEUTRAL_ACCENT,
   followSystem: true,
 });
 

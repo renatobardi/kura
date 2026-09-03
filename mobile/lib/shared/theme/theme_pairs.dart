@@ -1,4 +1,4 @@
-import 'buzz_theme.dart';
+import 'kura_theme.dart';
 import 'theme_catalog.dart';
 
 /// Light → dark theme counterparts, ported from the desktop app's `THEME_PAIRS`
@@ -8,7 +8,7 @@ import 'theme_catalog.dart';
 /// Buzz leads the map the way it leads desktop's, so the first-party pair sorts
 /// ahead of the borrowed syntax themes wherever insertion order is preserved.
 const themePairs = <String, String>{
-  'buzz': 'buzz-dark',
+  'kura': 'kura-dark',
   'catppuccin-latte': 'catppuccin-mocha',
   'everforest-light': 'everforest-dark',
   'github-light': 'github-dark',
@@ -81,8 +81,8 @@ ThemeGroups themeGroups() {
   }
 
   int byPickerOrder(ThemeColors a, ThemeColors b) {
-    final aIsBuzz = isBuzzTheme(a.name);
-    final bIsBuzz = isBuzzTheme(b.name);
+    final aIsBuzz = isKuraTheme(a.name);
+    final bIsBuzz = isKuraTheme(b.name);
     if (aIsBuzz != bIsBuzz) return aIsBuzz ? -1 : 1;
     return a.displayName.compareTo(b.displayName);
   }
@@ -109,9 +109,8 @@ const _modeTokens = <String>{
 /// mode-specific tokens so `github-light` reads as "Github" and stands for both
 /// halves. Mirrors desktop's `pairedThemeLabel`.
 String pairedThemeLabel(String lightName) {
-  // The first-party pair keeps its `buzz` id through phase 1 but is the Kura
-  // theme to users.
-  if (lightName == 'buzz' || lightName == 'buzz-dark') return 'Kura';
+  // The first-party pair is one choice to users, in either mode.
+  if (lightName == 'kura' || lightName == 'kura-dark') return 'Kura';
   final stripped = lightName
       .split('-')
       .where((token) => !_modeTokens.contains(token))

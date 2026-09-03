@@ -3,58 +3,57 @@ import 'package:flutter/material.dart';
 import 'accent_colors.dart';
 import 'app_colors.dart';
 
-/// Name of the first-party Kura theme (id kept as `buzz` for phase 1). Uses
-/// the washi/sumi palette; the top section renders as a flat fill (no
-/// gradient, per identity guidelines) via [buzzTopSectionGradient].
-const buzzThemeName = 'buzz';
+/// Name of the first-party Kura theme. Uses the Kubo stone palette; the top
+/// section renders as a flat fill (no gradient, per identity guidelines) via
+/// [kuraTopSectionGradient].
+const kuraThemeName = 'kura';
 
-/// Name of the dark counterpart, which reuses the GitHub Dark palette and the
-/// dark-tuned gradient stops. Paired with [buzzThemeName] in `themePairs`, so
-/// the two behave as a single "Buzz" choice under System mode.
-const buzzDarkThemeName = 'buzz-dark';
+/// Name of the dark counterpart. Paired with [kuraThemeName] in `themePairs`,
+/// so the two behave as a single "Kura" choice under System mode.
+const kuraDarkThemeName = 'kura-dark';
 
-/// Whether [themeName] is either half of the Buzz pair. Both halves enable the
+/// Whether [themeName] is either half of the Kura pair. Both halves enable the
 /// gradient so System mode keeps it on across an OS light/dark switch.
-bool isBuzzTheme(String themeName) =>
-    themeName == buzzThemeName || themeName == buzzDarkThemeName;
+bool isKuraTheme(String themeName) =>
+    themeName == kuraThemeName || themeName == kuraDarkThemeName;
 
-/// Whether the current widget tree is using the first-party Buzz treatment.
-bool isBuzzThemeContext(BuildContext context) =>
+/// Whether the current widget tree is using the first-party Kura treatment.
+bool isKuraThemeContext(BuildContext context) =>
     Theme.of(context).extension<AppColors>()?.topSectionGradient != null;
 
 /// Primary foreground for the mobile top navigation.
 ///
-/// Every theme uses its own [ColorScheme.onSurface]. Buzz is the exception:
+/// Every theme uses its own [ColorScheme.onSurface]. Kura is the exception:
 /// its desktop-matching top gradient needs a neutral black or white foreground
 /// rather than the accent-derived color scheme foreground.
 Color navigationPrimaryForeground(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
-  if (!isBuzzThemeContext(context)) return scheme.onSurface;
+  if (!isKuraThemeContext(context)) return scheme.onSurface;
   return scheme.brightness == Brightness.dark ? Colors.white : Colors.black;
 }
 
 /// Secondary label and placeholder foreground for the mobile top navigation.
 Color navigationSecondaryForeground(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
-  if (!isBuzzThemeContext(context)) return scheme.onSurfaceVariant;
+  if (!isKuraThemeContext(context)) return scheme.onSurfaceVariant;
   return navigationPrimaryForeground(context).withValues(alpha: 0.4);
 }
 
 /// Channel-section label and icon foreground for the mobile side navigation.
 ///
-/// Section labels need more hierarchy than a placeholder. Buzz therefore uses
+/// Section labels need more hierarchy than a placeholder. Kura therefore uses
 /// a stronger neutral over its gradient, while all other themes preserve their
 /// established secondary foreground token.
 Color navigationSectionForeground(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
-  if (!isBuzzThemeContext(context)) return scheme.onSurfaceVariant;
+  if (!isKuraThemeContext(context)) return scheme.onSurfaceVariant;
   return navigationPrimaryForeground(context).withValues(alpha: 0.8);
 }
 
 /// Search-field surface for the mobile top navigation.
 Color navigationSearchSurface(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
-  if (!isBuzzThemeContext(context)) return scheme.surfaceContainerHighest;
+  if (!isKuraThemeContext(context)) return scheme.surfaceContainerHighest;
   return navigationPrimaryForeground(context).withValues(alpha: 0.04);
 }
 
@@ -65,13 +64,13 @@ Color navigationDivider(BuildContext context, double opacity) =>
 /// Buzz renders with its fixed neutral foreground while preserving the stored
 /// wire accent so the user's choice returns on another theme.
 int effectiveAccentIndex(String themeName, String storedAccent) {
-  if (isBuzzTheme(themeName)) return neutralAccentIndex;
+  if (isKuraTheme(themeName)) return neutralAccentIndex;
   return accentIndexForWireValue(storedAccent) ?? defaultAccentIndex;
 }
 
 /// Flat top-section fill for the Kura theme (washi/sumi) — no gradient, per
 /// identity guidelines. Kept as matching top/bottom stops so the existing
-/// [LinearGradient] plumbing in [buzzTopSectionGradient] renders as a solid
+/// [LinearGradient] plumbing in [kuraTopSectionGradient] renders as a solid
 /// fill without touching call sites.
 const _lightTop = Color(0xFFF7F4EE);
 const _lightBottom = Color(0xFFF7F4EE);
@@ -86,11 +85,11 @@ const _darkBottom = Color(0xFF151412);
 ///
 /// [brightness] comes from the applied color scheme rather than the theme name,
 /// so System mode picks the right stops as the OS switches.
-LinearGradient? buzzTopSectionGradient(
+LinearGradient? kuraTopSectionGradient(
   String themeName,
   Brightness brightness,
 ) {
-  if (!isBuzzTheme(themeName)) return null;
+  if (!isKuraTheme(themeName)) return null;
 
   final isDark = brightness == Brightness.dark;
   return LinearGradient(

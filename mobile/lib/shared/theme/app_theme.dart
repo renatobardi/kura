@@ -6,21 +6,25 @@ import 'color_scheme.dart';
 import 'grid.dart';
 import 'text_theme.dart';
 
-/// Border radius constants matching desktop shadcn "New York" style.
-/// Desktop uses --radius: 0.625rem (10px) as base:
-///   lg = 10px, md = 8px, sm = 6px
+/// Border radius constants mirroring the desktop's Kubo tokens.
+/// Desktop `--radius` is 0.5rem (8px): lg = 8, md = 6, sm = 4.
 class Radii {
   /// Small radius for compact UI elements.
-  static const double xs = 4.0;
-  static const double lg = 10.0;
-  static const double md = 8.0;
-  static const double sm = 6.0;
+  static const double xs = 2.0;
+  static const double lg = 8.0;
+  static const double md = 6.0;
+  static const double sm = 4.0;
 
-  /// Shared strong radius for grouped rows, fields, and utility containers.
-  static const double container = 22.0;
-  static const double card = container; // Backwards-compatible card alias.
-  static const double popover = 20.0;
-  static const double dialog = 24.0; // desktop uses rounded-3xl for dialogs
+  /// Kubo component radii — `--radius-pill|card|textarea|dialog` on desktop.
+  /// Controls are pills: buttons, inputs and chips all take [pill].
+  static const double pill = 20.8;
+  static const double card = 14.4;
+  static const double textarea = 12.0;
+  static const double dialog = 20.8;
+  static const double popover = dialog;
+
+  /// Grouped rows and utility containers share the card radius.
+  static const double container = card;
 
   /// Fully rounds pills, circles, and other capsule shapes.
   static const double full = 999.0;
@@ -142,7 +146,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           minimumSize: const Size(0, 36),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(Radii.md),
+            borderRadius: BorderRadius.circular(Radii.pill),
           ),
           textStyle: textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w500,
@@ -155,7 +159,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           minimumSize: const Size(0, 36),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(Radii.md),
+            borderRadius: BorderRadius.circular(Radii.pill),
           ),
           textStyle: textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w500,
@@ -170,7 +174,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           minimumSize: const Size(0, 36),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(Radii.md),
+            borderRadius: BorderRadius.circular(Radii.pill),
           ),
           textStyle: textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w500,
@@ -183,7 +187,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           minimumSize: const Size(0, 36),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(Radii.md),
+            borderRadius: BorderRadius.circular(Radii.pill),
           ),
           textStyle: textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w500,
@@ -191,37 +195,37 @@ class AppTheme {
         ),
       ),
 
-      // Cards: desktop uses rounded-lg (10px), flat, no elevation
+      // Cards: one flat plane, no elevation, Kubo card radius.
       cardTheme: CardThemeData(
         color: scheme.surfaceContainerHighest,
         margin: EdgeInsets.zero,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(Radii.lg),
+          borderRadius: BorderRadius.circular(Radii.card),
         ),
       ),
 
-      // Inputs: desktop uses outlined style, rounded-md (8px), h-9 (36px)
+      // Inputs: outlined pills, h-9 (36px), matching the desktop composer.
       inputDecorationTheme: InputDecorationTheme(
         filled: false,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(Radii.md),
+          borderRadius: BorderRadius.circular(Radii.pill),
           borderSide: BorderSide(color: scheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(Radii.md),
+          borderRadius: BorderRadius.circular(Radii.pill),
           borderSide: BorderSide(color: scheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(Radii.md),
+          borderRadius: BorderRadius.circular(Radii.pill),
           borderSide: BorderSide(color: scheme.primary),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(Radii.md),
+          borderRadius: BorderRadius.circular(Radii.pill),
           borderSide: BorderSide(color: scheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(Radii.md),
+          borderRadius: BorderRadius.circular(Radii.pill),
           borderSide: BorderSide(color: scheme.error),
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -270,7 +274,7 @@ class AppTheme {
         ),
       ),
 
-      // Chips: desktop uses rounded-sm (6px)
+      // Chips are pill controls too.
       chipTheme: ChipThemeData(
         labelStyle: textTheme.bodySmall?.copyWith(color: scheme.secondary),
         // M3 resolves the chip container via `color` (WidgetStateProperty);
@@ -283,14 +287,14 @@ class AppTheme {
         checkmarkColor: scheme.onPrimary,
         shape: RoundedRectangleBorder(
           side: BorderSide.none,
-          borderRadius: BorderRadius.circular(Radii.sm),
+          borderRadius: BorderRadius.circular(Radii.pill),
         ),
         side: BorderSide.none,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         labelPadding: EdgeInsets.zero,
       ),
 
-      // Popups/menus share the elevated 20px mobile popover treatment.
+      // Popups/menus share the dialog radius.
       popupMenuTheme: PopupMenuThemeData(
         color: scheme.surface.withValues(alpha: 0.98),
         elevation: 8,
@@ -320,11 +324,11 @@ class AppTheme {
         ),
       ),
 
-      // Tooltips: desktop uses rounded-md, primary bg
+      // Tooltips: pill, primary fill
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
           color: scheme.primary,
-          borderRadius: BorderRadius.circular(Radii.md),
+          borderRadius: BorderRadius.circular(Radii.pill),
         ),
         textStyle: textTheme.bodySmall?.copyWith(
           color: scheme.onPrimary,

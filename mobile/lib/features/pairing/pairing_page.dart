@@ -18,12 +18,16 @@ import 'pairing_qr_scanner.dart';
 part 'pairing_page/onboarding_background.dart';
 part 'pairing_page/pairing_welcome_view.dart';
 
-const _onboardingChartreuse = Color(0xFFD7D72E);
-const _onboardingShellBottom = Color(0xFFD7E7F6);
-const _onboardingCtaLabel = Color(0xFFD7E6F0);
-const _onboardingInk = Color(0xFF111111);
-const _onboardingMutedInk = Color(0xB3111111);
-const _onboardingErrorInk = Color(0xFF7A1025);
+// Onboarding is a light world in both app themes, with its own palette rather
+// than the theme's — the same values the desktop pins in
+// `.kura-onboarding-neutral-theme`. The names are kept so the shell's gradient
+// stops keep reading top-to-bottom.
+const _onboardingChartreuse = Color(0xFFF7F4EE); // washi, the top stop
+const _onboardingShellBottom = Color(0xFFECE7DC); // warm stone, the bottom
+const _onboardingCtaLabel = Color(0xFFF7F4EE); // label on the dark CTA pill
+const _onboardingInk = Color(0xFF1C1917);
+const _onboardingMutedInk = Color(0xB31C1917);
+const _onboardingErrorInk = Color(0xFFB4432B); // shu, the one warning hue
 
 class PairingPage extends HookConsumerWidget {
   /// When true, the pairing page is being used to add a new community
