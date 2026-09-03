@@ -5,6 +5,7 @@
 //! `archive/sync.rs` and its `sync_tests.rs`.
 
 use super::*;
+use crate::test_host::test_host;
 use futures_util::{SinkExt, StreamExt};
 use nostr::EventBuilder;
 use tokio_tungstenite::tungstenite::protocol::Message;
@@ -159,7 +160,7 @@ async fn settle() {
 #[tokio::test]
 async fn finite_fetch_multiplexes_with_persistent_delivery_on_a_real_websocket() {
     let (relay_url, mut frames, commands) = stub_relay().await;
-    let (session, mut events) = start(relay_url, Keys::generate(), None).await;
+    let (session, mut events) = start(relay_url, Keys::generate(), None, &test_host()).await;
     session.set_subscriptions(vec![probe_subscription()]).await;
     assert_eq!(next_req(&mut frames, "the persistent REQ").await, PROBE_ID);
 
@@ -233,7 +234,7 @@ async fn run_persistent_burst(drain_concurrently: bool) {
     const BURST: usize = 1_200;
 
     let (relay_url, mut frames, commands) = stub_relay().await;
-    let (session, mut events) = start(relay_url, Keys::generate(), None).await;
+    let (session, mut events) = start(relay_url, Keys::generate(), None, &test_host()).await;
     session.set_subscriptions(vec![probe_subscription()]).await;
     assert_eq!(next_req(&mut frames, "the burst REQ").await, PROBE_ID);
 
@@ -304,7 +305,7 @@ async fn persistent_delivery_applies_backpressure_without_losing_a_burst() {
 #[tokio::test]
 async fn a_closed_subscription_reopens_without_a_desired_set_change() {
     let (relay_url, mut frames, closed) = stub_relay().await;
-    let (session, _events) = start(relay_url, Keys::generate(), None).await;
+    let (session, _events) = start(relay_url, Keys::generate(), None, &test_host()).await;
 
     session.set_subscriptions(vec![probe_subscription()]).await;
     assert_eq!(next_req(&mut frames, "the initial REQ").await, PROBE_ID);
@@ -332,7 +333,7 @@ async fn a_closed_subscription_reopens_without_a_desired_set_change() {
 #[tokio::test]
 async fn a_terminal_closed_is_not_retried_on_the_same_socket() {
     let (relay_url, mut frames, closed) = stub_relay().await;
-    let (session, _events) = start(relay_url, Keys::generate(), None).await;
+    let (session, _events) = start(relay_url, Keys::generate(), None, &test_host()).await;
 
     session.set_subscriptions(vec![probe_subscription()]).await;
     assert_eq!(next_req(&mut frames, "the initial REQ").await, PROBE_ID);
@@ -368,7 +369,7 @@ async fn a_terminal_closed_is_not_retried_on_the_same_socket() {
 #[tokio::test]
 async fn a_recreated_subscription_does_not_inherit_a_terminal_latch() {
     let (relay_url, mut frames, closed) = stub_relay().await;
-    let (session, _events) = start(relay_url, Keys::generate(), None).await;
+    let (session, _events) = start(relay_url, Keys::generate(), None, &test_host()).await;
 
     session.set_subscriptions(vec![probe_subscription()]).await;
     assert_eq!(next_req(&mut frames, "the initial REQ").await, PROBE_ID);
@@ -412,7 +413,7 @@ async fn a_recreated_subscription_does_not_inherit_a_terminal_latch() {
 #[tokio::test]
 async fn a_recreated_subscription_is_not_suppressed_when_the_writes_coalesce() {
     let (relay_url, mut frames, closed) = stub_relay().await;
-    let (session, _events) = start(relay_url, Keys::generate(), None).await;
+    let (session, _events) = start(relay_url, Keys::generate(), None, &test_host()).await;
 
     session.set_subscriptions(vec![probe_subscription()]).await;
     assert_eq!(next_req(&mut frames, "the initial REQ").await, PROBE_ID);
@@ -447,7 +448,7 @@ async fn a_recreated_subscription_is_not_suppressed_when_the_writes_coalesce() {
 #[tokio::test]
 async fn a_reconcile_preserves_the_backoff_of_a_still_desired_subscription() {
     let (relay_url, mut frames, closed) = stub_relay().await;
-    let (session, _events) = start(relay_url, Keys::generate(), None).await;
+    let (session, _events) = start(relay_url, Keys::generate(), None, &test_host()).await;
 
     session.set_subscriptions(vec![probe_subscription()]).await;
     assert_eq!(next_req(&mut frames, "the initial REQ").await, PROBE_ID);
@@ -501,7 +502,7 @@ async fn a_reconcile_preserves_the_backoff_of_a_still_desired_subscription() {
 #[tokio::test]
 async fn a_closed_arriving_after_removal_does_not_mint_retry_state() {
     let (relay_url, mut frames, closed) = stub_relay().await;
-    let (session, _events) = start(relay_url, Keys::generate(), None).await;
+    let (session, _events) = start(relay_url, Keys::generate(), None, &test_host()).await;
 
     session.set_subscriptions(vec![probe_subscription()]).await;
     assert_eq!(next_req(&mut frames, "the initial REQ").await, PROBE_ID);
@@ -550,7 +551,7 @@ async fn a_closed_arriving_after_removal_does_not_mint_retry_state() {
 #[tokio::test]
 async fn a_stale_terminal_closed_does_not_blackhole_a_recreated_subscription() {
     let (relay_url, mut frames, closed) = stub_relay().await;
-    let (session, mut events) = start(relay_url, Keys::generate(), None).await;
+    let (session, mut events) = start(relay_url, Keys::generate(), None, &test_host()).await;
 
     session.set_subscriptions(vec![probe_subscription()]).await;
     assert_eq!(next_req(&mut frames, "the initial REQ").await, PROBE_ID);
@@ -799,10 +800,10 @@ async fn a_stale_finite_request_cannot_displace_the_new_scopes_session() {
     let scope_b = (scope_url(10), Keys::generate());
 
     let archive_a = client
-        .ensure_session(scope_a.0.clone(), scope_a.1.clone())
+        .ensure_session(scope_a.0.clone(), scope_a.1.clone(), &test_host())
         .await;
     let archive_b = client
-        .ensure_session(scope_b.0.clone(), scope_b.1.clone())
+        .ensure_session(scope_b.0.clone(), scope_b.1.clone(), &test_host())
         .await;
     assert!(
         archive_a.cancel.is_cancelled(),
@@ -810,7 +811,9 @@ async fn a_stale_finite_request_cannot_displace_the_new_scopes_session() {
     );
 
     // Scope A's in-flight catalog/catch-up command, resuming late.
-    let stale = client.session(scope_a.0.clone(), scope_a.1.clone()).await;
+    let stale = client
+        .session(scope_a.0.clone(), scope_a.1.clone(), &test_host())
+        .await;
 
     assert!(
         !archive_b.cancel.is_cancelled(),
@@ -849,8 +852,12 @@ async fn a_same_scope_lease_shares_the_installed_session_and_never_ends_it() {
     let client = NativeRelayClient::default();
     let (relay_url, keys) = (scope_url(11), Keys::generate());
 
-    let archive = client.ensure_session(relay_url.clone(), keys.clone()).await;
-    let lease = client.session(relay_url.clone(), keys.clone()).await;
+    let archive = client
+        .ensure_session(relay_url.clone(), keys.clone(), &test_host())
+        .await;
+    let lease = client
+        .session(relay_url.clone(), keys.clone(), &test_host())
+        .await;
     assert!(
         Arc::ptr_eq(&lease.session, &archive),
         "a same-scope finite request must multiplex over the installed socket \
@@ -878,7 +885,9 @@ async fn the_first_lease_installs_a_session_the_archive_then_reuses() {
     let client = NativeRelayClient::default();
     let (relay_url, keys) = (scope_url(12), Keys::generate());
 
-    let lease = client.session(relay_url.clone(), keys.clone()).await;
+    let lease = client
+        .session(relay_url.clone(), keys.clone(), &test_host())
+        .await;
     let leased = lease.handle();
     drop(lease);
     assert!(
@@ -887,7 +896,7 @@ async fn the_first_lease_installs_a_session_the_archive_then_reuses() {
          session the archive is about to reuse"
     );
 
-    let archive = client.ensure_session(relay_url, keys).await;
+    let archive = client.ensure_session(relay_url, keys, &test_host()).await;
     assert!(
         Arc::ptr_eq(&archive, &leased),
         "the archive start must reuse the installed session rather than \

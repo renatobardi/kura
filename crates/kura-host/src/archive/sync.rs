@@ -581,7 +581,7 @@ pub async fn start_archive_sync(
     // shared session is destructive to whatever scope holds it, so a superseded
     // start must not be able to reach this line at all. See [`ArchiveOwnership`].
     let (session, events) = relay_client
-        .archive_session(relay_url, keys, &ownership)
+        .archive_session(relay_url, keys, &ownership, &app)
         .await;
 
     let io = AppIo {

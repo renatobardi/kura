@@ -27,4 +27,7 @@ pub mod relay_admission;
 pub mod secret_store;
 pub mod util;
 
+#[cfg(test)]
+mod test_host;
+
 pub use host::{Host, HostHandle};

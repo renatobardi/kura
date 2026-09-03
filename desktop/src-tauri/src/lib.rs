@@ -235,12 +235,6 @@ pub fn run() {
         .manage(channel_head_cache::ChannelHeadCacheStore::default())
         .setup(move |app| {
             let app_handle = app.handle().clone();
-            // Register the process-wide host FIRST: `kura-host` reaches it for
-            // the few spawn sites buried under `Default`-constructed managed
-            // state (the native relay client's socket task), and every one of
-            // those must land on `tauri::async_runtime::spawn`, never a bare
-            // `tokio::spawn`.
-            kura_host::host::install(crate::host::AsHost::as_host(&app_handle));
             #[cfg(target_os = "macos")]
             {
                 tray_menu::init(&app_handle)?;

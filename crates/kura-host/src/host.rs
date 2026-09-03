@@ -5,6 +5,11 @@
 //! from its embedder (directories, shared state, event emission, task spawn,
 //! instance identity, dev-vs-prod). The desktop crate provides a `TauriHost`
 //! implementation; tests provide their own.
+//!
+//! There is no process-wide host: a [`HostHandle`] reaches every call site
+//! through its own signature. `NativeRelayClient` is `Default`-constructed
+//! managed state and therefore cannot hold one, so its session methods take
+//! the handle as a parameter from the command that already has it.
 
 use std::future::Future;
 use std::path::PathBuf;
@@ -65,39 +70,4 @@ where
     F: Future<Output = ()> + Send + 'static,
 {
     host.spawn(Box::pin(future));
-}
-
-static GLOBAL_HOST: std::sync::OnceLock<HostHandle> = std::sync::OnceLock::new();
-
-/// Register the process-wide host.
-///
-/// The desktop calls this once, first thing in `setup()`. It exists for the
-/// handful of call sites buried under `Default`-constructed managed state
-/// (`NativeRelayClient`) that cannot be handed a handle through their
-/// signature. Everything else takes a [`HostHandle`] argument.
-pub fn install(host: HostHandle) {
-    let _ = GLOBAL_HOST.set(host);
-}
-
-/// The process-wide host, if one was installed.
-pub fn global() -> Option<&'static HostHandle> {
-    GLOBAL_HOST.get()
-}
-
-/// Spawn on the installed host.
-///
-/// Falls back to `tokio::spawn` when no host is installed — that is the unit
-/// test configuration, where the caller is already inside a tokio runtime. In
-/// the desktop the host is always installed before any relay session starts,
-/// so this routes to `tauri::async_runtime::spawn`.
-pub fn spawn_detached<F>(future: F)
-where
-    F: Future<Output = ()> + Send + 'static,
-{
-    match global() {
-        Some(host) => host.spawn(Box::pin(future)),
-        None => {
-            tokio::spawn(future);
-        }
-    }
 }

@@ -24,6 +24,7 @@ use std::{
     time::Duration,
 };
 
+use crate::host::HostHandle;
 use kura_ws_client_pkg::{NostrWsConnection, RelayMessage};
 use nostr::{Event, Keys};
 use tokio::{
@@ -136,7 +137,12 @@ impl NativeRelayClient {
     /// slot. Destructive on entry, so every caller must already hold proof it
     /// is the current owner — today that is
     /// [`crate::archive::sync::ArchiveOwnership`].
-    async fn ensure_session(&self, relay_url: String, keys: Keys) -> Arc<RelaySession> {
+    async fn ensure_session(
+        &self,
+        relay_url: String,
+        keys: Keys,
+        host: &HostHandle,
+    ) -> Arc<RelaySession> {
         let scope = (relay_url.clone(), keys.public_key().to_hex());
         let mut current = self.current.lock().await;
         if let Some(managed) = current.as_ref().filter(|managed| managed.scope == scope) {
@@ -145,7 +151,7 @@ impl NativeRelayClient {
         if let Some(previous) = current.take() {
             previous.session.shutdown();
         }
-        let session = start_managed(relay_url, keys, None);
+        let session = start_managed(relay_url, keys, None, host);
         *current = Some(ManagedSession {
             scope,
             session: Arc::clone(&session),
@@ -176,7 +182,7 @@ impl NativeRelayClient {
     /// Filling an empty slot is deliberate: at startup the catalog fetch
     /// commonly precedes archive sync, and installing here means the archive
     /// start that follows reuses this socket instead of opening a second one.
-    pub async fn session(&self, relay_url: String, keys: Keys) -> SessionLease {
+    pub async fn session(&self, relay_url: String, keys: Keys, host: &HostHandle) -> SessionLease {
         let scope = (relay_url.clone(), keys.public_key().to_hex());
         let mut current = self.current.lock().await;
         if let Some(managed) = current.as_ref() {
@@ -187,12 +193,12 @@ impl NativeRelayClient {
                 }
             } else {
                 SessionLease {
-                    session: start_managed(relay_url, keys, None),
+                    session: start_managed(relay_url, keys, None, host),
                     private: true,
                 }
             };
         }
-        let session = start_managed(relay_url, keys, None);
+        let session = start_managed(relay_url, keys, None, host);
         *current = Some(ManagedSession {
             scope,
             session: Arc::clone(&session),
@@ -218,8 +224,9 @@ impl NativeRelayClient {
         relay_url: String,
         keys: Keys,
         _ownership: &crate::archive::sync::ArchiveOwnership<'_>,
+        host: &HostHandle,
     ) -> (Arc<RelaySession>, mpsc::Receiver<MatchedEvent>) {
-        let session = self.ensure_session(relay_url, keys).await;
+        let session = self.ensure_session(relay_url, keys, host).await;
         let event_rx = session.attach_archive().await;
         (session, event_rx)
     }
@@ -388,13 +395,25 @@ pub async fn start(
     relay_url: String,
     keys: Keys,
     auth_tag: Option<nostr::Tag>,
+    host: &HostHandle,
 ) -> (Arc<RelaySession>, mpsc::Receiver<MatchedEvent>) {
-    let session = start_managed(relay_url, keys, auth_tag);
+    let session = start_managed(relay_url, keys, auth_tag, host);
     let events = session.attach_archive().await;
     (session, events)
 }
 
-fn start_managed(relay_url: String, keys: Keys, auth_tag: Option<nostr::Tag>) -> Arc<RelaySession> {
+/// Opens a managed session, spawning its socket loop on `host`.
+///
+/// The handle is a parameter rather than client state because
+/// `NativeRelayClient` is `Default`-constructed managed state: it is built
+/// before any host exists. Every caller is a command or a lifecycle entry
+/// point that already holds one.
+fn start_managed(
+    relay_url: String,
+    keys: Keys,
+    auth_tag: Option<nostr::Tag>,
+    host: &HostHandle,
+) -> Arc<RelaySession> {
     let (wake, wake_rx) = mpsc::channel(1);
     let session = Arc::new(RelaySession {
         state: Arc::new(Mutex::new(SessionState::default())),
@@ -404,13 +423,10 @@ fn start_managed(relay_url: String, keys: Keys, auth_tag: Option<nostr::Tag>) ->
         cancel: CancellationToken::new(),
     });
 
-    crate::host::spawn_detached(run_session(
-        relay_url,
-        keys,
-        auth_tag,
-        Arc::clone(&session),
-        wake_rx,
-    ));
+    crate::host::spawn(
+        host,
+        run_session(relay_url, keys, auth_tag, Arc::clone(&session), wake_rx),
+    );
 
     session
 }
@@ -907,7 +923,13 @@ mod relay_backed_tests {
         // shape: that the `#p` tag key and the `limit: 0` live tail produce a
         // REQ a real relay accepts and answers. Scope demultiplexing on the
         // archive side is covered in `archive/sync_tests.rs`.
-        let (session, mut events) = start(relay_url.clone(), owner.clone(), None).await;
+        let (session, mut events) = start(
+            relay_url.clone(),
+            owner.clone(),
+            None,
+            &crate::test_host::test_host(),
+        )
+        .await;
         session
             .set_subscriptions(vec![Subscription {
                 id: "archive:owner_p:test".to_string(),

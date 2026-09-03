@@ -16,10 +16,11 @@ use std::{collections::HashMap, time::Duration};
 use kura_core_pkg::kind::{event_is_shared, KIND_TEAM_CATALOG};
 use nostr::Event;
 use serde::Serialize;
-use tauri::State;
+use tauri::{AppHandle, State};
 
 use crate::{
     app_state::AppState,
+    host::AsHost,
     managed_agents::team_catalog::{team_catalog_content_from_event, TeamCatalogContent},
     native_relay_client::NativeRelayClient,
 };
@@ -61,13 +62,16 @@ struct TeamCatalogMemberProjection {
 /// response cannot populate the new community's query cache.
 #[tauri::command]
 pub(crate) async fn fetch_team_catalog(
+    app: AppHandle,
     state: State<'_, AppState>,
     relay_client: State<'_, NativeRelayClient>,
 ) -> Result<Vec<TeamCatalogPublication>, String> {
     let keys = state.signing_keys()?;
     let owner = keys.public_key().to_hex();
     let relay_url = crate::relay::relay_ws_url_with_override(&state);
-    let session = relay_client.session(relay_url.clone(), keys).await;
+    let session = relay_client
+        .session(relay_url.clone(), keys, &app.as_host())
+        .await;
     let by_id = collect_verified_catalog(|until| {
         let session = &session;
         async move {
