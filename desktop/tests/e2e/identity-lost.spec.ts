@@ -20,9 +20,12 @@ test("normal first launch uses the already-persisted identity", async ({
   // Landing carries a subtle dot-grid pattern over the chartreuse fill.
   await expect(gate).toHaveCSS("background-image", /radial-gradient/);
   await expect(gate).toHaveCSS("color", "rgb(28, 26, 23)");
+  // Kubo: the onboarding CTA is the near-black mono primary. It used to be the
+  // shu terracotta of the old washi/sumi/shu identity — color is reserved for
+  // meaning now, and creating an identity carries none.
   await expect(
     page.getByRole("button", { name: "Create a new identity key" }),
-  ).toHaveCSS("background-color", "rgb(181, 67, 44)");
+  ).toHaveCSS("background-color", "rgb(28, 25, 23)");
   await page.getByRole("button", { name: "Create a new identity key" }).click();
 
   await expect(
