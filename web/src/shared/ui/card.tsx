@@ -9,7 +9,9 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-xl border border-border/70 bg-card/80 text-card-foreground shadow-xs",
+      // Kubo surfaces are flat: one plane, a 1px ring, no shadow and no
+      // translucency. The ring is a box-shadow so it never joins the layout.
+      "rounded-card bg-card text-card-foreground shadow-[0_0_0_1px_color-mix(in_oklab,hsl(var(--foreground))_10%,transparent)]",
       className,
     )}
     {...props}

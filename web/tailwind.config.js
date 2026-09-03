@@ -6,6 +6,11 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        // Kubo component radii, same keys the desktop uses.
+        pill: "var(--radius-pill)",
+        card: "var(--radius-card)",
+        textarea: "var(--radius-textarea)",
+        dialog: "var(--radius-dialog)",
       },
       fontFamily: {
         sans: [
