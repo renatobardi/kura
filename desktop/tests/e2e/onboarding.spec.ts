@@ -1548,6 +1548,54 @@ test("first-community explains when the local identity belongs to another accoun
   ).toBeVisible();
 });
 
+/**
+ * Onboarding is a light world in both app themes. It pins its own tokens, and
+ * the surfaces it paints have to be part of that: with Kura Dark selected the
+ * community choices once inherited the theme's near-black `--card` under
+ * onboarding's dark `--foreground`, which is a black label on a black card.
+ */
+test("onboarding stays light under a dark app theme", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("kura-theme", "kura-dark");
+  });
+  await seedActiveIdentity(page, BLANK_TYLER_IDENTITY);
+  await page.addInitScript((pubkey) => {
+    window.localStorage.setItem(
+      `kura-machine-onboarding-complete.v2:${pubkey}`,
+      "true",
+    );
+  }, BLANK_TYLER_IDENTITY.pubkey);
+  await installMockBridge(page, undefined, {
+    relayWsUrl: "ws://localhost:3000",
+    skipOnboardingSeed: true,
+    skipCommunitySeed: true,
+  });
+  await page.goto("/");
+
+  const choice = page.getByTestId("community-choice-join");
+  await expect(choice).toBeVisible();
+
+  const paint = await choice.evaluate((element) => {
+    const styles = getComputedStyle(element);
+    const luminance = (color: string) => {
+      const [r, g, b] = (color.match(/\d+(\.\d+)?/g) ?? ["0", "0", "0"]).map(
+        Number,
+      );
+      return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    };
+    return {
+      background: luminance(styles.backgroundColor),
+      text: luminance(styles.color),
+      isDarkRoot: document.documentElement.classList.contains("dark"),
+    };
+  });
+
+  // The app theme really is dark — otherwise this test proves nothing.
+  expect(paint.isDarkRoot).toBe(true);
+  expect(paint.background).toBeGreaterThan(0.8);
+  expect(paint.text).toBeLessThan(0.3);
+});
+
 test("back clears Builderlab auth before returning to first-community choices", async ({
   page,
 }) => {

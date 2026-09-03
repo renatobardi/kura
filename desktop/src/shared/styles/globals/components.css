@@ -314,6 +314,14 @@
     --kura-onboarding-backup-ink: #b4432b;
     --background: 40 36% 95.1%;
     --foreground: 36 10% 10%;
+    /* Onboarding is a light world in BOTH app themes, so it has to pin every
+       surface token it paints with — not just the page. Leaving --card to be
+       inherited put a near-black Kura Dark card under this block's dark
+       --foreground: an unreadable label on the community choices. */
+    --card: 0 0% 100%;
+    --card-foreground: 36 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 36 10% 10%;
     --primary: 10 61% 44%;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
@@ -388,6 +396,12 @@
   .dark .kura-onboarding-neutral-theme:not(.kura-startup-shell) {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
+    /* Surfaces pinned for the same reason as the light block: this one forces
+       a dark world, so an inherited light --card would be white-on-white. */
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
     --primary: 0 0% 98%;
     --primary-foreground: 0 0% 9%;
     --secondary: 0 0% 14.9%;
@@ -418,6 +432,11 @@
     ) {
     --background: 40 36% 95.1%;
     --foreground: 36 10% 10%;
+    /* Surfaces pinned for the same reason as the block above. */
+    --card: 0 0% 100%;
+    --card-foreground: 36 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 36 10% 10%;
     --primary: 10 61% 44%;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
@@ -446,6 +465,12 @@
   ) {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
+    /* Surfaces pinned for the same reason as the light block: this one forces
+       a dark world, so an inherited light --card would be white-on-white. */
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
     --primary: 0 0% 98%;
     --primary-foreground: 0 0% 9%;
     --secondary: 0 0% 14.9%;
