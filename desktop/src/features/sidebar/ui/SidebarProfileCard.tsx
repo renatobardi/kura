@@ -17,6 +17,7 @@ import { useMyRelayMembershipLookupQuery } from "@/features/community-members/ho
 import type { SettingsSection } from "@/features/settings/ui/SettingsPanels";
 import type { PresenceStatus, Profile, UserStatus } from "@/shared/api/types";
 import { cn } from "@/shared/lib/cn";
+import { SakuraGlyph } from "@/shared/ui/kura-logo/SakuraMark";
 
 type SidebarProfileCardProps = {
   activeCommunity: Community | null;
@@ -92,7 +93,7 @@ export function SidebarProfileCard({
         aria-hidden="true"
         className="flex w-3.5 shrink-0 items-center justify-center text-2xs"
       >
-        <span className="-translate-y-px leading-normal">🐝</span>
+        <SakuraGlyph className="h-3 w-3" />
       </span>
       <span className="truncate">{communityLabel}</span>
     </span>

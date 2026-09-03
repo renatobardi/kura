@@ -38,6 +38,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip";
 import { cn } from "@/shared/lib/cn";
 import { getInitials } from "@/shared/lib/initials";
 import { writeTextToClipboard } from "@/shared/lib/clipboard";
+import { SakuraGlyph } from "@/shared/ui/kura-logo/SakuraMark";
 
 type CommunityRailProps = {
   communities: Community[];
@@ -155,7 +156,9 @@ function CommunityButton({
                     src={iconUrl}
                   />
                 ) : (
-                  getInitials(community.name) || "🐝"
+                  getInitials(community.name) || (
+                    <SakuraGlyph className="h-4 w-4" />
+                  )
                 )}
               </span>
               {showBadge ? (
@@ -207,7 +210,7 @@ function CommunityDragOverlay({
           src={iconUrl}
         />
       ) : (
-        getInitials(community.name) || "🐝"
+        getInitials(community.name) || <SakuraGlyph className="h-4 w-4" />
       )}
     </div>
   );
