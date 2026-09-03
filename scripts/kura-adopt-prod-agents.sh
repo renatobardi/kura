@@ -62,8 +62,8 @@ set -euo pipefail
 # real invocation ever uses. Keychain service/account stay overridable because
 # they are read-only against prod (used to fixture-test the identity read).
 SUPPORT="$HOME/Library/Application Support"
-PROD_DIR="$SUPPORT/xyz.block.kura.app"
-DEV_DIR="$SUPPORT/xyz.block.kura.app.dev"
+PROD_DIR="$SUPPORT/pro.oute.kura.app"
+DEV_DIR="$SUPPORT/pro.oute.kura.app.dev"
 KEYCHAIN_SVC="${KURA_KEYCHAIN_SVC:-kura-desktop}"
 KEYCHAIN_ACCT="${KURA_KEYCHAIN_ACCT:-secrets}"
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Remove desktop state owned by development bundle identifiers only.
-# Production state (`xyz.block.kura.app`, `~/.kura`, and `kura-desktop`) is
+# Production state (`pro.oute.kura.app`, `~/.kura`, and `kura-desktop`) is
 # deliberately outside every deletion pattern in this script.
 set -euo pipefail
 
@@ -21,7 +21,9 @@ remove_bundle_state() {
 
   [[ -d "$base" ]] || return 0
   shopt -s nullglob
-  for prefix in xyz.block.kura.app.dev xyz.block.sprout.app.dev; do
+  # The current dev identifier plus the retired ones, so a machine that ran a
+  # pre-rename build is cleaned too.
+  for prefix in pro.oute.kura.app.dev xyz.block.kura.app.dev xyz.block.sprout.app.dev; do
     # Match the canonical dev identifier and dot-delimited worktree variants.
     # Do not use `${prefix}*`: that could match a non-dev prefix collision.
     remove_path "$base/${prefix}${suffix}"
