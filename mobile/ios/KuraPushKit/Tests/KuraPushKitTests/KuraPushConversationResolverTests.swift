@@ -1,9 +1,9 @@
 import Foundation
 import XCTest
 
-@testable import BuzzPushKit
+@testable import KuraPushKit
 
-extension BuzzPushNotificationResolverTests {
+extension KuraPushNotificationResolverTests {
   func testOpenChannelOutsiderUsesEveryVerifiedMemberAsARecipient() throws {
     let message = try Self.signedEvent(
       privateKey: Self.profilePrivateKey,
@@ -13,9 +13,9 @@ extension BuzzPushNotificationResolverTests {
       content: "Hello from an open-channel guest"
     )
     let relayPubkey = try Self.pubkey(for: Self.relayPrivateKey)
-    let snapshot = BuzzPushPresentationCacheSnapshot(
+    let snapshot = KuraPushPresentationCacheSnapshot(
       channels: [
-        BuzzPushCachedChannel(
+        KuraPushCachedChannel(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           channelID: Self.channelID,
@@ -60,9 +60,9 @@ extension BuzzPushNotificationResolverTests {
       content: "Do not fabricate a group"
     )
     let relayPubkey = try Self.pubkey(for: Self.relayPrivateKey)
-    let snapshot = BuzzPushPresentationCacheSnapshot(
+    let snapshot = KuraPushPresentationCacheSnapshot(
       channels: [
-        BuzzPushCachedChannel(
+        KuraPushCachedChannel(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           channelID: Self.channelID,
@@ -108,9 +108,9 @@ extension BuzzPushNotificationResolverTests {
       content: "Refresh an evicted roster"
     )
     let relayPubkey = try Self.pubkey(for: Self.relayPrivateKey)
-    let snapshot = BuzzPushPresentationCacheSnapshot(
+    let snapshot = KuraPushPresentationCacheSnapshot(
       channels: [
-        BuzzPushCachedChannel(
+        KuraPushCachedChannel(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           channelID: Self.channelID,
@@ -174,9 +174,9 @@ extension BuzzPushNotificationResolverTests {
       content: "Direct message"
     )
     let relayPubkey = try Self.pubkey(for: Self.relayPrivateKey)
-    let snapshot = BuzzPushPresentationCacheSnapshot(
+    let snapshot = KuraPushPresentationCacheSnapshot(
       channels: [
-        BuzzPushCachedChannel(
+        KuraPushCachedChannel(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           channelID: Self.channelID,
@@ -221,9 +221,9 @@ extension BuzzPushNotificationResolverTests {
       content: "Group direct message"
     )
     let relayPubkey = try Self.pubkey(for: Self.relayPrivateKey)
-    let snapshot = BuzzPushPresentationCacheSnapshot(
+    let snapshot = KuraPushPresentationCacheSnapshot(
       channels: [
-        BuzzPushCachedChannel(
+        KuraPushCachedChannel(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           channelID: Self.channelID,

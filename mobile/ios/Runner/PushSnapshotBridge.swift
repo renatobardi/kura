@@ -1,27 +1,27 @@
-import BuzzPushKit
+import KuraPushKit
 import Flutter
 import Foundation
 
-final class BuzzPushSnapshotBridge {
+final class KuraPushSnapshotBridge {
   private let appGroupIdentifier: String?
-  private let endpointGrantStore: BuzzPushEndpointGrantKeychainStore
+  private let endpointGrantStore: KuraPushEndpointGrantKeychainStore
   private let keychainAccessGroup: String?
   private let queue = DispatchQueue(
     label: "xyz.block.buzz.push-snapshot",
     qos: .utility
   )
-  private lazy var store: BuzzPushPresentationCacheStore? = {
+  private lazy var store: KuraPushPresentationCacheStore? = {
     guard let appGroupIdentifier,
       let container = FileManager.default.containerURL(
         forSecurityApplicationGroupIdentifier: appGroupIdentifier
       )
     else { return nil }
-    return BuzzPushPresentationCacheStore(containerURL: container)
+    return KuraPushPresentationCacheStore(containerURL: container)
   }()
 
   init(
     appGroupIdentifier: String?,
-    endpointGrantStore: BuzzPushEndpointGrantKeychainStore,
+    endpointGrantStore: KuraPushEndpointGrantKeychainStore,
     keychainAccessGroup: String?
   ) {
     self.appGroupIdentifier = appGroupIdentifier
@@ -50,7 +50,7 @@ final class BuzzPushSnapshotBridge {
   private func syncCommunities(_ arguments: [String: Any], result: @escaping FlutterResult) {
     guard let communities = arguments["communities"] as? [[String: Any]],
       let signingKeys = arguments["signingKeys"] as? [String: String],
-      communities.count <= BuzzPushPresentationCacheStore.maximumCommunities
+      communities.count <= KuraPushPresentationCacheStore.maximumCommunities
     else {
       result(
         FlutterError(
@@ -84,7 +84,7 @@ final class BuzzPushSnapshotBridge {
         let data = try JSONSerialization.data(withJSONObject: enriched, options: [.sortedKeys])
         let decoded = try JSONDecoder().decode([PushLeaseCommunity].self, from: data)
         try store.replaceCommunities(decoded)
-        try BuzzPushKeychain.replace(
+        try KuraPushKeychain.replace(
           signingKeys: signingKeys,
           accessGroup: keychainAccessGroup
         )
@@ -104,14 +104,14 @@ final class BuzzPushSnapshotBridge {
 
   static func relayMetadataPubkey(
     relayURL: String,
-    grants: [BuzzPushEndpointGrantRecord]
+    grants: [KuraPushEndpointGrantRecord]
   ) -> String? {
-    guard let origin = BuzzPushPresentationCacheStore.canonicalRelayOrigin(relayURL) else {
+    guard let origin = KuraPushPresentationCacheStore.canonicalRelayOrigin(relayURL) else {
       return nil
     }
     return grants.filter {
-      $0.appProfile == BuzzDevPushEnrollmentDriver.appProfile
-        && BuzzPushPresentationCacheStore.canonicalRelayOrigin($0.relayOrigin) == origin
+      $0.appProfile == KuraDevPushEnrollmentDriver.appProfile
+        && KuraPushPresentationCacheStore.canonicalRelayOrigin($0.relayOrigin) == origin
     }.max {
       $0.generation < $1.generation
     }?.relayMetadataPubkey
@@ -121,7 +121,7 @@ final class BuzzPushSnapshotBridge {
     guard let arguments = rawArguments as? [String: Any],
       let communityID = arguments["communityId"] as? String,
       let rawEvents = arguments["events"] as? [[String: Any]],
-      rawEvents.count <= BuzzPushPresentationCacheStore.maximumProfiles
+      rawEvents.count <= KuraPushPresentationCacheStore.maximumProfiles
     else {
       result(
         FlutterError(
@@ -142,7 +142,7 @@ final class BuzzPushSnapshotBridge {
         try store?.updateProfiles(
           communityID: communityID,
           relayOrigin: community.relayUrl,
-          updates: events.map { BuzzPushProfileCacheUpdate(event: $0) }
+          updates: events.map { KuraPushProfileCacheUpdate(event: $0) }
         )
         Self.complete(result, value: nil)
       } catch {
@@ -163,8 +163,8 @@ final class BuzzPushSnapshotBridge {
       let communityID = arguments["communityId"] as? String,
       let rawMetadataEvents = arguments["metadataEvents"] as? [[String: Any]],
       let rawMembershipEvents = arguments["membershipEvents"] as? [[String: Any]],
-      rawMetadataEvents.count <= BuzzPushPresentationCacheStore.maximumChannels,
-      rawMembershipEvents.count <= BuzzPushPresentationCacheStore.maximumChannels
+      rawMetadataEvents.count <= KuraPushPresentationCacheStore.maximumChannels,
+      rawMembershipEvents.count <= KuraPushPresentationCacheStore.maximumChannels
     else {
       result(
         FlutterError(
@@ -252,8 +252,8 @@ final class BuzzPushSnapshotBridge {
       let container = FileManager.default.containerURL(
         forSecurityApplicationGroupIdentifier: appGroupIdentifier
       ),
-      let data = try? Data(contentsOf: container.appendingPathComponent(BuzzPushPresentationCacheStore.fileName)),
-      let snapshot = try? JSONDecoder().decode(BuzzPushPresentationCacheSnapshot.self, from: data)
+      let data = try? Data(contentsOf: container.appendingPathComponent(KuraPushPresentationCacheStore.fileName)),
+      let snapshot = try? JSONDecoder().decode(KuraPushPresentationCacheSnapshot.self, from: data)
     else { return nil }
     return snapshot.communities.first { $0.id == id }
   }

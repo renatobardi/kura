@@ -3,13 +3,13 @@ import Foundation
 import P256K
 import XCTest
 
-@testable import BuzzPushKit
+@testable import KuraPushKit
 
 #if canImport(FoundationNetworking)
   import FoundationNetworking
 #endif
 
-final class BuzzPushNotificationResolverTests: XCTestCase {
+final class KuraPushNotificationResolverTests: XCTestCase {
   static let privateKey = String(repeating: "0", count: 63) + "1"
   static let ownPubkey =
     "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
@@ -75,7 +75,7 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
   }
 
   func testDecodeResolutionFiltersOwnPubkeyEvent() {
-    let result = BuzzPushNotificationResolver.decodeResolution(
+    let result = KuraPushNotificationResolver.decodeResolution(
       events: [event(pubkey: Self.ownPubkey, content: "This should be filtered")],
       community: community()
     )
@@ -86,7 +86,7 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
   func testDecodeResolutionReturnsNilWhenSanitizedPreviewIsEmpty() {
     let event = event(content: "  \n\t  ")
 
-    let result = BuzzPushNotificationResolver.decodeResolution(
+    let result = KuraPushNotificationResolver.decodeResolution(
       events: [event],
       community: community()
     )
@@ -104,20 +104,20 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
       """
 
     XCTAssertEqual(
-      BuzzPushNotificationResolver.previewBody(content),
+      KuraPushNotificationResolver.previewBody(content),
       "Before [code] inline docs image [link] After"
     )
   }
 
   func testPreviewBodyTruncatesTo178CharactersIncludingEllipsis() {
-    let preview = BuzzPushNotificationResolver.previewBody(String(repeating: "x", count: 200))
+    let preview = KuraPushNotificationResolver.previewBody(String(repeating: "x", count: 200))
 
     XCTAssertEqual(preview.count, 178)
     XCTAssertEqual(preview, String(repeating: "x", count: 177) + "…")
   }
 
   func testDecodeResolutionUsesLowestIDWhenCreatedAtTies() {
-    let result = BuzzPushNotificationResolver.decodeResolution(
+    let result = KuraPushNotificationResolver.decodeResolution(
       events: [
         event(id: "a", content: "lower ID", createdAt: Self.now),
         event(id: "b", content: "higher ID", createdAt: Self.now),
@@ -147,11 +147,11 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
     XCTAssertNotEqual(result.title, Self.gatewayBody)
     XCTAssertNotEqual(result.body, Self.gatewayBody)
     XCTAssertEqual(result.title, String(event.pubkey.prefix(8)) + "…")
-    XCTAssertEqual(result.body, "Hello Buzz")
+    XCTAssertEqual(result.body, "Hello Kura")
     XCTAssertEqual(result.subtitle, "Community")
     XCTAssertEqual(
       result.threadIdentifier,
-      BuzzPushPresentationIdentity.conversation(
+      KuraPushPresentationIdentity.conversation(
         communityID: "community-id",
         channelID: Self.channelID
       )
@@ -159,7 +159,7 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
     XCTAssertEqual(result.senderPubkey, event.pubkey)
     XCTAssertEqual(
       result.navigationTarget,
-      BuzzPushNavigationTarget(
+      KuraPushNavigationTarget(
         eventID: event.id,
         communityID: "community-id",
         channelID: Self.channelID
@@ -177,9 +177,9 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
     )
     let relayPubkey = try Self.pubkey(for: Self.relayPrivateKey)
     let avatar = Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
-    let snapshot = BuzzPushPresentationCacheSnapshot(
+    let snapshot = KuraPushPresentationCacheSnapshot(
       profiles: [
-        BuzzPushCachedProfile(
+        KuraPushCachedProfile(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           pubkey: message.pubkey,
@@ -192,7 +192,7 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
         )
       ],
       channels: [
-        BuzzPushCachedChannel(
+        KuraPushCachedChannel(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           channelID: Self.channelID,
@@ -240,10 +240,10 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
       content: "Stale cache still presents"
     )
     let relayPubkey = try Self.pubkey(for: Self.relayPrivateKey)
-    let staleAt = Self.now - Int(BuzzPushPresentationCacheStore.freshnessLifetime) - 1
-    let snapshot = BuzzPushPresentationCacheSnapshot(
+    let staleAt = Self.now - Int(KuraPushPresentationCacheStore.freshnessLifetime) - 1
+    let snapshot = KuraPushPresentationCacheSnapshot(
       profiles: [
-        BuzzPushCachedProfile(
+        KuraPushCachedProfile(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           pubkey: message.pubkey,
@@ -256,7 +256,7 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
         )
       ],
       channels: [
-        BuzzPushCachedChannel(
+        KuraPushCachedChannel(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           channelID: Self.channelID,
@@ -318,10 +318,10 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
       kind: 39_000,
       tags: [["d", Self.channelID], ["name", "Older General"]]
     )
-    let staleAt = Self.now - Int(BuzzPushPresentationCacheStore.freshnessLifetime) - 1
-    let snapshot = BuzzPushPresentationCacheSnapshot(
+    let staleAt = Self.now - Int(KuraPushPresentationCacheStore.freshnessLifetime) - 1
+    let snapshot = KuraPushPresentationCacheSnapshot(
       profiles: [
-        BuzzPushCachedProfile(
+        KuraPushCachedProfile(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           pubkey: message.pubkey,
@@ -334,7 +334,7 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
         )
       ],
       channels: [
-        BuzzPushCachedChannel(
+        KuraPushCachedChannel(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           channelID: Self.channelID,
@@ -394,10 +394,10 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
       content: #"{"display_name":"Unexpected Alice"}"#
     )
     let relayMetadataPubkey = try Self.pubkey(for: Self.relayPrivateKey)
-    let staleAt = Self.now - Int(BuzzPushPresentationCacheStore.freshnessLifetime) - 1
-    let snapshot = BuzzPushPresentationCacheSnapshot(
+    let staleAt = Self.now - Int(KuraPushPresentationCacheStore.freshnessLifetime) - 1
+    let snapshot = KuraPushPresentationCacheSnapshot(
       profiles: [
-        BuzzPushCachedProfile(
+        KuraPushCachedProfile(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           pubkey: message.pubkey,
@@ -410,7 +410,7 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
         )
       ],
       channels: [
-        BuzzPushCachedChannel(
+        KuraPushCachedChannel(
           communityID: "community-id",
           relayOrigin: "https://relay.example",
           channelID: Self.channelID,
@@ -585,7 +585,7 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
       }
       var oversized = Data(
         repeating: 0x20,
-        count: BuzzPushNotificationResolver.maximumPresentationResponseBytes
+        count: KuraPushNotificationResolver.maximumPresentationResponseBytes
       )
       oversized.append(try JSONEncoder().encode([profile]))
       return Self.response(request, status: 200, data: oversized)
@@ -635,7 +635,7 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
     let presentationData = try JSONEncoder().encode([profile])
     XCTAssertLessThan(
       presentationData.count,
-      BuzzPushNotificationResolver.maximumPresentationResponseBytes
+      KuraPushNotificationResolver.maximumPresentationResponseBytes
     )
     URLProtocolStub.handler = { request in
       Self.response(
@@ -681,10 +681,10 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
     privateKeys: [String: String] = ["community-id": privateKey],
     presentationCacheData: Data? = nil,
     now: Date = Date()
-  ) -> BuzzPushNotificationResolver {
+  ) -> KuraPushNotificationResolver {
     let configuration = URLSessionConfiguration.ephemeral
     configuration.protocolClasses = [URLProtocolStub.self]
-    return BuzzPushNotificationResolver(
+    return KuraPushNotificationResolver(
       session: URLSession(configuration: configuration),
       loadCommunitiesData: { communitiesData },
       loadPrivateKey: { privateKeys[$0] },
@@ -693,9 +693,9 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
     )
   }
 
-  func resolve(_ resolver: BuzzPushNotificationResolver) -> BuzzPushResolution? {
+  func resolve(_ resolver: KuraPushNotificationResolver) -> KuraPushResolution? {
     let completed = expectation(description: "resolver completed")
-    var result: BuzzPushResolution?
+    var result: KuraPushResolution?
     resolver.resolve {
       result = $0
       completed.fulfill()
@@ -752,7 +752,7 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
   }
 
   private static let fixtureEvent = #"""
-    {"kind":9,"created_at":1785551670,"tags":[["h","123e4567-e89b-42d3-a456-426614174000"]],"content":"  Hello   [Buzz](https://buzz.block.xyz)  ","pubkey":"c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5","id":"233ccf24ec7c94808f9ef08b0c986b6df1bc3843ff72a9f8d016e2a77c77429b","sig":"d39dcd413839b872ed75a979b2c1542247fde636709966905c9e424e227a43897dc67b71ec84178a3faad0634f9bcdf0b48a56ebac84a2ac6e58124b8b6476e6"}
+    {"kind":9,"created_at":1785551670,"tags":[["h","123e4567-e89b-42d3-a456-426614174000"]],"content":"  Hello   [Kura](https://buzz.block.xyz)  ","pubkey":"c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5","id":"233ccf24ec7c94808f9ef08b0c986b6df1bc3843ff72a9f8d016e2a77c77429b","sig":"d39dcd413839b872ed75a979b2c1542247fde636709966905c9e424e227a43897dc67b71ec84178a3faad0634f9bcdf0b48a56ebac84a2ac6e58124b8b6476e6"}
     """#
 
   static func response(
@@ -777,7 +777,7 @@ final class BuzzPushNotificationResolverTests: XCTestCase {
 
   static func memberDigests(_ pubkeys: [String]) -> [String] {
     pubkeys.map {
-      BuzzPushPresentationIdentity.channelMember(
+      KuraPushPresentationIdentity.channelMember(
         communityID: "community-id",
         channelID: channelID,
         pubkey: $0

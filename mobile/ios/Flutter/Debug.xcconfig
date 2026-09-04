@@ -8,14 +8,14 @@ SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) DEBUG
 // `BUNDLE_IDENTIFIER = your.app.id` (gitignored).
 BUNDLE_IDENTIFIER = pro.oute.kura.dogfood.mobile
 APP_DISPLAY_NAME = Kura
-BUZZ_DEVELOPMENT_TEAM = JMTDPW9CG3
+KURA_DEVELOPMENT_TEAM = JMTDPW9CG3
 
 // Push support is always present in the iOS artifact. The current relay's
 // fully validated NIP-11 descriptor is the runtime activation authority.
-BUZZ_APP_GROUP_IDENTIFIER = group.$(BUNDLE_IDENTIFIER)
-BUZZ_KEYCHAIN_ACCESS_GROUP = $(BUNDLE_IDENTIFIER)
-BUZZ_IOS_PUSH_ENVIRONMENT = development
-BUZZ_APP_ATTEST_ENVIRONMENT = development
+KURA_APP_GROUP_IDENTIFIER = group.$(BUNDLE_IDENTIFIER)
+KURA_KEYCHAIN_ACCESS_GROUP = $(BUNDLE_IDENTIFIER)
+KURA_IOS_PUSH_ENVIRONMENT = development
+KURA_APP_ATTEST_ENVIRONMENT = development
 
 // Worktree-aware debug identity (gitignored, written by
 // scripts/mobile-worktree-overrides.sh): a per-worktree bundle identifier

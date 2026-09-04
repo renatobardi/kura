@@ -2,7 +2,7 @@ import Foundation
 
 /// A stable destination attached by the notification service extension after
 /// it resolves and verifies the event that produced a push wake.
-public struct BuzzPushNavigationTarget: Codable, Equatable, Sendable {
+public struct KuraPushNavigationTarget: Codable, Equatable, Sendable {
   public static let userInfoKey = "buzz_push_navigation"
 
   public let eventID: String
@@ -26,7 +26,7 @@ public struct BuzzPushNavigationTarget: Codable, Equatable, Sendable {
   /// Decodes a target without trusting other fields from the APNs payload.
   public static func decodeIfPresent(
     from userInfo: [AnyHashable: Any]
-  ) -> BuzzPushNavigationTarget? {
+  ) -> KuraPushNavigationTarget? {
     guard let raw = userInfo[userInfoKey] as? [String: Any],
       raw.count == 3,
       let eventID = raw["event_id"] as? String,
@@ -38,7 +38,7 @@ public struct BuzzPushNavigationTarget: Codable, Equatable, Sendable {
     else {
       return nil
     }
-    return BuzzPushNavigationTarget(
+    return KuraPushNavigationTarget(
       eventID: eventID,
       communityID: communityID,
       channelID: channelID
@@ -49,25 +49,25 @@ public struct BuzzPushNavigationTarget: Codable, Equatable, Sendable {
 
 /// Thread-safe one-item buffer spanning notification delivery and Flutter
 /// engine startup during a cold notification launch.
-public final class BuzzPushNavigationBuffer: @unchecked Sendable {
+public final class KuraPushNavigationBuffer: @unchecked Sendable {
   private let lock = NSLock()
-  private var target: BuzzPushNavigationTarget?
+  private var target: KuraPushNavigationTarget?
 
   public init() {}
 
-  public func record(_ target: BuzzPushNavigationTarget) {
+  public func record(_ target: KuraPushNavigationTarget) {
     lock.lock()
     self.target = target
     lock.unlock()
   }
 
-  public func peek() -> BuzzPushNavigationTarget? {
+  public func peek() -> KuraPushNavigationTarget? {
     lock.lock()
     defer { lock.unlock() }
     return target
   }
 
-  public func take() -> BuzzPushNavigationTarget? {
+  public func take() -> KuraPushNavigationTarget? {
     lock.lock()
     defer { lock.unlock() }
     let current = target
@@ -75,7 +75,7 @@ public final class BuzzPushNavigationBuffer: @unchecked Sendable {
     return current
   }
 
-  public func remove(ifMatching expected: BuzzPushNavigationTarget) {
+  public func remove(ifMatching expected: KuraPushNavigationTarget) {
     lock.lock()
     defer { lock.unlock() }
     if target == expected {

@@ -3,13 +3,13 @@ import Foundation
 import Security
 import XCTest
 
-@testable import BuzzPushKit
+@testable import KuraPushKit
 
 #if canImport(FoundationNetworking)
   import FoundationNetworking
 #endif
 
-final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
+final class KuraDevPushEnrollmentDriverTests: XCTestCase {
   private static let gatewayURL = URL(string: "http://push.example/")!
   private static let relayURL = URL(string: "wss://relay.example/")!
   private static let relayPubkey = String(repeating: "a", count: 64)
@@ -141,7 +141,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
     )
     XCTAssertEqual(
       record,
-      BuzzPushEndpointGrantRecord(
+      KuraPushEndpointGrantRecord(
         relayOrigin: "wss://relay.example",
         relayPubkey: Self.relayPubkey,
         relayMetadataPubkey: Self.relayPubkey,
@@ -379,7 +379,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
         .utf8
     )
 
-    let record = try JSONDecoder().decode(BuzzPushEndpointGrantRecord.self, from: data)
+    let record = try JSONDecoder().decode(KuraPushEndpointGrantRecord.self, from: data)
 
     XCTAssertEqual(record.relayPubkey, Self.relayPubkey)
     XCTAssertNil(record.relayMetadataPubkey)
@@ -387,7 +387,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
 
   func testRealAppAttestFailsLoudlyWhenUnsupported() async throws {
     let service = RecordingDCAppAttestService(isSupported: false)
-    let provider = BuzzDCAppAttestProvider(
+    let provider = KuraDCAppAttestProvider(
       service: service,
       keyIdStore: MemoryAppAttestKeyIdStore(keyId: Self.keyId)
     )
@@ -396,7 +396,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
       _ = try await provider.prepareAttestation()
       XCTFail("Expected App Attest to be unavailable")
     } catch {
-      XCTAssertEqual(error as? BuzzDevPushEnrollmentError, .appAttestUnsupported)
+      XCTAssertEqual(error as? KuraDevPushEnrollmentError, .appAttestUnsupported)
     }
     XCTAssertEqual(service.generateKeyCallCount, 0)
   }
@@ -407,13 +407,13 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
       attestationObject: Data([0x01, 0x02, 0x03])
     )
     let keyIdStore = MemoryAppAttestKeyIdStore()
-    let provider = BuzzDCAppAttestProvider(service: service, keyIdStore: keyIdStore)
+    let provider = KuraDCAppAttestProvider(service: service, keyIdStore: keyIdStore)
     let clientData = Data("enrollment transcript".utf8)
 
     let prepared = try await provider.prepareAttestation()
     let attestation = try await provider.attestation(prepared, clientData: clientData)
 
-    XCTAssertEqual(prepared, BuzzDevAttestation(keyId: Self.keyId, attestation: ""))
+    XCTAssertEqual(prepared, KuraDevAttestation(keyId: Self.keyId, attestation: ""))
     XCTAssertEqual(keyIdStore.savedKeyIds, [Self.keyId])
     XCTAssertEqual(attestation.keyId, Self.keyId)
     XCTAssertEqual(attestation.attestation, Data([0x01, 0x02, 0x03]).base64EncodedString())
@@ -427,7 +427,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
   func testRealAppAttestAssertionReusesStoredKeyAndMapsObject() async throws {
     let service = RecordingDCAppAttestService(assertionObject: Data([0x04, 0x05, 0x06]))
     let keyIdStore = MemoryAppAttestKeyIdStore(keyId: Self.keyId)
-    let provider = BuzzDCAppAttestProvider(service: service, keyIdStore: keyIdStore)
+    let provider = KuraDCAppAttestProvider(service: service, keyIdStore: keyIdStore)
     let clientData = Data("delegation transcript".utf8)
 
     let assertion = try await provider.assertion(clientData: clientData)
@@ -450,13 +450,13 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
     ] {
       let service = RecordingDCAppAttestService(generatedKeyId: invalidKeyId)
       let keyIdStore = MemoryAppAttestKeyIdStore()
-      let provider = BuzzDCAppAttestProvider(service: service, keyIdStore: keyIdStore)
+      let provider = KuraDCAppAttestProvider(service: service, keyIdStore: keyIdStore)
 
       do {
         _ = try await provider.prepareAttestation()
         XCTFail("Accepted invalid generated key ID: \(invalidKeyId)")
       } catch {
-        XCTAssertEqual(error as? BuzzDevPushEnrollmentError, .invalidAppAttestKeyId)
+        XCTAssertEqual(error as? KuraDevPushEnrollmentError, .invalidAppAttestKeyId)
       }
       XCTAssertTrue(keyIdStore.savedKeyIds.isEmpty)
     }
@@ -465,17 +465,17 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
   func testRealAppAttestRejectsMismatchedPreparedKey() async throws {
     let service = RecordingDCAppAttestService()
     let keyIdStore = MemoryAppAttestKeyIdStore(keyId: Self.keyId)
-    let provider = BuzzDCAppAttestProvider(service: service, keyIdStore: keyIdStore)
+    let provider = KuraDCAppAttestProvider(service: service, keyIdStore: keyIdStore)
     let otherKeyId = Data(repeating: 0xBB, count: 32).base64EncodedString()
 
     do {
       _ = try await provider.attestation(
-        BuzzDevAttestation(keyId: otherKeyId, attestation: ""),
+        KuraDevAttestation(keyId: otherKeyId, attestation: ""),
         clientData: Data("enrollment transcript".utf8)
       )
       XCTFail("Expected the prepared key ID to match persistent state")
     } catch {
-      XCTAssertEqual(error as? BuzzDevPushEnrollmentError, .invalidAppAttestKeyId)
+      XCTAssertEqual(error as? KuraDevPushEnrollmentError, .invalidAppAttestKeyId)
     }
     XCTAssertTrue(service.attestedKeyIds.isEmpty)
   }
@@ -483,7 +483,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
   func testRealAppAttestForwardsServiceErrors() async throws {
     let expected = NSError(domain: "DeviceCheckTest", code: 41)
     let service = RecordingDCAppAttestService(error: expected)
-    let provider = BuzzDCAppAttestProvider(
+    let provider = KuraDCAppAttestProvider(
       service: service,
       keyIdStore: MemoryAppAttestKeyIdStore(keyId: Self.keyId)
     )
@@ -499,7 +499,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
 
   func testKeychainStoreReadsKeyIdAndIncludesAccessGroup() throws {
     var capturedQuery: [String: Any] = [:]
-    let store = BuzzAppAttestKeyIdKeychainStore(
+    let store = KuraAppAttestKeyIdKeychainStore(
       accessGroup: "group.buzz",
       copyMatching: { query, result in
         capturedQuery = query as! [String: Any]
@@ -519,7 +519,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
   }
 
   func testKeychainStoreReturnsNilOnMissAndRejectsInvalidData() throws {
-    let missing = BuzzAppAttestKeyIdKeychainStore(
+    let missing = KuraAppAttestKeyIdKeychainStore(
       accessGroup: nil,
       copyMatching: { _, _ in errSecItemNotFound }
     )
@@ -531,7 +531,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
       Data(repeating: 0xAA, count: 31).base64EncodedString(),
       Data(repeating: 0xAA, count: 33).base64EncodedString(),
     ] {
-      let invalid = BuzzAppAttestKeyIdKeychainStore(
+      let invalid = KuraAppAttestKeyIdKeychainStore(
         accessGroup: nil,
         copyMatching: { _, result in
           result?.pointee = Data(invalidKeyId.utf8) as CFData
@@ -539,7 +539,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
         }
       )
       XCTAssertThrowsError(try invalid.keyId(), "Accepted invalid key ID: \(invalidKeyId)") {
-        XCTAssertEqual($0 as? BuzzDevPushEnrollmentError, .invalidAppAttestKeyId)
+        XCTAssertEqual($0 as? KuraDevPushEnrollmentError, .invalidAppAttestKeyId)
       }
     }
   }
@@ -548,7 +548,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
     var updatedQuery: [String: Any] = [:]
     var updatedValues: [String: Any] = [:]
     var addCallCount = 0
-    let store = BuzzAppAttestKeyIdKeychainStore(
+    let store = KuraAppAttestKeyIdKeychainStore(
       accessGroup: nil,
       update: { query, values in
         updatedQuery = query as! [String: Any]
@@ -570,7 +570,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
 
   func testKeychainStoreAddsMissingKeyIdWithDeviceOnlyAccessibility() throws {
     var addedItem: [String: Any] = [:]
-    let store = BuzzAppAttestKeyIdKeychainStore(
+    let store = KuraAppAttestKeyIdKeychainStore(
       accessGroup: "group.buzz",
       update: { _, _ in errSecItemNotFound },
       add: { item, _ in
@@ -590,7 +590,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
   }
 
   func testKeychainStoreSurfacesReadUpdateAndAddErrors() throws {
-    let readFailure = BuzzAppAttestKeyIdKeychainStore(
+    let readFailure = KuraAppAttestKeyIdKeychainStore(
       accessGroup: nil,
       copyMatching: { _, _ in errSecInteractionNotAllowed }
     )
@@ -598,7 +598,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
       XCTAssertEqual(($0 as NSError).code, Int(errSecInteractionNotAllowed))
     }
 
-    let updateFailure = BuzzAppAttestKeyIdKeychainStore(
+    let updateFailure = KuraAppAttestKeyIdKeychainStore(
       accessGroup: nil,
       update: { _, _ in errSecInteractionNotAllowed }
     )
@@ -606,7 +606,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
       XCTAssertEqual(($0 as NSError).code, Int(errSecInteractionNotAllowed))
     }
 
-    let addFailure = BuzzAppAttestKeyIdKeychainStore(
+    let addFailure = KuraAppAttestKeyIdKeychainStore(
       accessGroup: nil,
       update: { _, _ in errSecItemNotFound },
       add: { _, _ in errSecDuplicateItem }
@@ -617,7 +617,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
   }
 
   func testReusesPersistedUnexpiredGrant() async throws {
-    let existing = BuzzPushEndpointGrantRecord(
+    let existing = KuraPushEndpointGrantRecord(
       relayOrigin: "wss://relay.example",
       relayPubkey: Self.relayPubkey,
       relayMetadataPubkey: Self.relayPubkey,
@@ -657,7 +657,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
   }
 
   func testSecondOriginOnSameRelayKeyReusesGrantWithFreshLeaseAddress() async throws {
-    let existing = BuzzPushEndpointGrantRecord(
+    let existing = KuraPushEndpointGrantRecord(
       relayOrigin: "wss://first.example",
       relayPubkey: Self.relayPubkey,
       relayMetadataPubkey: Self.relayPubkey,
@@ -702,7 +702,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
 
   func testSecondRelayKeyReusesAttestedInstallationAndCreatesOnlyDelegation() async throws {
     let secondRelayPubkey = String(repeating: "b", count: 64)
-    let existing = BuzzPushEndpointGrantRecord(
+    let existing = KuraPushEndpointGrantRecord(
       relayOrigin: "wss://first.example",
       relayPubkey: Self.relayPubkey,
       relayMetadataPubkey: Self.relayPubkey,
@@ -772,7 +772,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
   }
 
   func testExpiringGrantRenewsExistingInstallationAndReusesRelayLeaseAddress() async throws {
-    let existing = BuzzPushEndpointGrantRecord(
+    let existing = KuraPushEndpointGrantRecord(
       relayOrigin: "wss://relay.example",
       relayPubkey: Self.relayPubkey,
       relayMetadataPubkey: Self.relayPubkey,
@@ -868,7 +868,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
       _ = try await driver.enroll(deviceToken: Data([1]), relayURL: Self.relayURL)
       XCTFail("Expected an invalid relay descriptor")
     } catch {
-      XCTAssertEqual(error as? BuzzDevPushEnrollmentError, .invalidRelayDescriptor)
+      XCTAssertEqual(error as? KuraDevPushEnrollmentError, .invalidRelayDescriptor)
     }
     XCTAssertEqual(URLProtocolStub.requests.count, 1)
   }
@@ -877,7 +877,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
     let pushPubkey = String(repeating: "b", count: 64)
     let oldMetadataPubkey = String(repeating: "c", count: 64)
     let deviceToken = Data((1...32).map(UInt8.init))
-    let existing = BuzzPushEndpointGrantRecord(
+    let existing = KuraPushEndpointGrantRecord(
       relayOrigin: "wss://relay.example",
       relayPubkey: pushPubkey,
       relayMetadataPubkey: oldMetadataPubkey,
@@ -918,7 +918,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
 
   func testMissingRelayMetadataAuthorityDoesNotBlockExistingPushGrant() async throws {
     let deviceToken = Data((1...32).map(UInt8.init))
-    let existing = BuzzPushEndpointGrantRecord(
+    let existing = KuraPushEndpointGrantRecord(
       relayOrigin: "wss://relay.example",
       relayPubkey: Self.relayPubkey,
       relayMetadataPubkey: Self.relayPubkey,
@@ -955,7 +955,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
 
   func testMalformedRelayMetadataAuthorityDoesNotBlockExistingPushGrant() async throws {
     let deviceToken = Data((1...32).map(UInt8.init))
-    let existing = BuzzPushEndpointGrantRecord(
+    let existing = KuraPushEndpointGrantRecord(
       relayOrigin: "wss://relay.example",
       relayPubkey: Self.relayPubkey,
       relayMetadataPubkey: Self.relayPubkey,
@@ -1010,7 +1010,7 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
     do {
       _ = try await driver.enroll(deviceToken: Data([1]), relayURL: Self.relayURL)
       XCTFail("Expected the gateway error")
-    } catch let error as BuzzDevPushEnrollmentError {
+    } catch let error as KuraDevPushEnrollmentError {
       XCTAssertEqual(
         error,
         .unexpectedStatus(
@@ -1024,15 +1024,15 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
   }
 
   private func makeDriver(
-    store: BuzzPushEndpointGrantStore,
-    appAttest: BuzzDevAppAttesting,
+    store: KuraPushEndpointGrantStore,
+    appAttest: KuraDevAppAttesting,
     installationIdBytes: @escaping () throws -> Data = {
       Data(0..<16)
     }
-  ) throws -> BuzzDevPushEnrollmentDriver {
+  ) throws -> KuraDevPushEnrollmentDriver {
     let configuration = URLSessionConfiguration.ephemeral
     configuration.protocolClasses = [URLProtocolStub.self]
-    return try BuzzDevPushEnrollmentDriver(
+    return try KuraDevPushEnrollmentDriver(
       gatewayBaseURL: Self.gatewayURL,
       store: store,
       session: URLSession(configuration: configuration),
@@ -1144,19 +1144,19 @@ final class BuzzDevPushEnrollmentDriverTests: XCTestCase {
   }
 }
 
-private final class MemoryGrantStore: BuzzPushEndpointGrantStore {
-  var saved: [BuzzPushEndpointGrantRecord]
-  var pending: [BuzzPushPendingEnrollmentRecord] = []
+private final class MemoryGrantStore: KuraPushEndpointGrantStore {
+  var saved: [KuraPushEndpointGrantRecord]
+  var pending: [KuraPushPendingEnrollmentRecord] = []
   var grantSaveFailuresRemaining: Int
   init(
-    records: [BuzzPushEndpointGrantRecord] = [],
+    records: [KuraPushEndpointGrantRecord] = [],
     grantSaveFailuresRemaining: Int = 0
   ) {
     saved = records
     self.grantSaveFailuresRemaining = grantSaveFailuresRemaining
   }
-  func records() throws -> [BuzzPushEndpointGrantRecord] { saved }
-  func save(_ record: BuzzPushEndpointGrantRecord) throws {
+  func records() throws -> [KuraPushEndpointGrantRecord] { saved }
+  func save(_ record: KuraPushEndpointGrantRecord) throws {
     if grantSaveFailuresRemaining > 0 {
       grantSaveFailuresRemaining -= 1
       throw NSError(domain: "MemoryGrantStore", code: 1)
@@ -1169,12 +1169,12 @@ private final class MemoryGrantStore: BuzzPushEndpointGrantStore {
   func pendingEnrollment(
     relayOrigin: String,
     appProfile: String
-  ) throws -> BuzzPushPendingEnrollmentRecord? {
+  ) throws -> KuraPushPendingEnrollmentRecord? {
     pending.first {
       $0.relayOrigin == relayOrigin && $0.appProfile == appProfile
     }
   }
-  func savePendingEnrollment(_ record: BuzzPushPendingEnrollmentRecord) throws {
+  func savePendingEnrollment(_ record: KuraPushPendingEnrollmentRecord) throws {
     pending.removeAll {
       $0.relayOrigin == record.relayOrigin && $0.appProfile == record.appProfile
     }
@@ -1187,31 +1187,31 @@ private final class MemoryGrantStore: BuzzPushEndpointGrantStore {
   }
 }
 
-private final class RecordingAppAttest: BuzzDevAppAttesting {
+private final class RecordingAppAttest: KuraDevAppAttesting {
   var clientData: [Data] = []
 
-  func prepareAttestation() async throws -> BuzzDevAttestation {
-    BuzzDevAttestation(
-      keyId: BuzzDevPushEnrollmentDriverTests.keyId,
-      attestation: BuzzDevPushEnrollmentDriverTests.attestation
+  func prepareAttestation() async throws -> KuraDevAttestation {
+    KuraDevAttestation(
+      keyId: KuraDevPushEnrollmentDriverTests.keyId,
+      attestation: KuraDevPushEnrollmentDriverTests.attestation
     )
   }
 
   func attestation(
-    _ prepared: BuzzDevAttestation,
+    _ prepared: KuraDevAttestation,
     clientData: Data
-  ) async throws -> BuzzDevAttestation {
+  ) async throws -> KuraDevAttestation {
     self.clientData.append(clientData)
     return prepared
   }
 
   func assertion(clientData: Data) async throws -> String {
     self.clientData.append(clientData)
-    return BuzzDevPushEnrollmentDriverTests.assertion
+    return KuraDevPushEnrollmentDriverTests.assertion
   }
 }
 
-private final class MemoryAppAttestKeyIdStore: BuzzAppAttestKeyIdStoring {
+private final class MemoryAppAttestKeyIdStore: KuraAppAttestKeyIdStoring {
   var keyIdValue: String?
   var savedKeyIds: [String] = []
 
@@ -1227,7 +1227,7 @@ private final class MemoryAppAttestKeyIdStore: BuzzAppAttestKeyIdStoring {
   }
 }
 
-private final class RecordingDCAppAttestService: BuzzDCAppAttestServicing {
+private final class RecordingDCAppAttestService: KuraDCAppAttestServicing {
   let isSupported: Bool
   let generatedKeyId: String
   let attestationObject: Data
@@ -1242,7 +1242,7 @@ private final class RecordingDCAppAttestService: BuzzDCAppAttestServicing {
 
   init(
     isSupported: Bool = true,
-    generatedKeyId: String = BuzzDevPushEnrollmentDriverTests.keyId,
+    generatedKeyId: String = KuraDevPushEnrollmentDriverTests.keyId,
     attestationObject: Data = Data("attestation-object".utf8),
     assertionObject: Data = Data("assertion-object".utf8),
     error: Error? = nil

@@ -98,7 +98,7 @@ installs are never touched.
 Every iOS artifact builds and embeds the Notification Service Extension and
 native push bridge. Runtime activation is fail-closed and scoped to the current
 relay. After authenticated connectivity and a fully valid NIP-11 `nip-pl` push
-descriptor, Buzz independently requests display permission and registers with
+descriptor, Kura independently requests display permission and registers with
 APNs. Display denial or request failure does not gate the device token, gateway
 enrollment, or lease publication, so a later user opt-in can display pushes
 without rebuilding transport authority. An absent, malformed, or unreachable
@@ -113,10 +113,10 @@ For local physical-device development, override the identity and sandbox
 environments in the gitignored `mobile/ios/Flutter/AppOverrides.xcconfig`:
 
 ```xcconfig
-BUNDLE_IDENTIFIER = xyz.block.buzz.mobile
-BUZZ_DEVELOPMENT_TEAM = EYF346PHUG
-BUZZ_IOS_PUSH_ENVIRONMENT = development
-BUZZ_APP_ATTEST_ENVIRONMENT = development
+BUNDLE_IDENTIFIER = pro.oute.kura.dogfood.mobile
+KURA_DEVELOPMENT_TEAM = EYF346PHUG
+KURA_IOS_PUSH_ENVIRONMENT = development
+KURA_APP_ATTEST_ENVIRONMENT = development
 ```
 
 This exercises the client, extension, relay, and gateway integration without

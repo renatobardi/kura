@@ -1,7 +1,7 @@
 import Foundation
 
 /// Errors thrown by the canonical transcript encoder.
-public enum BuzzPushTranscriptError: Error, Equatable {
+public enum KuraPushTranscriptError: Error, Equatable {
     /// A string field contained non-ASCII scalars. NIP-PL admits only ASCII
     /// authority-bearing strings; rather than guess at UTF-8-vs-escaping
     /// behavior we fail closed.
@@ -32,7 +32,7 @@ public enum BuzzPushTranscriptError: Error, Equatable {
 /// domain-separation string, not a deployment URL: the gateway hardcodes it
 /// regardless of where it is hosted, so clients must never derive it from a
 /// discovered gateway base URL or relay host.
-public enum BuzzPushTranscript {
+public enum KuraPushTranscript {
     // MARK: Domains
 
     public static let enrollDomain = "buzz.push.enroll.v1"
@@ -218,7 +218,7 @@ public enum BuzzPushTranscript {
                 case 0x0D: out += "\\r"
                 case 0x00...0x1F: out += String(format: "\\u%04x", scalar.value)
                 case 0x20...0x7E: out.unicodeScalars.append(scalar)
-                default: throw BuzzPushTranscriptError.nonASCIIInput(field: field)
+                default: throw KuraPushTranscriptError.nonASCIIInput(field: field)
                 }
             }
             return out

@@ -1,6 +1,6 @@
 import XCTest
 
-@testable import BuzzPushKit
+@testable import KuraPushKit
 
 final class PushLeaseTests: XCTestCase {
   private let mine = String(repeating: "a", count: 64)

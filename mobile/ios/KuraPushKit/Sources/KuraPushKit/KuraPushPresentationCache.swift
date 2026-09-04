@@ -2,7 +2,7 @@ import CryptoKit
 import Foundation
 
 /// A verified sender profile retained for notification presentation.
-public struct BuzzPushCachedProfile: Codable, Equatable, Sendable {
+public struct KuraPushCachedProfile: Codable, Equatable, Sendable {
   public let communityID: String
   public let relayOrigin: String
   public let pubkey: String
@@ -37,13 +37,13 @@ public struct BuzzPushCachedProfile: Codable, Equatable, Sendable {
 }
 
 /// Verified channel metadata retained for notification presentation.
-public struct BuzzPushCachedChannel: Codable, Equatable, Sendable {
+public struct KuraPushCachedChannel: Codable, Equatable, Sendable {
   public let communityID: String
   public let relayOrigin: String
   public let channelID: String
   public let relayMetadataPubkey: String
   public let displayName: String?
-  /// Relay-verified Buzz channel type, when recognized.
+  /// Relay-verified Kura channel type, when recognized.
   public let channelType: String?
   /// Exact unique-member count when bounded, or a value above the bound when oversized.
   public let memberCount: Int?
@@ -93,19 +93,19 @@ public struct BuzzPushCachedChannel: Codable, Equatable, Sendable {
 }
 
 /// Atomic App Group snapshot shared by the app and its notification extension.
-public struct BuzzPushPresentationCacheSnapshot: Codable, Equatable, Sendable {
+public struct KuraPushPresentationCacheSnapshot: Codable, Equatable, Sendable {
   public static let currentVersion = 1
 
   public let version: Int
   public var communities: [PushLeaseCommunity]
-  public var profiles: [BuzzPushCachedProfile]
-  public var channels: [BuzzPushCachedChannel]
+  public var profiles: [KuraPushCachedProfile]
+  public var channels: [KuraPushCachedChannel]
 
   public init(
     version: Int = currentVersion,
     communities: [PushLeaseCommunity] = [],
-    profiles: [BuzzPushCachedProfile] = [],
-    channels: [BuzzPushCachedChannel] = []
+    profiles: [KuraPushCachedProfile] = [],
+    channels: [KuraPushCachedChannel] = []
   ) {
     self.version = version
     self.communities = communities
@@ -125,7 +125,7 @@ public struct BuzzPushPresentationCacheSnapshot: Codable, Equatable, Sendable {
     communityID: String,
     relayOrigin: String,
     pubkey: String
-  ) -> BuzzPushCachedProfile? {
+  ) -> KuraPushCachedProfile? {
     let normalizedPubkey = pubkey.lowercased()
     return profiles.first {
       $0.communityID == communityID && $0.relayOrigin == relayOrigin
@@ -137,7 +137,7 @@ public struct BuzzPushPresentationCacheSnapshot: Codable, Equatable, Sendable {
     communityID: String,
     relayOrigin: String,
     channelID: String
-  ) -> BuzzPushCachedChannel? {
+  ) -> KuraPushCachedChannel? {
     channels.first {
       $0.communityID == communityID && $0.relayOrigin == relayOrigin
         && $0.channelID == channelID
@@ -146,7 +146,7 @@ public struct BuzzPushPresentationCacheSnapshot: Codable, Equatable, Sendable {
 }
 
 /// One app-provided profile update, optionally carrying a sanitized local thumbnail.
-public struct BuzzPushProfileCacheUpdate: Sendable {
+public struct KuraPushProfileCacheUpdate: Sendable {
   public let event: VerifiedNostrEvent
   public let avatarPNG: Data?
 
@@ -157,7 +157,7 @@ public struct BuzzPushProfileCacheUpdate: Sendable {
 }
 
 /// Maintains the bounded presentation snapshot. The app is the sole writer.
-public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
+public final class KuraPushPresentationCacheStore: @unchecked Sendable {
   public static let fileName = "push-snapshot.json"
   public static let freshnessLifetime: TimeInterval = 24 * 60 * 60
   public static let maximumProfiles = 256
@@ -197,7 +197,7 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
   public func updateProfiles(
     communityID: String,
     relayOrigin: String,
-    updates: [BuzzPushProfileCacheUpdate]
+    updates: [KuraPushProfileCacheUpdate]
   ) throws -> Set<String> {
     guard Self.isBoundedOpaqueID(communityID),
       let canonicalRelayOrigin = Self.canonicalRelayOrigin(relayOrigin),
@@ -234,7 +234,7 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
       let preservedAvatar =
         existing?.pictureHash == metadata.pictureHash
         ? existing?.avatarPNG : nil
-      let entry = BuzzPushCachedProfile(
+      let entry = KuraPushCachedProfile(
         communityID: communityID,
         relayOrigin: canonicalRelayOrigin,
         pubkey: pubkey,
@@ -311,7 +311,7 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
           )
       else { continue }
 
-      let entry = BuzzPushCachedChannel(
+      let entry = KuraPushCachedChannel(
         communityID: communityID,
         relayOrigin: canonicalRelayOrigin,
         channelID: channelID,
@@ -362,7 +362,7 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
         )
       else { continue }
 
-      snapshot.channels[index] = BuzzPushCachedChannel(
+      snapshot.channels[index] = KuraPushCachedChannel(
         communityID: existing.communityID,
         relayOrigin: existing.relayOrigin,
         channelID: existing.channelID,
@@ -414,7 +414,7 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
       && snapshot.profiles[index].avatarPNG != normalizedPNG
     {
       let profile = snapshot.profiles[index]
-      snapshot.profiles[index] = BuzzPushCachedProfile(
+      snapshot.profiles[index] = KuraPushCachedProfile(
         communityID: profile.communityID,
         relayOrigin: profile.relayOrigin,
         pubkey: profile.pubkey,
@@ -433,15 +433,15 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
     return true
   }
 
-  private func loadLocked() -> BuzzPushPresentationCacheSnapshot {
+  private func loadLocked() -> KuraPushPresentationCacheSnapshot {
     guard let values = try? fileURL.resourceValues(forKeys: [.fileSizeKey]),
       let fileSize = values.fileSize,
       fileSize <= Self.maximumSnapshotBytes
-    else { return BuzzPushPresentationCacheSnapshot() }
-    return BuzzPushPresentationCacheSnapshot.decode(try? Data(contentsOf: fileURL))
+    else { return KuraPushPresentationCacheSnapshot() }
+    return KuraPushPresentationCacheSnapshot.decode(try? Data(contentsOf: fileURL))
   }
 
-  private func writeLocked(_ snapshot: BuzzPushPresentationCacheSnapshot) throws {
+  private func writeLocked(_ snapshot: KuraPushPresentationCacheSnapshot) throws {
     let data = try Self.encodedBoundedSnapshot(snapshot)
     try data.write(to: fileURL, options: [.atomic])
     #if os(iOS)
@@ -453,7 +453,7 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
   }
 
   static func encodedBoundedSnapshot(
-    _ snapshot: BuzzPushPresentationCacheSnapshot
+    _ snapshot: KuraPushPresentationCacheSnapshot
   ) throws -> Data {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys]
@@ -548,7 +548,7 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
       exceededMemberBound
       ? nil
       : pubkeys.map {
-        BuzzPushPresentationIdentity.channelMember(
+        KuraPushPresentationIdentity.channelMember(
           communityID: communityID,
           channelID: channelID,
           pubkey: $0
@@ -636,7 +636,7 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
       || (candidateCreatedAt == existingCreatedAt && candidateID <= existingID)
   }
 
-  static func enforceBounds(_ snapshot: inout BuzzPushPresentationCacheSnapshot) {
+  static func enforceBounds(_ snapshot: inout KuraPushPresentationCacheSnapshot) {
     snapshot.communities = Array(snapshot.communities.prefix(maximumCommunities))
     snapshot.profiles = Array(
       snapshot.profiles.sorted(by: profileNewestFirst).prefix(maximumProfiles)
@@ -656,7 +656,7 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
   }
 
   private static func enforceChannelCountBound(
-    _ snapshot: inout BuzzPushPresentationCacheSnapshot
+    _ snapshot: inout KuraPushPresentationCacheSnapshot
   ) {
     snapshot.channels = Array(
       snapshot.channels.sorted(by: channelNewestFirst).prefix(maximumChannels)
@@ -664,7 +664,7 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
   }
 
   private static func enforceMemberDigestBound(
-    _ snapshot: inout BuzzPushPresentationCacheSnapshot
+    _ snapshot: inout KuraPushPresentationCacheSnapshot
   ) {
     snapshot.channels.sort(by: channelNewestFirst)
     var memberDigestCount = snapshot.channels.reduce(0) {
@@ -680,9 +680,9 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
   }
 
   private static func removingAvatar(
-    from profile: BuzzPushCachedProfile
-  ) -> BuzzPushCachedProfile {
-    BuzzPushCachedProfile(
+    from profile: KuraPushCachedProfile
+  ) -> KuraPushCachedProfile {
+    KuraPushCachedProfile(
       communityID: profile.communityID,
       relayOrigin: profile.relayOrigin,
       pubkey: profile.pubkey,
@@ -696,9 +696,9 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
   }
 
   private static func removingMemberDigests(
-    from channel: BuzzPushCachedChannel
-  ) -> BuzzPushCachedChannel {
-    BuzzPushCachedChannel(
+    from channel: KuraPushCachedChannel
+  ) -> KuraPushCachedChannel {
+    KuraPushCachedChannel(
       communityID: channel.communityID,
       relayOrigin: channel.relayOrigin,
       channelID: channel.channelID,
@@ -718,7 +718,7 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
 
   private static func removeOldestEntries(
     _ count: Int,
-    from snapshot: inout BuzzPushPresentationCacheSnapshot
+    from snapshot: inout KuraPushPresentationCacheSnapshot
   ) {
     for _ in 0..<count {
       switch (snapshot.profiles.last, snapshot.channels.last) {
@@ -739,28 +739,28 @@ public final class BuzzPushPresentationCacheStore: @unchecked Sendable {
   }
 
   private static func profileNewestFirst(
-    _ lhs: BuzzPushCachedProfile,
-    _ rhs: BuzzPushCachedProfile
+    _ lhs: KuraPushCachedProfile,
+    _ rhs: KuraPushCachedProfile
   ) -> Bool {
     lhs.cachedAt == rhs.cachedAt ? lhs.eventID > rhs.eventID : lhs.cachedAt > rhs.cachedAt
   }
 
   private static func channelNewestFirst(
-    _ lhs: BuzzPushCachedChannel,
-    _ rhs: BuzzPushCachedChannel
+    _ lhs: KuraPushCachedChannel,
+    _ rhs: KuraPushCachedChannel
   ) -> Bool {
     let lhsCachedAt = channelLastCachedAt(lhs)
     let rhsCachedAt = channelLastCachedAt(rhs)
     return lhsCachedAt == rhsCachedAt ? lhs.eventID > rhs.eventID : lhsCachedAt > rhsCachedAt
   }
 
-  private static func channelLastCachedAt(_ channel: BuzzPushCachedChannel) -> Int {
+  private static func channelLastCachedAt(_ channel: KuraPushCachedChannel) -> Int {
     max(channel.cachedAt, channel.membershipCachedAt ?? 0)
   }
 }
 
 /// Stable, privacy-preserving identifiers used only after the NSE resolves an event.
-public enum BuzzPushPresentationIdentity {
+public enum KuraPushPresentationIdentity {
   public static func conversation(communityID: String, channelID: String) -> String {
     scoped(namespace: "conversation", values: [communityID, channelID])
   }

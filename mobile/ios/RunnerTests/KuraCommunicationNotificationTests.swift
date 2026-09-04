@@ -1,11 +1,11 @@
-import BuzzPushKit
+import KuraPushKit
 import Intents
 import UserNotifications
 import XCTest
 
-@testable import Buzz
+@testable import Kura
 
-final class BuzzCommunicationNotificationTests: XCTestCase {
+final class KuraCommunicationNotificationTests: XCTestCase {
   func testIntentUsesVerifiedSenderAvatarAndGroupName() throws {
     let resolution = communicationResolution(
       displayName: "Alice",
@@ -13,16 +13,16 @@ final class BuzzCommunicationNotificationTests: XCTestCase {
       avatarPNG: Data([0x89, 0x50, 0x4E, 0x47])
     )
     let descriptor = try XCTUnwrap(
-      BuzzCommunicationNotificationDescriptor(resolution: resolution)
+      KuraCommunicationNotificationDescriptor(resolution: resolution)
     )
 
-    let intent = BuzzCommunicationNotificationPresenter.makeIntent(descriptor)
+    let intent = KuraCommunicationNotificationPresenter.makeIntent(descriptor)
 
     XCTAssertEqual(intent.sender?.displayName, "Alice")
     XCTAssertEqual(intent.sender?.customIdentifier, descriptor.senderIdentifier)
     XCTAssertNotNil(intent.sender?.image)
     XCTAssertNotNil(intent.image(forParameterNamed: \.speakableGroupName))
-    XCTAssertEqual(intent.content, "Hello Buzz")
+    XCTAssertEqual(intent.content, "Hello Kura")
     XCTAssertEqual(intent.speakableGroupName?.spokenPhrase, "General")
     XCTAssertEqual(intent.conversationIdentifier, resolution.conversationIdentifier)
     XCTAssertNil(intent.recipients)
@@ -40,10 +40,10 @@ final class BuzzCommunicationNotificationTests: XCTestCase {
       avatarPNG: Data([0x89, 0x50, 0x4E, 0x47])
     )
     let descriptor = try XCTUnwrap(
-      BuzzCommunicationNotificationDescriptor(resolution: resolution)
+      KuraCommunicationNotificationDescriptor(resolution: resolution)
     )
 
-    let intent = BuzzCommunicationNotificationPresenter.makeIntent(descriptor)
+    let intent = KuraCommunicationNotificationPresenter.makeIntent(descriptor)
 
     XCTAssertEqual(intent.sender?.displayName, "Alice")
     XCTAssertNotNil(intent.sender?.image)
@@ -54,7 +54,7 @@ final class BuzzCommunicationNotificationTests: XCTestCase {
 
   func testMissingVerifiedRecipientCountUsesOrdinaryPresentation() {
     XCTAssertNil(
-      BuzzCommunicationNotificationDescriptor(
+      KuraCommunicationNotificationDescriptor(
         resolution: communicationResolution(recipientCount: nil)
       )
     )
@@ -63,9 +63,9 @@ final class BuzzCommunicationNotificationTests: XCTestCase {
   func testPresentationFallsBackWhenDonationFails() {
     let ordinary = UNMutableNotificationContent()
     ordinary.title = "Alice"
-    ordinary.body = "Hello Buzz"
+    ordinary.body = "Hello Kura"
     var updateCalled = false
-    let presenter = BuzzCommunicationNotificationPresenter(
+    let presenter = KuraCommunicationNotificationPresenter(
       donate: { _, completion in
         completion(NSError(domain: "test", code: 1))
       },
@@ -81,7 +81,7 @@ final class BuzzCommunicationNotificationTests: XCTestCase {
       resolution: communicationResolution()
     ) { content in
       XCTAssertEqual(content.title, "Alice")
-      XCTAssertEqual(content.body, "Hello Buzz")
+      XCTAssertEqual(content.body, "Hello Kura")
       completed.fulfill()
     }
 
@@ -93,7 +93,7 @@ final class BuzzCommunicationNotificationTests: XCTestCase {
     let ordinary = UNMutableNotificationContent()
     ordinary.title = "Alice"
     var order: [String] = []
-    let presenter = BuzzCommunicationNotificationPresenter(
+    let presenter = KuraCommunicationNotificationPresenter(
       donate: { _, completion in
         order.append("donate")
         completion(nil)
@@ -122,8 +122,8 @@ final class BuzzCommunicationNotificationTests: XCTestCase {
   func testPresentationFallsBackWhenSpecializationFails() {
     let ordinary = UNMutableNotificationContent()
     ordinary.title = "Alice"
-    ordinary.body = "Hello Buzz"
-    let presenter = BuzzCommunicationNotificationPresenter(
+    ordinary.body = "Hello Kura"
+    let presenter = KuraCommunicationNotificationPresenter(
       donate: { _, completion in completion(nil) },
       updateContent: { _, _ in throw NSError(domain: "test", code: 2) }
     )
@@ -134,7 +134,7 @@ final class BuzzCommunicationNotificationTests: XCTestCase {
       resolution: communicationResolution()
     ) { content in
       XCTAssertEqual(content.title, "Alice")
-      XCTAssertEqual(content.body, "Hello Buzz")
+      XCTAssertEqual(content.body, "Hello Kura")
       completed.fulfill()
     }
 
@@ -146,25 +146,25 @@ final class BuzzCommunicationNotificationTests: XCTestCase {
     groupName: String? = "General",
     avatarPNG: Data? = nil,
     recipientCount: Int? = 1
-  ) -> BuzzPushResolution {
+  ) -> KuraPushResolution {
     let communityID = "community-id"
     let channelID = "channel/general:v5"
-    return BuzzPushResolution(
+    return KuraPushResolution(
       title: displayName,
-      body: "Hello Buzz",
+      body: "Hello Kura",
       subtitle: "Community",
-      threadIdentifier: BuzzPushPresentationIdentity.conversation(
+      threadIdentifier: KuraPushPresentationIdentity.conversation(
         communityID: communityID,
         channelID: channelID
       ),
-      navigationTarget: BuzzPushNavigationTarget(
+      navigationTarget: KuraPushNavigationTarget(
         eventID: "message-id",
         communityID: communityID,
         channelID: channelID
       ),
       senderPubkey: String(repeating: "a", count: 64),
       senderAvatarPNG: avatarPNG,
-      conversationIdentifier: BuzzPushPresentationIdentity.conversation(
+      conversationIdentifier: KuraPushPresentationIdentity.conversation(
         communityID: communityID,
         channelID: channelID
       ),
@@ -174,10 +174,10 @@ final class BuzzCommunicationNotificationTests: XCTestCase {
   }
 }
 
-final class BuzzPushSnapshotEnrichmentTests: XCTestCase {
+final class KuraPushSnapshotEnrichmentTests: XCTestCase {
   func testMetadataAuthorityUsesCurrentAppProfileForMatchingRelay() {
     let correctProfile = grant(
-      appProfile: BuzzDevPushEnrollmentDriver.appProfile,
+      appProfile: KuraDevPushEnrollmentDriver.appProfile,
       generation: 2,
       metadataPubkey: String(repeating: "a", count: 64)
     )
@@ -188,7 +188,7 @@ final class BuzzPushSnapshotEnrichmentTests: XCTestCase {
     )
 
     XCTAssertEqual(
-      BuzzPushSnapshotBridge.relayMetadataPubkey(
+      KuraPushSnapshotBridge.relayMetadataPubkey(
         relayURL: "wss://relay.example/",
         grants: [wrongProfile, correctProfile]
       ),
@@ -200,8 +200,8 @@ final class BuzzPushSnapshotEnrichmentTests: XCTestCase {
     appProfile: String,
     generation: Int64,
     metadataPubkey: String
-  ) -> BuzzPushEndpointGrantRecord {
-    BuzzPushEndpointGrantRecord(
+  ) -> KuraPushEndpointGrantRecord {
+    KuraPushEndpointGrantRecord(
       relayOrigin: "https://relay.example",
       relayPubkey: String(repeating: "c", count: 64),
       relayMetadataPubkey: metadataPubkey,
@@ -216,20 +216,20 @@ final class BuzzPushSnapshotEnrichmentTests: XCTestCase {
   }
 }
 
-final class BuzzPushNotificationResponseTests: XCTestCase {
+final class KuraPushNotificationResponseTests: XCTestCase {
   func testValidDefaultActionRoutesAndCompletesExactlyOnce() {
-    let target = BuzzPushNavigationTarget(
+    let target = KuraPushNavigationTarget(
       eventID: "message-id",
       communityID: "community-id",
       channelID: "opaque-channel-id"
     )
-    var routedTargets: [BuzzPushNavigationTarget] = []
+    var routedTargets: [KuraPushNavigationTarget] = []
     var forwarded = 0
     var completions = 0
 
-    BuzzPushNotificationResponseCoordinator.handle(
+    KuraPushNotificationResponseCoordinator.handle(
       actionIdentifier: UNNotificationDefaultActionIdentifier,
-      userInfo: [BuzzPushNavigationTarget.userInfoKey: target.userInfoValue],
+      userInfo: [KuraPushNavigationTarget.userInfoKey: target.userInfoValue],
       onTarget: { routedTargets.append($0) },
       forwardToFlutter: { pluginCompletion in
         forwarded += 1
@@ -245,12 +245,12 @@ final class BuzzPushNotificationResponseTests: XCTestCase {
   }
 
   func testMalformedTargetFallsBackToOneCompletion() {
-    var routedTargets: [BuzzPushNavigationTarget] = []
+    var routedTargets: [KuraPushNavigationTarget] = []
     var completions = 0
 
-    BuzzPushNotificationResponseCoordinator.handle(
+    KuraPushNotificationResponseCoordinator.handle(
       actionIdentifier: UNNotificationDefaultActionIdentifier,
-      userInfo: [BuzzPushNavigationTarget.userInfoKey: ["event_id": ""]],
+      userInfo: [KuraPushNavigationTarget.userInfoKey: ["event_id": ""]],
       onTarget: { routedTargets.append($0) },
       forwardToFlutter: { _ in },
       completion: { completions += 1 }
@@ -261,11 +261,11 @@ final class BuzzPushNotificationResponseTests: XCTestCase {
   }
 
   func testNonDefaultActionIgnoresLateDuplicatePluginCompletion() throws {
-    var routedTargets: [BuzzPushNavigationTarget] = []
+    var routedTargets: [KuraPushNavigationTarget] = []
     var pluginCompletion: (() -> Void)?
     var completions = 0
 
-    BuzzPushNotificationResponseCoordinator.handle(
+    KuraPushNotificationResponseCoordinator.handle(
       actionIdentifier: "buzz.reply",
       userInfo: [:],
       onTarget: { routedTargets.append($0) },

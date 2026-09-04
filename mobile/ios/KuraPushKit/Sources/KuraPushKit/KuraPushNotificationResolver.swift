@@ -4,13 +4,13 @@ import Foundation
   import FoundationNetworking
 #endif
 
-/// Content resolved from unread Buzz events for a mutable push notification.
-public struct BuzzPushResolution: Decodable, Equatable, Sendable {
+/// Content resolved from unread Kura events for a mutable push notification.
+public struct KuraPushResolution: Decodable, Equatable, Sendable {
   public let title: String
   public let body: String
   public let subtitle: String?
   public let threadIdentifier: String?
-  public let navigationTarget: BuzzPushNavigationTarget?
+  public let navigationTarget: KuraPushNavigationTarget?
   public let senderPubkey: String?
   public let senderAvatarPNG: Data?
   public let conversationIdentifier: String?
@@ -23,7 +23,7 @@ public struct BuzzPushResolution: Decodable, Equatable, Sendable {
     body: String,
     subtitle: String?,
     threadIdentifier: String?,
-    navigationTarget: BuzzPushNavigationTarget? = nil,
+    navigationTarget: KuraPushNavigationTarget? = nil,
     senderPubkey: String? = nil,
     senderAvatarPNG: Data? = nil,
     conversationIdentifier: String? = nil,
@@ -43,13 +43,13 @@ public struct BuzzPushResolution: Decodable, Equatable, Sendable {
   }
 }
 
-/// Resolves the content used to mutate a generic Buzz push notification.
-public protocol BuzzPushNotificationResolving {
-  func resolve(completion: @escaping (BuzzPushResolution?) -> Void)
+/// Resolves the content used to mutate a generic Kura push notification.
+public protocol KuraPushNotificationResolving {
+  func resolve(completion: @escaping (KuraPushResolution?) -> Void)
 }
 
-/// Reads configured Buzz communities and resolves their newest unread event.
-public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
+/// Reads configured Kura communities and resolves their newest unread event.
+public final class KuraPushNotificationResolver: KuraPushNotificationResolving {
   // Verified profiles may carry bounded inline raster avatars. Keep the refresh
   // response capped, but large enough to recover the sender name from those
   // otherwise valid kind-0 events when the app cache has not been populated.
@@ -69,7 +69,7 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
     loadPrivateKey: @escaping (String) -> String?,
     loadPresentationCacheData: @escaping () -> Data? = { nil },
     now: @escaping () -> Date = Date.init,
-    presentationCacheLifetime: TimeInterval = BuzzPushPresentationCacheStore.freshnessLifetime
+    presentationCacheLifetime: TimeInterval = KuraPushPresentationCacheStore.freshnessLifetime
   ) {
     self.session = session
     self.loadCommunitiesData = loadCommunitiesData
@@ -79,7 +79,7 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
     self.presentationCacheLifetime = presentationCacheLifetime
   }
 
-  public func resolve(completion: @escaping (BuzzPushResolution?) -> Void) {
+  public func resolve(completion: @escaping (KuraPushResolution?) -> Void) {
     let communities = loadCommunities().filter {
       $0.pubkey?.isEmpty == false
         && loadPrivateKey($0.id) != nil
@@ -171,10 +171,10 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
   private func resolvePresentation(
     event: VerifiedNostrEvent,
     community: PushLeaseCommunity,
-    completion: @escaping (BuzzPushResolution?) -> Void
+    completion: @escaping (KuraPushResolution?) -> Void
   ) {
-    let snapshot = BuzzPushPresentationCacheSnapshot.decode(loadPresentationCacheData())
-    let relayOrigin = BuzzPushPresentationCacheStore.canonicalRelayOrigin(community.relayUrl)
+    let snapshot = KuraPushPresentationCacheSnapshot.decode(loadPresentationCacheData())
+    let relayOrigin = KuraPushPresentationCacheStore.canonicalRelayOrigin(community.relayUrl)
     let cachedProfile = relayOrigin.flatMap {
       snapshot.profile(
         communityID: community.id,
@@ -211,7 +211,7 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
         return true
       }
       guard let memberCount = cachedChannel.memberCount else { return true }
-      guard memberCount <= BuzzPushPresentationCacheStore.maximumMembersPerChannel
+      guard memberCount <= KuraPushPresentationCacheStore.maximumMembersPerChannel
       else { return false }
       return cachedChannel.memberDigests?.count != memberCount
     }()
@@ -242,7 +242,7 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
       let profile =
         refreshedProfileEvent.flatMap {
           guard
-            BuzzPushPresentationCacheStore.shouldReplace(
+            KuraPushPresentationCacheStore.shouldReplace(
               existingCreatedAt: cachedProfile?.eventCreatedAt,
               existingID: cachedProfile?.eventID,
               candidateCreatedAt: $0.createdAt,
@@ -259,7 +259,7 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
         } ?? cachedProfile
       let newerChannelEvent: VerifiedNostrEvent? = refreshedChannelEvent.flatMap { event in
         guard
-          BuzzPushPresentationCacheStore.shouldReplace(
+          KuraPushPresentationCacheStore.shouldReplace(
             existingCreatedAt: cachedChannel?.eventCreatedAt,
             existingID: cachedChannel?.eventID,
             candidateCreatedAt: event.createdAt,
@@ -270,7 +270,7 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
       }
       let newerMembershipEvent: VerifiedNostrEvent? = refreshedMembershipEvent.flatMap { event in
         guard
-          BuzzPushPresentationCacheStore.shouldReplace(
+          KuraPushPresentationCacheStore.shouldReplace(
             existingCreatedAt: cachedChannel?.membershipEventCreatedAt,
             existingID: cachedChannel?.membershipEventID,
             candidateCreatedAt: event.createdAt,
@@ -412,7 +412,7 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
 
   static func decodeResolution(
     events: [VerifiedNostrEvent], community: PushLeaseCommunity
-  ) -> (BuzzPushResolution, VerifiedNostrEvent)? {
+  ) -> (KuraPushResolution, VerifiedNostrEvent)? {
     let event = newestMessage(events: events, community: community)
     guard let event else { return nil }
     guard
@@ -441,25 +441,25 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
   private static func makeResolution(
     event: VerifiedNostrEvent,
     community: PushLeaseCommunity,
-    profile: BuzzPushCachedProfile?,
-    channel: BuzzPushCachedChannel?
-  ) -> BuzzPushResolution? {
+    profile: KuraPushCachedProfile?,
+    channel: KuraPushCachedChannel?
+  ) -> KuraPushResolution? {
     let body = previewBody(event.content)
     guard !body.isEmpty else { return nil }
     let channelID = tagValue("h", in: event)
     let conversationIdentifier = channelID.map {
-      BuzzPushPresentationIdentity.conversation(communityID: community.id, channelID: $0)
+      KuraPushPresentationIdentity.conversation(communityID: community.id, channelID: $0)
     }
     let conversation = channel.flatMap {
       communicationConversation(event: event, community: community, channel: $0)
     }
-    return BuzzPushResolution(
+    return KuraPushResolution(
       title: profile?.displayName ?? shortPubkey(event.pubkey),
       body: body,
       subtitle: community.name,
       threadIdentifier: conversationIdentifier ?? community.id,
       navigationTarget: channelID.map {
-        BuzzPushNavigationTarget(
+        KuraPushNavigationTarget(
           eventID: event.id,
           communityID: community.id,
           channelID: $0
@@ -477,11 +477,11 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
     event: VerifiedNostrEvent,
     communityID: String,
     relayOrigin: String,
-    cached: BuzzPushCachedProfile?,
+    cached: KuraPushCachedProfile?,
     cachedAt: Int
-  ) -> BuzzPushCachedProfile {
-    let metadata = BuzzPushPresentationCacheStore.profileMetadata(event)
-    return BuzzPushCachedProfile(
+  ) -> KuraPushCachedProfile {
+    let metadata = KuraPushPresentationCacheStore.profileMetadata(event)
+    return KuraPushCachedProfile(
       communityID: communityID,
       relayOrigin: relayOrigin,
       pubkey: event.pubkey.lowercased(),
@@ -497,12 +497,12 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
   private static func ephemeralChannel(
     metadataEvent: VerifiedNostrEvent?,
     membershipEvent: VerifiedNostrEvent?,
-    cached: BuzzPushCachedChannel?,
+    cached: KuraPushCachedChannel?,
     communityID: String,
     relayOrigin: String,
     relayMetadataPubkey: String,
     cachedAt: Int
-  ) -> BuzzPushCachedChannel? {
+  ) -> KuraPushCachedChannel? {
     guard metadataEvent != nil || cached != nil else { return nil }
     let channelID = metadataEvent.flatMap { tagValue("d", in: $0) } ?? cached?.channelID
     guard let channelID, !channelID.isEmpty,
@@ -511,23 +511,23 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
       let metadataCachedAt = metadataEvent == nil ? cached?.cachedAt : cachedAt
     else { return nil }
     let membership = membershipEvent.flatMap {
-      BuzzPushPresentationCacheStore.normalizedChannelMembership(
+      KuraPushPresentationCacheStore.normalizedChannelMembership(
         $0,
         communityID: communityID,
         channelID: channelID
       )
     }
     let acceptedMembershipEvent = membership == nil ? nil : membershipEvent
-    return BuzzPushCachedChannel(
+    return KuraPushCachedChannel(
       communityID: communityID,
       relayOrigin: relayOrigin,
       channelID: channelID,
       relayMetadataPubkey: relayMetadataPubkey,
       displayName: metadataEvent.map {
-        BuzzPushPresentationCacheStore.normalizedDisplayName(tagValue("name", in: $0))
+        KuraPushPresentationCacheStore.normalizedDisplayName(tagValue("name", in: $0))
       } ?? cached?.displayName,
       channelType: metadataEvent.map {
-        BuzzPushPresentationCacheStore.normalizedChannelType(tagValue("t", in: $0))
+        KuraPushPresentationCacheStore.normalizedChannelType(tagValue("t", in: $0))
       } ?? cached?.channelType,
       memberCount: membership?.count ?? cached?.memberCount,
       memberDigests: membership?.digests ?? cached?.memberDigests,
@@ -545,20 +545,20 @@ public final class BuzzPushNotificationResolver: BuzzPushNotificationResolving {
   private static func communicationConversation(
     event: VerifiedNostrEvent,
     community: PushLeaseCommunity,
-    channel: BuzzPushCachedChannel
+    channel: KuraPushCachedChannel
   ) -> (displayName: String?, recipientCount: Int)? {
     guard let currentUser = community.pubkey?.lowercased(),
       let memberCount = channel.memberCount,
       let memberDigests = channel.memberDigests,
       memberDigests.count == memberCount
     else { return nil }
-    let currentUserDigest = BuzzPushPresentationIdentity.channelMember(
+    let currentUserDigest = KuraPushPresentationIdentity.channelMember(
       communityID: community.id,
       channelID: channel.channelID,
       pubkey: currentUser
     )
     guard memberDigests.contains(currentUserDigest) else { return nil }
-    let senderDigest = BuzzPushPresentationIdentity.channelMember(
+    let senderDigest = KuraPushPresentationIdentity.channelMember(
       communityID: community.id,
       channelID: channel.channelID,
       pubkey: event.pubkey
