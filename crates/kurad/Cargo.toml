@@ -34,5 +34,8 @@ tracing-subscriber = { workspace = true }
 # Platform app-data dir resolution when --data-dir is omitted.
 dirs = "6"
 
+# No-echo terminal prompts for `kurad identity lock`/`unlock`.
+rpassword = "7"
+
 # Error plumbing in main.
 anyhow = { workspace = true }
