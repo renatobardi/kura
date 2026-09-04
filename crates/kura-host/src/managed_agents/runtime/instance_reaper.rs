@@ -3,6 +3,10 @@ use super::*;
 
 /// Binary names for the Kura desktop/Tauri process. Used by dead-instance
 /// detection to confirm the owning desktop is still alive.
+///
+/// Read only by the `unix` scan paths and by `mod tests`; on a Windows
+/// non-test build nothing reaches it.
+#[cfg(any(unix, test))]
 const DESKTOP_BINARY_NAMES: &[&str] = &[
     "Kura",
     "kura-desktop",
@@ -13,6 +17,7 @@ const DESKTOP_BINARY_NAMES: &[&str] = &[
 ];
 
 /// Check if a process name matches a known Kura desktop binary.
+#[cfg(any(unix, test))]
 pub(super) fn is_desktop_binary(name: &str) -> bool {
     DESKTOP_BINARY_NAMES.contains(&name)
 }
@@ -23,6 +28,7 @@ pub(super) fn is_desktop_binary(name: &str) -> bool {
 /// as `KEY=...app.dev\0`, so a valid match is followed by a non-identifier byte
 /// (not `[A-Za-z0-9._-]`) or sits at the end of the buffer. This prevents
 /// `pro.oute.kura.app` from matching inside `pro.oute.kura.app.dev`.
+#[cfg(any(unix, test))]
 pub(super) fn buffer_contains_identifier(buf: &[u8], id: &[u8]) -> bool {
     if id.is_empty() {
         return false;
@@ -98,11 +104,6 @@ fn extract_kura_marker_value(pid: u32) -> Option<String> {
             return String::from_utf8(entry[prefix.len()..].to_vec()).ok();
         }
     }
-    None
-}
-
-#[cfg(not(unix))]
-fn extract_kura_marker_value(_pid: u32) -> Option<String> {
     None
 }
 
@@ -215,11 +216,6 @@ fn desktop_is_alive_for_instance(instance_id: &str) -> bool {
             return true;
         }
     }
-    false
-}
-
-#[cfg(not(unix))]
-fn desktop_is_alive_for_instance(_instance_id: &str) -> bool {
     false
 }
 

@@ -74,5 +74,10 @@ kura_agent_pkg = { package = "kura-agent", path = "../kura-agent" }
 keyring = { version = "3.6.3", default-features = false, features = ["windows-native", "vendored"], optional = true }
 windows-sys = { version = "0.61", features = ["Win32_Security", "Win32_Storage_FileSystem", "Win32_System_Diagnostics_ToolHelp", "Win32_System_JobObjects", "Win32_System_Registry", "Win32_System_Threading", "Win32_Foundation"] }
 
+[build-dependencies]
+# `build.rs` base64-encodes the validated `KURA_BUILD_AGENT_ENV` payload so the
+# line-oriented Cargo build-script output carries multiline values intact.
+base64 = "0.22"
+
 [dev-dependencies]
 tokio = { version = "1", features = ["test-util"] }

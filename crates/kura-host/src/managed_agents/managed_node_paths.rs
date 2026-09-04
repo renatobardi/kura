@@ -46,12 +46,13 @@ pub fn kura_managed_node_bin_path() -> Option<PathBuf> {
 
 pub fn kura_managed_npm_bin_dir() -> Option<PathBuf> {
     kura_managed_npm_prefix().map(|prefix| {
-        #[cfg(windows)]
-        {
+        // npm keeps its shims at the prefix root on Windows and under `bin/`
+        // everywhere else. `cfg!` instead of `#[cfg]` blocks: with the latter the
+        // Windows arm compiles down to a bare `prefix`, which reads as an identity
+        // closure and trips `clippy::map_identity` on that target only.
+        if cfg!(windows) {
             prefix
-        }
-        #[cfg(not(windows))]
-        {
+        } else {
             prefix.join("bin")
         }
     })

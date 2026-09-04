@@ -39,7 +39,7 @@ pub fn resolve_git_bash_path() -> Option<std::path::PathBuf> {
     #[cfg(windows)]
     {
         let env = GitBashEnv::from_process();
-        return resolve_git_bash(
+        resolve_git_bash(
             &env.path,
             env.shell_override,
             env.git_bash_override,
@@ -47,7 +47,7 @@ pub fn resolve_git_bash_path() -> Option<std::path::PathBuf> {
             env.program_files,
             env.program_files_x86,
             env.local_app_data,
-        );
+        )
     }
 
     #[cfg(not(windows))]
@@ -66,7 +66,7 @@ pub fn resolve_bash_path() -> Option<std::path::PathBuf> {
     #[cfg(windows)]
     {
         let env = GitBashEnv::from_process();
-        return resolve_git_bash(
+        resolve_git_bash(
             &env.path,
             None, // skip KURA_SHELL — install/login-shell callers require bash
             env.git_bash_override,
@@ -74,7 +74,7 @@ pub fn resolve_bash_path() -> Option<std::path::PathBuf> {
             env.program_files,
             env.program_files_x86,
             env.local_app_data,
-        );
+        )
     }
 
     #[cfg(not(windows))]
@@ -85,12 +85,12 @@ pub fn discover_git_bash() -> Option<GitBashPrerequisite> {
     #[cfg(windows)]
     {
         let path = resolve_git_bash_path();
-        return Some(GitBashPrerequisite {
+        Some(GitBashPrerequisite {
             available: path.is_some(),
             path: path.map(|path| path.display().to_string()),
             install_instructions_url: INSTALL_URL.to_string(),
             install_hint: INSTALL_HINT.to_string(),
-        });
+        })
     }
 
     #[cfg(not(windows))]
@@ -163,6 +163,20 @@ impl GitBashEnv {
     }
 }
 
+/// The resolver inputs, grouped so the inner resolver stays within a readable
+/// argument count. Mirrors [`GitBashEnv`] but borrows `path_env`, so the public
+/// entry points keep taking a plain `&str` PATH without allocating.
+#[cfg(windows)]
+struct GitBashLookup<'a> {
+    path_env: &'a str,
+    shell_override: Option<PathBuf>,
+    git_bash_override: Option<PathBuf>,
+    system_root: Option<PathBuf>,
+    program_files: Option<PathBuf>,
+    program_files_x86: Option<PathBuf>,
+    local_app_data: Option<PathBuf>,
+}
+
 #[cfg(windows)]
 pub fn resolve_git_bash(
     path_env: &str,
@@ -174,13 +188,15 @@ pub fn resolve_git_bash(
     local_app_data: Option<PathBuf>,
 ) -> Option<PathBuf> {
     resolve_git_bash_inner(
-        path_env,
-        shell_override,
-        git_bash_override,
-        system_root,
-        program_files,
-        program_files_x86,
-        local_app_data,
+        GitBashLookup {
+            path_env,
+            shell_override,
+            git_bash_override,
+            system_root,
+            program_files,
+            program_files_x86,
+            local_app_data,
+        },
         true,
     )
 }
@@ -188,16 +204,16 @@ pub fn resolve_git_bash(
 /// Inner resolver with an explicit `check_registry` toggle so tests can
 /// disable the ambient `HKLM/HKCU\SOFTWARE\GitForWindows` lookup.
 #[cfg(windows)]
-fn resolve_git_bash_inner(
-    path_env: &str,
-    shell_override: Option<PathBuf>,
-    git_bash_override: Option<PathBuf>,
-    system_root: Option<PathBuf>,
-    program_files: Option<PathBuf>,
-    program_files_x86: Option<PathBuf>,
-    local_app_data: Option<PathBuf>,
-    check_registry: bool,
-) -> Option<PathBuf> {
+fn resolve_git_bash_inner(lookup: GitBashLookup<'_>, check_registry: bool) -> Option<PathBuf> {
+    let GitBashLookup {
+        path_env,
+        shell_override,
+        git_bash_override,
+        system_root,
+        program_files,
+        program_files_x86,
+        local_app_data,
+    } = lookup;
     let result = shell_override
         .and_then(|path| resolve_shell_override(&path, path_env))
         .or_else(|| git_bash_override.filter(|path| path.is_file()))
@@ -232,13 +248,15 @@ pub fn resolve_git_bash_no_registry(
     local_app_data: Option<PathBuf>,
 ) -> Option<PathBuf> {
     resolve_git_bash_inner(
-        path_env,
-        shell_override,
-        git_bash_override,
-        system_root,
-        program_files,
-        program_files_x86,
-        local_app_data,
+        GitBashLookup {
+            path_env,
+            shell_override,
+            git_bash_override,
+            system_root,
+            program_files,
+            program_files_x86,
+            local_app_data,
+        },
         false,
     )
 }
@@ -414,6 +432,15 @@ fn git_bash_from_standard_paths(
     .flatten()
     .map(|install_root| install_root.join("bin").join("bash.exe"))
     .find(|bash| bash.is_file())
+}
+
+/// Pure mapping from a resolved bash path to the install-shell result.
+/// `None` → `Err(GIT_BASH_INSTALL_HINT)`, `Some(path)` → `Ok(path)`.
+#[cfg(windows)]
+pub fn install_shell_from(
+    resolved: Option<std::path::PathBuf>,
+) -> Result<std::path::PathBuf, String> {
+    resolved.ok_or_else(|| GIT_BASH_INSTALL_HINT.to_string())
 }
 
 #[cfg(all(test, windows))]
@@ -673,13 +700,4 @@ mod windows_apps_tests {
             "Unix bash must not be detected as a WindowsApps alias"
         );
     }
-}
-
-/// Pure mapping from a resolved bash path to the install-shell result.
-/// `None` → `Err(GIT_BASH_INSTALL_HINT)`, `Some(path)` → `Ok(path)`.
-#[cfg(windows)]
-pub fn install_shell_from(
-    resolved: Option<std::path::PathBuf>,
-) -> Result<std::path::PathBuf, String> {
-    resolved.ok_or_else(|| GIT_BASH_INSTALL_HINT.to_string())
 }

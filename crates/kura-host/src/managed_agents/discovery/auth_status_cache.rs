@@ -39,7 +39,9 @@ pub(super) fn get(runtime_id: &str) -> AuthStatus {
         .unwrap_or(AuthStatus::Unknown)
 }
 
-#[cfg(test)]
+// Only `tests/forced_discovery.rs` reads this, and that test is `#[cfg(unix)]`
+// (it builds executable shell fixtures), so on Windows the helper would be dead.
+#[cfg(all(test, unix))]
 pub fn len() -> usize {
     cache().lock().map(|g| g.len()).unwrap_or(0)
 }
