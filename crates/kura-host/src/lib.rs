@@ -17,6 +17,7 @@ pub mod archive;
 pub mod egress_guard;
 pub mod events;
 pub mod identity_archive;
+pub mod identity_lock;
 pub mod identity_storage;
 pub mod link_preview_tags;
 pub mod managed_agents;
