@@ -74,9 +74,9 @@ lxc exec "$CONTAINER" -- env NODE_MAJOR="$NODE_MAJOR" bash -euo pipefail -c '
     apt-get install -y -qq nodejs
   fi
 
-  echo "  -> git, ripgrep"
+  echo "  -> git, ripgrep, bzip2"
   apt-get update -qq
-  apt-get install -y -qq git ripgrep
+  apt-get install -y -qq git ripgrep bzip2
 
   if ! command -v gh >/dev/null 2>&1; then
     echo "  -> gh (GitHub CLI)"
@@ -106,6 +106,9 @@ lxc exec "$CONTAINER" -- env NODE_MAJOR="$NODE_MAJOR" bash -euo pipefail -c '
 
   if ! command -v goose >/dev/null 2>&1; then
     echo "  -> goose CLI"
+    # O instalador baixa um .tar.bz2 e usa `tar` pra extrair, que por sua vez
+    # invoca `bzip2` (instalado acima) — sem isso a extração falha em uma
+    # instalação limpa do Ubuntu 24.04.
     curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash
   fi
 
