@@ -1,92 +1,17 @@
 // Shared schema, included from the same source the runtime command parses with,
 // so the build-time validation below and the runtime parse cannot drift.
 include!("src/commands/reconnect_hook_config.rs");
-// Same source of truth the runtime filters with, so a baked build env cannot
-// carry a reserved key the runtime believes it already rejected.
-include!("src/managed_agents/reserved_env_keys.rs");
-
-use base64::Engine as _;
 
 fn main() {
-    println!("cargo:rerun-if-env-changed=KURA_RELAY_URL");
-    println!("cargo:rerun-if-env-changed=KURA_RELAY_HTTP");
+    // Only the capabilities this crate itself reads via `option_env!` belong
+    // here. `cargo:rustc-env` never reaches a dependency, so the relay URL/HTTP,
+    // agent provider/model, baked agent env and owner-only access markers — all
+    // read from `kura-host` — are baked by `crates/kura-host/build.rs` instead.
     println!("cargo:rerun-if-env-changed=KURA_UPDATER_PUBLIC_KEY");
     println!("cargo:rerun-if-env-changed=KURA_UPDATER_ENDPOINT");
-    println!("cargo:rerun-if-env-changed=KURA_BUILD_KURA_AGENT_PROVIDER");
-    println!("cargo:rerun-if-env-changed=KURA_BUILD_KURA_AGENT_MODEL");
-    println!("cargo:rerun-if-env-changed=KURA_BUILD_AGENT_ENV");
     println!("cargo:rerun-if-env-changed=KURA_BUILD_RELAY_RECONNECT_CMD");
-    println!("cargo:rerun-if-env-changed=KURA_BUILD_AGENT_ACCESS_OWNER_ONLY");
     println!("cargo:rerun-if-env-changed=KURA_BUILD_AUTO_CONNECT_DEFAULT_RELAY");
     println!("cargo:rustc-check-cfg=cfg(kura_updater_enabled)");
-
-    // Explicit owner-only agent-access capability. Release packaging sets this
-    // presence-only marker; OSS/custom builds leave agent access configurable.
-    if std::env::var("KURA_BUILD_AGENT_ACCESS_OWNER_ONLY").is_ok() {
-        println!("cargo:rustc-env=KURA_DESKTOP_BUILD_AGENT_ACCESS_OWNER_ONLY=1");
-    }
-
-    if let Ok(relay_url) = std::env::var("KURA_RELAY_URL") {
-        println!("cargo:rustc-env=KURA_DESKTOP_BUILD_RELAY_URL={relay_url}");
-    }
-
-    if let Ok(relay_http) = std::env::var("KURA_RELAY_HTTP") {
-        println!("cargo:rustc-env=KURA_DESKTOP_BUILD_RELAY_HTTP={relay_http}");
-    }
-
-    if let Ok(provider) = std::env::var("KURA_BUILD_KURA_AGENT_PROVIDER") {
-        println!("cargo:rustc-env=KURA_DESKTOP_BUILD_KURA_AGENT_PROVIDER={provider}");
-    }
-
-    if let Ok(model) = std::env::var("KURA_BUILD_KURA_AGENT_MODEL") {
-        println!("cargo:rustc-env=KURA_DESKTOP_BUILD_KURA_AGENT_MODEL={model}");
-    }
-
-    // Generic KEY=VALUE pairs to inject into every spawned agent process.
-    // Newline-delimited; each line must be non-empty and contain exactly one
-    // `=` separator with a non-empty key.  OSS builds leave this unset.
-    // The validated value is base64-encoded before emitting so the single-line
-    // Cargo build-script output carries all pairs (Cargo output is line-oriented;
-    // a raw multiline value would be silently truncated to the first line).
-    if let Ok(raw) = std::env::var("KURA_BUILD_AGENT_ENV") {
-        for (line_no, line) in raw.lines().enumerate() {
-            let line = line.trim();
-            if line.is_empty() {
-                continue;
-            }
-            let eq = line.find('=').unwrap_or_else(|| {
-                panic!(
-                    "KURA_BUILD_AGENT_ENV line {}: missing '=' separator in {:?}",
-                    line_no + 1,
-                    line
-                )
-            });
-            let key = &line[..eq];
-            if key.is_empty() {
-                panic!(
-                    "KURA_BUILD_AGENT_ENV line {}: key must not be empty in {:?}",
-                    line_no + 1,
-                    line
-                );
-            }
-            // The baked env is written into every spawned agent's environment
-            // LAST (see `managed_agents/runtime.rs`), after Kura sets the
-            // access gates and identity vars. A baked reserved key would
-            // therefore silently override the gate the UI promises, so reject
-            // it at build time instead of shipping a binary that bypasses its
-            // own enforcement.
-            if is_reserved_env_key(key) {
-                panic!(
-                    "KURA_BUILD_AGENT_ENV line {}: `{}` is reserved by Kura and cannot be baked \
-                     into a build (it would override Kura's own identity/access env)",
-                    line_no + 1,
-                    key
-                );
-            }
-        }
-        let encoded = base64::engine::general_purpose::STANDARD.encode(raw.as_bytes());
-        println!("cargo:rustc-env=KURA_DESKTOP_BUILD_AGENT_ENV={encoded}");
-    }
 
     if let Ok(val) = std::env::var("KURA_BUILD_RELAY_RECONNECT_CMD") {
         let parsed: serde_json::Value = serde_json::from_str(&val)

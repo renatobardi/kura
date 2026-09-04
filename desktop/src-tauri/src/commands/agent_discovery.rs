@@ -820,14 +820,11 @@ fn resolve_install_shell() -> Result<std::path::PathBuf, String> {
     }
 }
 
-/// Pure mapping from a resolved bash path to the install-shell result.
-/// `None` → `Err(GIT_BASH_INSTALL_HINT)`, `Some(path)` → `Ok(path)`.
+/// Pure mapping from a resolved bash path to the install-shell result. Lives
+/// in `kura_host::managed_agents::git_bash` next to the hint it returns; the
+/// re-export keeps this module's callers and its Doctor hint wiring unchanged.
 #[cfg(windows)]
-pub(crate) fn install_shell_from(
-    resolved: Option<std::path::PathBuf>,
-) -> Result<std::path::PathBuf, String> {
-    resolved.ok_or_else(|| crate::managed_agents::git_bash::GIT_BASH_INSTALL_HINT.to_string())
-}
+pub(crate) use crate::managed_agents::git_bash::install_shell_from;
 
 /// Returns `true` when `command` is a Windows-native PowerShell invocation
 /// (i.e. begins with `powershell.exe`). These commands must NOT be routed

@@ -4607,6 +4607,7 @@ dependencies = [
  "keyring",
  "kura-agent",
  "kura-core",
+ "kura-host",
  "kura-media",
  "kura-persona",
  "kura-sdk",
@@ -4672,6 +4673,50 @@ dependencies = [
  "windows-sys 0.61.2",
  "zeroize",
  "zip 8.6.0",
+]
+
+[[package]]
+name = "kura-host"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "atomic-write-file",
+ "axum",
+ "base64 0.22.1",
+ "bytes",
+ "chrono",
+ "dirs",
+ "futures-util",
+ "hex",
+ "image",
+ "keyring",
+ "kura-agent",
+ "kura-core",
+ "kura-sdk",
+ "kura-ws-client",
+ "libc",
+ "nostr 0.44.7",
+ "percent-encoding",
+ "png 0.18.1",
+ "regex",
+ "reqwest 0.13.4",
+ "rusqlite",
+ "security-framework 3.7.0",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "sha2 0.11.0",
+ "strip-ansi-escapes",
+ "tempfile",
+ "tokio",
+ "tokio-tungstenite 0.29.0",
+ "tokio-util",
+ "toml 0.8.2",
+ "tracing",
+ "url",
+ "uuid",
+ "windows-sys 0.61.2",
+ "zeroize",
 ]
 
 [[package]]

@@ -1,0 +1,83 @@
+[package]
+name = "kura-host"
+version = "0.1.0"
+edition = "2021"
+description = "Host-agnostic Kura desktop backend: managed agents, archive, relay client, secret storage"
+license = "Apache-2.0"
+
+[features]
+default = ["system-keyring"]
+# OS keyring backing for desktop secret storage (nsec private keys). When
+# disabled, secrets fall back to 0o600 files. On by default for real builds.
+# Mirrors `kura-desktop`'s feature of the same name so the two crates agree on
+# which backend a build uses.
+system-keyring = ["dep:keyring"]
+# Marker feature mirroring `kura-desktop`'s. It pulls in no dependencies here —
+# it only gates the shared-compute env/model translation in
+# `managed_agents::relay_mesh` and its spawn-path call sites, which are plain
+# string work. The desktop's `mesh-llm` feature turns this on so both crates
+# agree on whether shared compute exists.
+mesh-llm = []
+# Exposes the `#[cfg(test)]`-only helpers (path mutex, admission-gate reset,
+# retention/persona test readers) to *other* crates' test builds. The desktop
+# enables it from its dev-dependencies so its own tests keep using them after
+# the backend moved here. Never enable it in a shipping build.
+test-support = []
+
+[dependencies]
+anyhow = "1"
+atomic-write-file = "0.3"
+axum = "0.8"
+base64 = "0.22"
+bytes = "1"
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "6"
+futures-util = "0.3"
+hex = "0.4"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp", "gif"] }
+nostr = { version = "0.44", features = ["nip44", "nip49"] }
+percent-encoding = "2"
+png = "0.18"
+regex = "1"
+reqwest = { version = "0.13", features = ["json", "query", "stream", "blocking"] }
+rusqlite = { version = "0.37", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+strip-ansi-escapes = "0.2"
+tempfile = "3"
+sha2 = "0.11"
+tokio = { version = "1", features = ["fs", "sync", "rt", "macros", "time", "net", "io-util"] }
+tokio-tungstenite = { version = "0.29", features = ["rustls-tls-webpki-roots"] }
+tokio-util = { version = "0.7", features = ["rt"] }
+toml = "0.8"
+tracing = "0.1"
+url = "2"
+uuid = { version = "1", features = ["v4", "v5"] }
+zeroize = "1"
+kura_core_pkg = { package = "kura-core", path = "../kura-core" }
+kura_sdk_pkg = { package = "kura-sdk", path = "../kura-sdk" }
+kura_ws_client_pkg = { package = "kura-ws-client", path = "../kura-ws-client" }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+keyring = { version = "3.6.3", default-features = false, features = ["sync-secret-service", "vendored"], optional = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+keyring = { version = "3.6.3", default-features = false, features = ["apple-native", "vendored"], optional = true }
+security-framework = { version = "3.7.0", features = ["OSX_10_15"] }
+
+[target.'cfg(windows)'.dependencies]
+kura_agent_pkg = { package = "kura-agent", path = "../kura-agent" }
+keyring = { version = "3.6.3", default-features = false, features = ["windows-native", "vendored"], optional = true }
+windows-sys = { version = "0.61", features = ["Win32_Security", "Win32_Storage_FileSystem", "Win32_System_Diagnostics_ToolHelp", "Win32_System_JobObjects", "Win32_System_Registry", "Win32_System_Threading", "Win32_Foundation"] }
+
+[build-dependencies]
+# `build.rs` base64-encodes the validated `KURA_BUILD_AGENT_ENV` payload so the
+# line-oriented Cargo build-script output carries multiline values intact.
+base64 = "0.22"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["test-util"] }

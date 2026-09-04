@@ -23,9 +23,13 @@ const desktopRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../../../..",
 );
+const repoRoot = path.resolve(desktopRoot, "..");
 
 const presetsRs = readFileSync(
-  path.join(desktopRoot, "src-tauri/src/managed_agents/discovery/presets.rs"),
+  path.join(
+    repoRoot,
+    "crates/kura-host/src/managed_agents/discovery/presets.rs",
+  ),
   "utf8",
 );
 

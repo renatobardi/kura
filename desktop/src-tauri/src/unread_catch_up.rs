@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, State};
 use tokio::{sync::Semaphore, task::JoinSet};
 
-use crate::{app_state::AppState, native_relay_client::NativeRelayClient};
+use crate::{app_state::AppState, host::AsHost, native_relay_client::NativeRelayClient};
 
 const CATCH_UP_LIMIT: usize = 1_000;
 const ACTIVITY_LIMIT: usize = 100;
@@ -151,7 +151,9 @@ pub(crate) async fn unread_catch_up(
     // would then be reading a cancelled socket. The `join_next` drain ends
     // before this binding does, so that holds today — keep it that way, and in
     // particular do not move the lease into a task or narrow its scope.
-    let session = relay_client.session(relay_url.clone(), keys).await;
+    let session = relay_client
+        .session(relay_url.clone(), keys, &app.as_host())
+        .await;
 
     let concurrency = std::sync::Arc::new(Semaphore::new(8));
     let mut pending = JoinSet::new();

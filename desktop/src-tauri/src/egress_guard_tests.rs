@@ -231,20 +231,36 @@ async fn boundary_native_websocket_blocks_ncryptsec() {
 
 // ── Structural tripwires ──────────────────────────────────────────────────────
 
-fn src_rust_files() -> Vec<std::path::PathBuf> {
-    fn walk(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+/// The two source trees the guard has to cover: this crate, and `kura-host`
+/// (which owns the relay client, the archive and the managed-agent backend
+/// since the host split). Each is returned with the prefix its inventory rows
+/// use — `src/...` for the desktop, `kura-host/src/...` for `kura-host` — so a
+/// row can name exactly one tree.
+fn scan_roots() -> Vec<(std::path::PathBuf, &'static str)> {
+    let manifest = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+    vec![
+        (manifest.join("src"), "src"),
+        (manifest.join("../../crates/kura-host/src"), "kura-host/src"),
+    ]
+}
+
+fn src_rust_files() -> Vec<(std::path::PathBuf, String)> {
+    fn walk(dir: &std::path::Path, prefix: &str, out: &mut Vec<(std::path::PathBuf, String)>) {
         for entry in std::fs::read_dir(dir).unwrap() {
             let path = entry.unwrap().path();
+            let name = path.file_name().unwrap().to_string_lossy().to_string();
+            let rel = format!("{prefix}/{name}");
             if path.is_dir() {
-                walk(&path, out);
+                walk(&path, &rel, out);
             } else if path.extension().and_then(|e| e.to_str()) == Some("rs") {
-                out.push(path);
+                out.push((path, rel));
             }
         }
     }
-    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
     let mut out = Vec::new();
-    walk(&root, &mut out);
+    for (root, prefix) in scan_roots() {
+        walk(&root, prefix, &mut out);
+    }
     out
 }
 
@@ -261,17 +277,17 @@ fn src_rust_files() -> Vec<std::path::PathBuf> {
 /// Updating a row here is the deliberate act that must accompany wiring the
 /// guard + adding an injection test for the new site.
 const EVENTS_INVENTORY: &[(&str, usize, usize)] = &[
-    // Production egress boundaries (see egress_guard.rs table):
-    ("src/relay.rs", 2, 2),                             // boundaries 2, 4
-    ("src/relay/submit.rs", 1, 1),                      // boundaries 1 + 3 (shared funnel)
-    ("src/huddle/pipeline.rs", 1, 1),                   // boundary 5
-    ("src/commands/team_snapshot.rs", 1, 1),            // boundary 6
+    // Production egress boundaries (see kura-host's egress_guard.rs table):
+    ("kura-host/src/relay.rs", 2, 2),        // boundaries 2, 4
+    ("kura-host/src/relay/submit.rs", 1, 1), // boundaries 1 + 3 (shared funnel)
+    ("src/huddle/pipeline.rs", 1, 1),        // boundary 5
+    ("src/commands/team_snapshot.rs", 1, 1), // boundary 6
     ("src/commands/personas/snapshot/import.rs", 2, 1), // boundary 7 + its in-file injection-test fixture URL
     ("src/native_websocket.rs", 0, 2),                  // boundary 8 (WS frames; no events URL)
     // Test-only fixtures — no production egress, no guard:
-    ("src/relay_admission.rs", 1, 0),
-    ("src/archive/mod_tests.rs", 1, 0),
-    ("src/managed_agents/persona_events/tests.rs", 1, 0),
+    ("kura-host/src/relay_admission.rs", 1, 0),
+    ("kura-host/src/archive/mod_tests.rs", 1, 0),
+    ("kura-host/src/managed_agents/persona_events/tests.rs", 1, 0),
     ("src/commands/team_snapshot/tests.rs", 1, 0),
     // Mock-relay route in its in-file tests; production publish goes through
     // the guarded boundary-1 funnel (`submit_signed_event_at_with_keys`).
@@ -348,15 +364,9 @@ fn events_inventory_violations(files: &[(String, String)]) -> Vec<String> {
 }
 
 fn read_src_files() -> Vec<(String, String)> {
-    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
     src_rust_files()
         .into_iter()
-        .map(|path| {
-            let rel = path
-                .strip_prefix(root)
-                .unwrap()
-                .to_string_lossy()
-                .replace('\\', "/");
+        .map(|(path, rel)| {
             let content = std::fs::read_to_string(&path).unwrap();
             (rel, content)
         })
@@ -386,7 +396,7 @@ fn inventory_scan_catches_new_site_in_allowlisted_file() {
     let mut files = read_src_files();
     let relay = files
         .iter_mut()
-        .find(|(rel, _)| rel.ends_with("src/relay.rs"))
+        .find(|(rel, _)| rel.ends_with("kura-host/src/relay.rs"))
         .expect("relay.rs must be in the scan set");
     relay.1.push_str(&format!(
         "\nfn sneaky_ninth_site(base: &str) -> String {{ format!(\"{{base}}{}\") }}\n",
@@ -394,7 +404,9 @@ fn inventory_scan_catches_new_site_in_allowlisted_file() {
     ));
     let violations = events_inventory_violations(&files);
     assert!(
-        violations.iter().any(|v| v.contains("src/relay.rs")),
+        violations
+            .iter()
+            .any(|v| v.contains("kura-host/src/relay.rs")),
         "an unguarded ninth events-URL site in relay.rs must trip the scan: {violations:?}"
     );
 }
@@ -406,12 +418,14 @@ fn inventory_scan_catches_removed_guard_call() {
     let mut files = read_src_files();
     let relay = files
         .iter_mut()
-        .find(|(rel, _)| rel.ends_with("src/relay.rs"))
+        .find(|(rel, _)| rel.ends_with("kura-host/src/relay.rs"))
         .expect("relay.rs must be in the scan set");
     relay.1 = relay.1.replacen(&guard_needle(), "removed_guard", 1);
     let violations = events_inventory_violations(&files);
     assert!(
-        violations.iter().any(|v| v.contains("src/relay.rs")),
+        violations
+            .iter()
+            .any(|v| v.contains("kura-host/src/relay.rs")),
         "a removed guard call in relay.rs must trip the scan: {violations:?}"
     );
 }
@@ -456,14 +470,8 @@ fn ncryptsec_handling_is_confined_to_allowlisted_files() {
         "src/native_websocket.rs",
     ];
 
-    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
     let mut violations = Vec::new();
-    for path in src_rust_files() {
-        let rel = path
-            .strip_prefix(root)
-            .unwrap()
-            .to_string_lossy()
-            .replace('\\', "/");
+    for (path, rel) in src_rust_files() {
         if allowlist.iter().any(|a| rel.ends_with(a)) {
             continue;
         }

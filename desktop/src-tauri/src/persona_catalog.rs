@@ -13,10 +13,10 @@ use regex::Regex;
 use serde::Serialize;
 use serde_json::Value;
 use std::sync::LazyLock;
-use tauri::State;
+use tauri::{AppHandle, State};
 
 use crate::{
-    app_state::AppState, managed_agents::validate_agent_definition_text,
+    app_state::AppState, host::AsHost, managed_agents::validate_agent_definition_text,
     native_relay_client::NativeRelayClient,
 };
 
@@ -63,13 +63,16 @@ struct CatalogAgentProjection {
 /// response cannot populate the new community's query cache.
 #[tauri::command]
 pub(crate) async fn fetch_persona_catalog(
+    app: AppHandle,
     state: State<'_, AppState>,
     relay_client: State<'_, NativeRelayClient>,
 ) -> Result<Vec<PersonaCatalogPublication>, String> {
     let keys = state.signing_keys()?;
     let owner = keys.public_key().to_hex();
     let relay_url = crate::relay::relay_ws_url_with_override(&state);
-    let session = relay_client.session(relay_url.clone(), keys).await;
+    let session = relay_client
+        .session(relay_url.clone(), keys, &app.as_host())
+        .await;
     let mut by_id = HashMap::new();
     let mut until = None;
 

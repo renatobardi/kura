@@ -9,11 +9,10 @@ mod deep_link;
 mod egress_guard;
 mod event_sync;
 mod events;
+mod host;
 mod huddle;
-mod identity_storage;
 mod initial_window;
 mod key_backup;
-mod link_preview_tags;
 mod linux_media;
 #[cfg(target_os = "macos")]
 mod macos_notifications;
@@ -52,6 +51,7 @@ mod unread_catch_up;
 mod util;
 #[cfg(target_os = "linux")]
 pub mod webkit_rendering;
+use crate::host::AsHost;
 use app_state::{build_app_state, resolve_persisted_identity, AppState};
 use builderlab::*;
 #[doc(hidden)]
@@ -282,7 +282,7 @@ pub fn run() {
             // that will be lost on restart, as that silently breaks channel
             // memberships, DMs, and relay identity.
             let state = app_handle.state::<AppState>();
-            if let Err(e) = resolve_persisted_identity(&app_handle, &state) {
+            if let Err(e) = resolve_persisted_identity(&app_handle.as_host(), &state) {
                 eprintln!("kura-desktop: fatal: identity resolution failed: {e}");
                 std::process::exit(1);
             }
@@ -847,9 +847,9 @@ pub fn run() {
             archive::get_observer_retention_days,
             archive::set_observer_retention_days,
             archive::archive_size_stats,
-            archive::sync::announce_archive_sync_epoch,
-            archive::sync::start_archive_sync,
-            archive::sync::stop_archive_sync,
+            archive::announce_archive_sync_epoch,
+            archive::start_archive_sync,
+            archive::stop_archive_sync,
             is_auto_update_supported,
             set_window_vibrancy,
             #[cfg(target_os = "macos")]

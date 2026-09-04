@@ -1130,9 +1130,9 @@ use fold::load_persona_runtimes;
 mod backfill;
 pub use backfill::backfill_standalone_agents;
 mod detach;
-mod profile_reconcile;
 mod team_membership;
-pub(crate) use profile_reconcile::*;
+// Queue moved to kura-host with the agent store it lives beside.
+pub(crate) use kura_host::profile_reconcile::*;
 mod team_suffix;
 pub use team_suffix::strip_baked_team_instructions;
 

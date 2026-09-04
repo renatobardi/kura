@@ -2,6 +2,7 @@
 members = [
     "crates/kura-relay",
     "crates/kura-core",
+    "crates/kura-host",
     "crates/kura-conformance",
     "crates/kura-push-gateway",
     "crates/kura-db",

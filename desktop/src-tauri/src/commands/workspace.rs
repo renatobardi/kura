@@ -266,10 +266,7 @@ pub async fn apply_workspace(
     // profiles independently of runtime restore; successful writes
     // record this relay while retaining the agent for other communities, and
     // failures retry on the next workspace apply.
-    crate::managed_agents::spawn_pending_profile_reconciliations(
-        &restore_app,
-        &profile_reconcile_relay,
-    );
+    super::agents::spawn_pending_profile_reconciliations(&restore_app, &profile_reconcile_relay);
 
     // Backfill this exact relay+owner scope only after the workspace has been
     // applied. Running at process boot would target the fallback relay and
@@ -338,8 +335,12 @@ pub async fn apply_workspace(
             }
             crate::mesh_llm::publish_current_status_once(&app, "workspace apply").await;
             if restore_pending {
-                if let Err(error) =
-                    restore_managed_agents_on_launch(&app, &state.shutdown_started).await
+                if let Err(error) = restore_managed_agents_on_launch(
+                    &app,
+                    &state.shutdown_started,
+                    &super::agents::DesktopRestoreHooks::new(app.clone()),
+                )
+                .await
                 {
                     eprintln!("kura-desktop: failed to restore managed agents: {error}");
                 }
@@ -355,8 +356,12 @@ pub async fn apply_workspace(
         tauri::async_runtime::spawn(async move {
             let _restore_lock = restore_lock;
             let state = app.state::<AppState>();
-            if let Err(error) =
-                restore_managed_agents_on_launch(&app, &state.shutdown_started).await
+            if let Err(error) = restore_managed_agents_on_launch(
+                &app,
+                &state.shutdown_started,
+                &super::agents::DesktopRestoreHooks::new(app.clone()),
+            )
+            .await
             {
                 eprintln!("kura-desktop: failed to restore managed agents: {error}");
             }
