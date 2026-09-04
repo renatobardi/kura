@@ -23,17 +23,20 @@ lado do relay `dev.kura.oute.pro`.
   este deploy hoje — ver "Estado atual").
 - `deploy/kura-dev/` já rodando (`wss://dev.kura.oute.pro` no ar), já que é
   o relay que este `kurad` usa.
-- **Gap de CI a resolver antes de `03-kurad.sh` funcionar de verdade:**
-  o job `server-cross-compile` em `.github/workflows/ci.yml` compila
+- **Binário `kurad` publicado**: o job `server-cross-compile` em
+  `.github/workflows/ci.yml` agora inclui `-p kurad` no matrix (junto com
   `kura-acp`, `kura-agent`, `kura-dev-mcp`, `git-credential-nostr` e
-  `git-sign-nostr` para `aarch64-unknown-linux-musl` via `cross@0.2.5`, mas
-  **`kurad` não está nesse matrix**, e esse job hoje só compila/testa — não
-  há passo de upload/publish de artefato para nenhum desses binários de
-  servidor. Antes de rodar `03-kurad.sh` em produção é preciso: (1) adicionar
-  `-p kurad` ao matrix de cross-compile, e (2) criar algum passo de
-  release/publish (release do GitHub, GHCR, etc.) que deixe o binário arm64
-  baixável por URL. Isso é trabalho de CI separado, fora deste PR — só
-  documentado aqui.
+  `git-sign-nostr`) para `x86_64-`/`aarch64-unknown-linux-musl` via
+  `cross@0.2.5` — mas esse job só compila/testa em CI, nunca publica nada.
+  O artefato baixável vem de um workflow separado,
+  `.github/workflows/kurad-release.yml`: `workflow_dispatch` manual (sem
+  trigger automático de push/tag — é um binário interno de ops, não um
+  produto com cadência de release própria ainda), publica os dois binários
+  numa release **rolling** de tag fixa `kurad-latest` (não usa
+  `releases/latest`, que é compartilhado com as releases do desktop/mobile e
+  mudaria de alvo sozinho). **Rode esse workflow manualmente (Actions →
+  "kurad release" → Run workflow) pelo menos uma vez antes do `03-kurad.sh`**,
+  e de novo sempre que quiser atualizar o binário no LXC.
 
 ## Estado atual do `kurad` (verificado em `crates/kurad/src/main.rs`)
 
@@ -48,12 +51,15 @@ lado do relay `dev.kura.oute.pro`.
 - **Sem `kurad service install`**: `03-kurad.sh` escreve a unit systemd à mão
   como stopgap; quando a Fase 4 trouxer esse subcomando, a unit gerada por
   ele deve substituir a escrita à mão.
-- **Sem `kurad identity lock/unlock`**: essa feature (passphrase NIP-49,
-  `identity.ncryptsec`, `KURA_IDENTITY_PASSPHRASE`, ver plano D4) está em
-  desenvolvimento paralelo, fora deste checkout — não existe neste binário
-  hoje. `03-kurad.sh` documenta o passo como best-effort/forward-looking e a
-  unit systemd já deixa uma linha `EnvironmentFile=` comentada, pronta para
-  quando existir.
+- **`kurad identity lock/unlock` existe** (D4, PR #14, `crates/kura-host/src/identity_lock.rs`
+  + `crates/kurad/src/main.rs`): `kurad identity lock --data-dir <path>`
+  cifra a identidade atual em `identity.ncryptsec` (NIP-49) sob uma
+  passphrase; `kurad identity unlock --data-dir <path> [--remember]` verifica
+  a passphrase e, com `--remember`, grava `identity.autounlock` (0600) para
+  boot desatendido; `KURA_IDENTITY_PASSPHRASE` é o equivalente por env var
+  (o que a unit systemd usa via `EnvironmentFile=`, ver "Secrets" abaixo).
+  Sem nenhuma dessas três fontes de passphrase, `kurad run`/`status` numa
+  identidade locked falham alto (não caem para uma chave efêmera).
 - **Sem HTTP/API**: o próprio comentário de módulo do `main.rs` lista como
   "deliberately absent (later phases)": a API JSON-RPC/WebSocket, o web
   console, qualquer listener HTTP e qualquer integração de service-manager.
@@ -71,22 +77,50 @@ lado do relay `dev.kura.oute.pro`.
 ```
 
 Depois do `03-kurad.sh`, antes de habilitar o serviço, configure a identidade
-uma vez interativamente (comando best-effort, ver acima) e só então habilite:
+uma vez interativamente e só então habilite:
 
 ```bash
 lxc exec kura-daemon -- sudo -u kura kurad identity lock --data-dir /var/lib/kura
+```
+
+Isso pede uma passphrase (duas vezes, para confirmar) e cifra a identidade
+atual (a que o `kurad run` já teria resolvido via keyring →
+`<data-dir>/identity.key` → gera-e-salva, sem `lock` nenhum) em
+`identity.ncryptsec`. Sem uma unidade sistemd rodando de forma desatendida
+capaz de fornecer essa passphrase, o `kurad` não vai destravar sozinho —
+escolha uma das duas rotas antes de habilitar o serviço:
+
+```bash
+# Rota A — reinício desatendido sem prompt (equivalente em ameaça ao
+# identity.key em texto plano de antes; ver "Secrets" abaixo):
+lxc exec kura-daemon -- sudo -u kura kurad identity unlock --data-dir /var/lib/kura --remember
+
+# Rota B — passphrase num arquivo root-only lido pela unit systemd (ver
+# "Secrets" abaixo para como preparar /etc/kurad/identity.env):
+lxc exec kura-daemon -- systemctl edit kurad --full   # descomente o EnvironmentFile=
+
 lxc exec kura-daemon -- systemctl enable --now kurad
 ```
 
 ## Secrets
 
 Não há secrets pedidos interativamente nestes scripts (diferente do
-`deploy/kura-dev/`, que pede senha do Postgres etc.) — o `kurad` de hoje
-resolve identidade via keyring → `<data-dir>/identity.key` → gera e salva, e
-não tem passphrase própria ainda. Quando `KURA_IDENTITY_PASSPHRASE` existir
-(ver "Estado atual"), o operador deve colocá-la num arquivo root-only
-(`chmod 600 /etc/kurad/identity.env` dentro do LXC) e descomentar a linha
-`EnvironmentFile=` na unit — nunca em texto plano no script.
+`deploy/kura-dev/`, que pede senha do Postgres etc.). A identidade do
+`kurad` pode ficar em texto plano (`<data-dir>/identity.key`, comportamento
+default — nenhuma ação extra) ou "locked" sob passphrase NIP-49 (rota
+recomendada, ver seção acima). Para a rota B (passphrase via arquivo em vez
+de `--remember`), a passphrase vai num arquivo root-only dentro do LXC —
+nunca em texto plano no script nem commitada:
+
+```bash
+lxc exec kura-daemon -- bash -c 'install -d -m 0700 /etc/kurad && install -m 0600 /dev/stdin /etc/kurad/identity.env' <<'EOF'
+KURA_IDENTITY_PASSPHRASE=<passphrase aqui>
+EOF
+lxc exec kura-daemon -- systemctl daemon-reload
+```
+
+depois descomente a linha `EnvironmentFile=-/etc/kurad/identity.env` na unit
+(`03-kurad.sh` já a escreve comentada) antes de `systemctl enable --now kurad`.
 
 ## Operação
 
@@ -106,4 +140,4 @@ lxc exec kura-daemon -- sudo -u kura kurad status --data-dir /var/lib/kura
 | `KURA_NODE_MAJOR` | `24` | `02-toolchain.sh` |
 | `KURA_RELAY_DEV_URL` | `wss://dev.kura.oute.pro` | `03-kurad.sh` |
 | `KURA_DAEMON_DATA_DIR` | `/var/lib/kura` | `03-kurad.sh`, `05-validate.sh` |
-| `KURA_RELEASE_URL` | release do GitHub (ver comentário em `03-kurad.sh`) | `03-kurad.sh` |
+| `KURA_RELEASE_URL` | `.../releases/download/kurad-latest/kurad-aarch64-unknown-linux-musl` (publicado por `kurad-release.yml`) | `03-kurad.sh` |
