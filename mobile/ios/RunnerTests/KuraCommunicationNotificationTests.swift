@@ -252,6 +252,7 @@ final class KuraPushNotificationResponseTests: XCTestCase {
       actionIdentifier: UNNotificationDefaultActionIdentifier,
       userInfo: [KuraPushNavigationTarget.userInfoKey: ["event_id": ""]],
       onTarget: { routedTargets.append($0) },
+      // Not under test here: this case only asserts routedTargets/completions.
       forwardToFlutter: { _ in },
       completion: { completions += 1 }
     )
