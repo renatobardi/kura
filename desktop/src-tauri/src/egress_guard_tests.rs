@@ -468,6 +468,14 @@ fn ncryptsec_handling_is_confined_to_allowlisted_files() {
         "src/commands/team_snapshot/tests.rs",
         "src/commands/personas/snapshot/import.rs",
         "src/native_websocket.rs",
+        // kurad's headless locked-identity path (D4: NIP-49 identity.ncryptsec
+        // for the LXC daemon) — same material, deliberately confined here too.
+        // `scan_roots()` above prefixes kura-host files with "kura-host/src",
+        // not "crates/kura-host/src" (and does not scan crates/kurad at all).
+        "kura-host/src/identity_lock.rs",
+        "kura-host/src/headless_identity.rs",
+        "kura-host/src/identity_storage.rs",
+        "kura-host/src/app_state.rs",
     ];
 
     let mut violations = Vec::new();

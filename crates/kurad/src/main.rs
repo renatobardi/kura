@@ -29,10 +29,18 @@ mod host;
 
 use std::path::PathBuf;
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use clap::{Args, Parser, Subcommand};
-use kura_host::app_state::{build_app_state, resolve_persisted_identity};
+use kura_host::app_state::{
+    build_app_state, remove_identity_from_keyring, resolve_persisted_identity,
+};
+use kura_host::headless_identity::{
+    self, forget_autounlock, resolve_headless_identity, write_autounlock_file,
+    write_ncryptsec_file, TerminalPassphraseSource,
+};
 use kura_host::host::HostHandle;
+use kura_host::identity_lock::lock_keys_to_ncryptsec;
+use kura_host::identity_storage::IdentityStorage;
 use kura_host::managed_agents::runtime_commands::{
     list_managed_agent_runtimes, stop_managed_agent_runtime,
 };
@@ -62,6 +70,58 @@ enum Command {
     Run(RunArgs),
     /// Print the managed-agent runtime status as JSON and exit.
     Status(StatusArgs),
+    /// Manage the locked (NIP-49 encrypted) owner identity.
+    Identity(IdentityArgs),
+}
+
+#[derive(Debug, Args)]
+struct IdentityArgs {
+    #[command(subcommand)]
+    command: IdentityCommand,
+}
+
+#[derive(Debug, Subcommand)]
+enum IdentityCommand {
+    /// Encrypt the current identity to `identity.ncryptsec` under a
+    /// passphrase, then remove the plaintext copy.
+    Lock(IdentityLockArgs),
+    /// Verify a passphrase against `identity.ncryptsec`, optionally storing
+    /// it for unattended future boots.
+    Unlock(IdentityUnlockArgs),
+    /// Delete `identity.autounlock`, disabling unattended unlock.
+    ForgetAutounlock(HostArgs),
+    /// Print whether the identity is locked and/or set to auto-unlock.
+    Status(HostArgs),
+}
+
+#[derive(Debug, Args)]
+struct IdentityLockArgs {
+    #[command(flatten)]
+    host: HostArgs,
+
+    /// Read the passphrase as a single line from stdin instead of an
+    /// interactive no-echo prompt (for scripting). The caller is responsible
+    /// for keeping the passphrase out of shell history and process listings.
+    #[arg(long)]
+    passphrase_stdin: bool,
+
+    /// Overwrite an existing `identity.ncryptsec`.
+    #[arg(long)]
+    force: bool,
+}
+
+#[derive(Debug, Args)]
+struct IdentityUnlockArgs {
+    #[command(flatten)]
+    host: HostArgs,
+
+    /// Store the verified passphrase in `identity.autounlock` (0600) so
+    /// future `kurad run`/`kurad status` decrypt without a prompt. This does
+    /// NOT unlock a currently running daemon — there is no supervisor/IPC in
+    /// this phase — it only verifies the passphrase and, with this flag,
+    /// enables unattended future boots.
+    #[arg(long)]
+    remember: bool,
 }
 
 /// Flags shared by every subcommand: they all need a host over the same tree.
@@ -110,6 +170,7 @@ async fn main() -> Result<()> {
     match Cli::parse().command {
         Command::Run(args) => run(args).await,
         Command::Status(args) => status(args).await,
+        Command::Identity(args) => identity(args).await,
     }
 }
 
@@ -125,25 +186,18 @@ fn resolve_data_dir(explicit: Option<PathBuf>) -> Result<PathBuf> {
     Ok(base.join("kura"))
 }
 
-/// Build the daemon's host: data dir, `AppState`, identity.
-///
-/// Identity resolution is the desktop's own, unchanged:
-/// `build_app_state` honours `KURA_PRIVATE_KEY`, and `resolve_persisted_identity`
-/// then walks keyring → `<data-dir>/identity.key` → generate-and-save. A
-/// failure there is logged and tolerated: a headless box booting for the first
-/// time with no identity anywhere is a legitimate state, and
-/// `build_app_state` has already seeded an ephemeral key, so refusing to boot
-/// would be strictly worse than running degraded.
-fn build_host(args: &HostArgs) -> Result<HostHandle> {
+/// Construct the host shell (data dir, `AppState`, `HeadlessHost`) without
+/// resolving identity. Callers finish setup with whichever identity path
+/// fits their command.
+fn new_headless_host(args: &HostArgs) -> Result<HostHandle> {
     let data_dir = resolve_data_dir(args.data_dir.clone())?;
     let state = build_app_state();
-    let host = HeadlessHost::new(data_dir.clone(), state, args.dev)
+    Ok(HeadlessHost::new(data_dir, state, args.dev)
         .map_err(anyhow::Error::msg)?
-        .into_handle();
+        .into_handle())
+}
 
-    if let Err(error) = resolve_persisted_identity(&host, host.state()) {
-        tracing::warn!(%error, "identity resolution failed; continuing on the boot key");
-    }
+fn log_ready(host: &HostHandle) {
     let pubkey = host
         .state()
         .keys
@@ -151,11 +205,52 @@ fn build_host(args: &HostArgs) -> Result<HostHandle> {
         .map(|keys| keys.public_key().to_hex())
         .unwrap_or_else(|_| "<poisoned>".into());
     tracing::info!(
-        data_dir = %data_dir.display(),
+        data_dir = %host.app_data_dir().map(|d| d.display().to_string()).unwrap_or_default(),
         instance_id = %host.instance_id(),
         %pubkey,
+        storage = %host.state().identity_storage().as_str(),
         "kurad host ready"
     );
+}
+
+/// Build the daemon's host for `run`/`status`: data dir, `AppState`, identity.
+///
+/// If `<data-dir>/identity.ncryptsec` exists, the identity is locked: it is
+/// resolved through [`resolve_headless_identity`] (env var →
+/// `identity.autounlock` → interactive prompt), and a failure there — wrong
+/// or missing passphrase, no TTY and no autounlock file, a corrupted file —
+/// is a **hard error that aborts startup**. Continuing on an ephemeral key
+/// while the real, locked identity sits right there unrecognized would run
+/// agents under the wrong pubkey without any indication something is wrong;
+/// that is worse than refusing to start.
+///
+/// Otherwise, behavior is unchanged from before this feature: `build_app_state`
+/// honours `KURA_PRIVATE_KEY`, and `resolve_persisted_identity` walks keyring →
+/// `<data-dir>/identity.key` → generate-and-save. A failure there is logged
+/// and tolerated — a headless box booting for the first time with no identity
+/// anywhere is a legitimate state, and `build_app_state` has already seeded an
+/// ephemeral key, so refusing to boot would be strictly worse than running
+/// degraded.
+fn build_host(args: &HostArgs) -> Result<HostHandle> {
+    let host = new_headless_host(args)?;
+    let data_dir = host.app_data_dir().map_err(anyhow::Error::msg)?;
+
+    if headless_identity::ncryptsec_path(&data_dir).exists() {
+        let resolved = resolve_headless_identity(&data_dir, &TerminalPassphraseSource)
+            .map_err(|error| anyhow::anyhow!("locked identity: {error}"))?;
+        let mut active_keys = host
+            .state()
+            .keys
+            .lock()
+            .map_err(|e| anyhow::anyhow!(e.to_string()))?;
+        *active_keys = resolved.keys;
+        host.state().set_identity_storage(resolved.storage);
+        drop(active_keys);
+    } else if let Err(error) = resolve_persisted_identity(&host, host.state()) {
+        tracing::warn!(%error, "identity resolution failed; continuing on the boot key");
+    }
+
+    log_ready(&host);
     Ok(host)
 }
 
@@ -298,12 +393,187 @@ async fn status(args: StatusArgs) -> Result<()> {
         })
         .collect();
 
+    let identity_storage = host.state().identity_storage();
     let report = serde_json::json!({
         "dataDir": host.app_data_dir().map_err(anyhow::Error::msg)?,
         "instanceId": host.instance_id(),
         "agents": agents,
         "runtimes": runtimes,
         "receipts": receipts,
+        "identityStorage": identity_storage.as_str(),
+        "identityLocked": identity_storage == IdentityStorage::LockedLocalFile,
+    });
+    println!("{}", serde_json::to_string_pretty(&report)?);
+    Ok(())
+}
+
+async fn identity(args: IdentityArgs) -> Result<()> {
+    match args.command {
+        IdentityCommand::Lock(args) => identity_lock(args),
+        IdentityCommand::Unlock(args) => identity_unlock(args),
+        IdentityCommand::ForgetAutounlock(args) => identity_forget_autounlock(&args),
+        IdentityCommand::Status(args) => identity_status(&args),
+    }
+}
+
+/// Resolve the *current* (unlocked) identity the normal way — the same
+/// keyring/plaintext-file/env resolution `run`/`status` use when there is no
+/// `identity.ncryptsec` yet. `identity lock` needs this, not the locked path,
+/// since its whole job is to take an unlocked identity and lock it.
+fn build_host_for_unlocked_identity(args: &HostArgs) -> Result<HostHandle> {
+    let host = new_headless_host(args)?;
+    resolve_persisted_identity(&host, host.state()).map_err(|error| {
+        anyhow::anyhow!("could not resolve the current (unlocked) identity: {error}")
+    })?;
+    Ok(host)
+}
+
+/// Read exactly one line from stdin as a passphrase (for `--passphrase-stdin`
+/// scripting). Trims the trailing newline only.
+fn read_passphrase_line_from_stdin() -> Result<String> {
+    let mut line = String::new();
+    std::io::stdin()
+        .read_line(&mut line)
+        .context("read passphrase from stdin")?;
+    let trimmed = line.trim_end_matches(['\n', '\r']);
+    if trimmed.is_empty() {
+        bail!("stdin passphrase was empty");
+    }
+    Ok(trimmed.to_string())
+}
+
+fn identity_lock(args: IdentityLockArgs) -> Result<()> {
+    let host = build_host_for_unlocked_identity(&args.host)?;
+    let data_dir = host.app_data_dir().map_err(anyhow::Error::msg)?;
+
+    if headless_identity::ncryptsec_path(&data_dir).exists() && !args.force {
+        bail!(
+            "{} already exists; pass --force to overwrite it",
+            headless_identity::ncryptsec_path(&data_dir).display()
+        );
+    }
+
+    let passphrase = if args.passphrase_stdin {
+        read_passphrase_line_from_stdin()?
+    } else {
+        let entered = rpassword::prompt_password("New passphrase to lock the Kura identity: ")
+            .context("read passphrase")?;
+        let confirm =
+            rpassword::prompt_password("Confirm passphrase: ").context("read passphrase")?;
+        if entered != confirm {
+            bail!("passphrases did not match; identity was not locked");
+        }
+        entered
+    };
+
+    let keys = host
+        .state()
+        .keys
+        .lock()
+        .map_err(|e| anyhow::anyhow!(e.to_string()))?
+        .clone();
+    let pubkey = keys.public_key().to_hex();
+
+    let ncryptsec = lock_keys_to_ncryptsec(&keys, &passphrase).map_err(|e| anyhow::anyhow!(e))?;
+    write_ncryptsec_file(&data_dir, &ncryptsec, args.force).map_err(|e| anyhow::anyhow!(e))?;
+
+    // Remove the plaintext copy so the encrypted file becomes the only source
+    // of truth. A previously-keyring-resident identity is also removed from
+    // the keyring, reusing the existing delete plumbing.
+    let legacy_key_path = data_dir.join("identity.key");
+    let mut removed_plaintext_file = false;
+    if legacy_key_path.exists() {
+        std::fs::remove_file(&legacy_key_path)
+            .with_context(|| format!("remove {}", legacy_key_path.display()))?;
+        removed_plaintext_file = true;
+    }
+    match remove_identity_from_keyring() {
+        Ok(()) => {}
+        Err(error) => {
+            eprintln!(
+                "warning: could not remove any keyring-resident copy of the identity ({error}); \
+                 if it was stored in the OS keyring, remove it manually"
+            );
+        }
+    }
+
+    println!(
+        "identity locked ({}): {}",
+        pubkey,
+        headless_identity::ncryptsec_path(&data_dir).display()
+    );
+    if removed_plaintext_file {
+        println!("removed plaintext {}", legacy_key_path.display());
+    }
+    println!(
+        "note: any keyring-resident copy was also targeted for removal; \
+         see any warning above if that could not be confirmed"
+    );
+    Ok(())
+}
+
+fn identity_unlock(args: IdentityUnlockArgs) -> Result<()> {
+    let host = new_headless_host(&args.host)?;
+    let data_dir = host.app_data_dir().map_err(anyhow::Error::msg)?;
+
+    if !headless_identity::ncryptsec_path(&data_dir).exists() {
+        bail!(
+            "{} does not exist; nothing to unlock",
+            headless_identity::ncryptsec_path(&data_dir).display()
+        );
+    }
+
+    let passphrase = rpassword::prompt_password("Passphrase to unlock the Kura identity: ")
+        .context("read passphrase")?;
+
+    let ncryptsec = std::fs::read_to_string(headless_identity::ncryptsec_path(&data_dir))
+        .context("read identity.ncryptsec")?;
+    let keys = kura_host::identity_lock::unlock_ncryptsec(ncryptsec.trim(), &passphrase)
+        .map_err(|error| anyhow::anyhow!("passphrase verification failed: {error}"))?;
+    let pubkey = keys.public_key().to_hex();
+
+    if args.remember {
+        write_autounlock_file(&data_dir, &passphrase).map_err(|e| anyhow::anyhow!(e))?;
+        println!(
+            "passphrase verified for {pubkey} and stored in {} (0600).",
+            headless_identity::autounlock_path(&data_dir).display()
+        );
+        println!(
+            "warning: this stores the passphrase in plaintext at 0600 on this host — the same \
+             threat model as the old unlocked identity.key. This is the deliberate opt-in \
+             tradeoff for unattended restarts (e.g. via systemd)."
+        );
+    } else {
+        println!(
+            "passphrase verified for {pubkey}. This only verifies the passphrase is correct — \
+             it does not unlock a running daemon (there is no supervisor/IPC yet) and stores \
+             nothing. Pass --remember to enable unattended future boots."
+        );
+    }
+    Ok(())
+}
+
+fn identity_forget_autounlock(args: &HostArgs) -> Result<()> {
+    let host = new_headless_host(args)?;
+    let data_dir = host.app_data_dir().map_err(anyhow::Error::msg)?;
+    let removed = forget_autounlock(&data_dir).map_err(|e| anyhow::anyhow!(e))?;
+    if removed {
+        println!(
+            "removed {} — unattended unlock is now disabled",
+            headless_identity::autounlock_path(&data_dir).display()
+        );
+    } else {
+        println!("no autounlock file was present; nothing to do");
+    }
+    Ok(())
+}
+
+fn identity_status(args: &HostArgs) -> Result<()> {
+    let host = new_headless_host(args)?;
+    let data_dir = host.app_data_dir().map_err(anyhow::Error::msg)?;
+    let report = serde_json::json!({
+        "locked": headless_identity::ncryptsec_path(&data_dir).exists(),
+        "autoUnlock": headless_identity::autounlock_path(&data_dir).exists(),
     });
     println!("{}", serde_json::to_string_pretty(&report)?);
     Ok(())

@@ -264,6 +264,18 @@ pub use keyring_config::keyring_service;
 /// Keyring key name for the human identity nsec.
 const IDENTITY_KEY_NAME: &str = "identity";
 
+/// Remove the human identity entry from the OS keyring, if present.
+///
+/// Used by `kurad identity lock` after moving the identity into an NIP-49
+/// encrypted `identity.ncryptsec` file, so no plaintext copy is left behind
+/// in the keyring. Reuses [`crate::secret_store::SecretStore::delete`] — the
+/// same call [`recover_from_keyring`] already makes — rather than adding new
+/// keyring-deletion logic; a missing entry is not an error.
+pub fn remove_identity_from_keyring() -> Result<(), String> {
+    let store = crate::secret_store::SecretStore::shared(keyring_service());
+    store.delete(IDENTITY_KEY_NAME)
+}
+
 /// Filename of the marker written once a successful keyring migration deletes
 /// the legacy `identity.key`. Its presence is the only durable signal that a
 /// key once lived in the keyring — used to tell a genuine first-ever launch
