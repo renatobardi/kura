@@ -1076,7 +1076,8 @@ jobs:
             -p kura-agent \
             -p kura-dev-mcp \
             -p git-credential-nostr \
-            -p git-sign-nostr
+            -p git-sign-nostr \
+            -p kurad
 
   windows-rust:
     name: Windows Rust (x86_64-pc-windows-msvc)
