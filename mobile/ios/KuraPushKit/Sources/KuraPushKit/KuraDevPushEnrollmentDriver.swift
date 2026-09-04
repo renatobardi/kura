@@ -11,7 +11,7 @@ import Foundation
 #endif
 
 /// The opaque gateway capability and binding metadata needed by a later lease publisher.
-public struct BuzzPushEndpointGrantRecord: Codable, Equatable, Sendable {
+public struct KuraPushEndpointGrantRecord: Codable, Equatable, Sendable {
   public let relayOrigin: String
   /// NIP-PL delegation key selected from the relay push descriptor.
   public let relayPubkey: String
@@ -58,18 +58,18 @@ public struct BuzzPushEndpointGrantRecord: Codable, Equatable, Sendable {
 
 /// Persistence boundary for endpoint grants. The Runner implementation stores
 /// records in its Keychain access group and exposes them over the Flutter bridge.
-public protocol BuzzPushEndpointGrantStore {
-  func records() throws -> [BuzzPushEndpointGrantRecord]
-  func save(_ record: BuzzPushEndpointGrantRecord) throws
+public protocol KuraPushEndpointGrantStore {
+  func records() throws -> [KuraPushEndpointGrantRecord]
+  func save(_ record: KuraPushEndpointGrantRecord) throws
   func pendingEnrollment(
     relayOrigin: String,
     appProfile: String
-  ) throws -> BuzzPushPendingEnrollmentRecord?
-  func savePendingEnrollment(_ record: BuzzPushPendingEnrollmentRecord) throws
+  ) throws -> KuraPushPendingEnrollmentRecord?
+  func savePendingEnrollment(_ record: KuraPushPendingEnrollmentRecord) throws
   func removePendingEnrollment(relayOrigin: String, appProfile: String) throws
 }
 
-public enum BuzzDevPushEnrollmentError: Error, LocalizedError, Equatable {
+public enum KuraDevPushEnrollmentError: Error, LocalizedError, Equatable {
   case invalidGatewayURL
   case invalidRelayURL
   case invalidRelayDescriptor
@@ -104,30 +104,30 @@ public enum BuzzDevPushEnrollmentError: Error, LocalizedError, Equatable {
   }
 }
 
-protocol BuzzDevAppAttesting {
-  func prepareAttestation() async throws -> BuzzDevAttestation
-  func attestation(_ prepared: BuzzDevAttestation, clientData: Data) async throws
-    -> BuzzDevAttestation
+protocol KuraDevAppAttesting {
+  func prepareAttestation() async throws -> KuraDevAttestation
+  func attestation(_ prepared: KuraDevAttestation, clientData: Data) async throws
+    -> KuraDevAttestation
   func assertion(clientData: Data) async throws -> String
 }
 
-struct BuzzDevAttestation: Equatable {
+struct KuraDevAttestation: Equatable {
   let keyId: String
   let attestation: String
 }
 
-private enum BuzzSecureRandom {
+private enum KuraSecureRandom {
   static func bytes(count: Int) throws -> Data {
     var bytes = [UInt8](repeating: 0, count: count)
     let status = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
     guard status == errSecSuccess else {
-      throw BuzzDevPushEnrollmentError.randomGenerationFailed(status)
+      throw KuraDevPushEnrollmentError.randomGenerationFailed(status)
     }
     return Data(bytes)
   }
 }
 
-private enum BuzzAppAttestKeyId {
+private enum KuraAppAttestKeyId {
   static func isValid(_ keyId: String) -> Bool {
     guard !keyId.isEmpty,
       keyId.unicodeScalars.allSatisfy(\.isASCII),
@@ -137,12 +137,12 @@ private enum BuzzAppAttestKeyId {
   }
 }
 
-protocol BuzzAppAttestKeyIdStoring {
+protocol KuraAppAttestKeyIdStoring {
   func keyId() throws -> String?
   func saveKeyId(_ keyId: String) throws
 }
 
-struct BuzzAppAttestKeyIdKeychainStore: BuzzAppAttestKeyIdStoring {
+struct KuraAppAttestKeyIdKeychainStore: KuraAppAttestKeyIdStoring {
   private static let service = "buzz.push.app-attest"
   private static let account = "key-id-v1"
 
@@ -176,16 +176,16 @@ struct BuzzAppAttestKeyIdKeychainStore: BuzzAppAttestKeyIdStoring {
     }
     guard let data = result as? Data,
       let keyId = String(data: data, encoding: .utf8),
-      BuzzAppAttestKeyId.isValid(keyId)
+      KuraAppAttestKeyId.isValid(keyId)
     else {
-      throw BuzzDevPushEnrollmentError.invalidAppAttestKeyId
+      throw KuraDevPushEnrollmentError.invalidAppAttestKeyId
     }
     return keyId
   }
 
   func saveKeyId(_ keyId: String) throws {
-    guard BuzzAppAttestKeyId.isValid(keyId) else {
-      throw BuzzDevPushEnrollmentError.invalidAppAttestKeyId
+    guard KuraAppAttestKeyId.isValid(keyId) else {
+      throw KuraDevPushEnrollmentError.invalidAppAttestKeyId
     }
     let data = Data(keyId.utf8)
     let updateStatus = update(
@@ -230,53 +230,53 @@ struct BuzzAppAttestKeyIdKeychainStore: BuzzAppAttestKeyIdStoring {
   }
 }
 
-protocol BuzzDCAppAttestServicing {
+protocol KuraDCAppAttestServicing {
   var isSupported: Bool { get }
   func generateKey() async throws -> String
   func attestKey(_ keyId: String, clientDataHash: Data) async throws -> Data
   func generateAssertion(_ keyId: String, clientDataHash: Data) async throws -> Data
 }
 
-extension DCAppAttestService: BuzzDCAppAttestServicing {}
+extension DCAppAttestService: KuraDCAppAttestServicing {}
 
-struct BuzzDCAppAttestProvider: BuzzDevAppAttesting {
-  private let service: BuzzDCAppAttestServicing
-  private let keyIdStore: BuzzAppAttestKeyIdStoring
+struct KuraDCAppAttestProvider: KuraDevAppAttesting {
+  private let service: KuraDCAppAttestServicing
+  private let keyIdStore: KuraAppAttestKeyIdStoring
 
   init(
-    service: BuzzDCAppAttestServicing = DCAppAttestService.shared,
-    keyIdStore: BuzzAppAttestKeyIdStoring
+    service: KuraDCAppAttestServicing = DCAppAttestService.shared,
+    keyIdStore: KuraAppAttestKeyIdStoring
   ) {
     self.service = service
     self.keyIdStore = keyIdStore
   }
 
-  func prepareAttestation() async throws -> BuzzDevAttestation {
+  func prepareAttestation() async throws -> KuraDevAttestation {
     try requireSupportedService()
     let keyId = try await service.generateKey()
-    guard BuzzAppAttestKeyId.isValid(keyId) else {
-      throw BuzzDevPushEnrollmentError.invalidAppAttestKeyId
+    guard KuraAppAttestKeyId.isValid(keyId) else {
+      throw KuraDevPushEnrollmentError.invalidAppAttestKeyId
     }
     try keyIdStore.saveKeyId(keyId)
-    return BuzzDevAttestation(keyId: keyId, attestation: "")
+    return KuraDevAttestation(keyId: keyId, attestation: "")
   }
 
   func attestation(
-    _ prepared: BuzzDevAttestation,
+    _ prepared: KuraDevAttestation,
     clientData: Data
-  ) async throws -> BuzzDevAttestation {
+  ) async throws -> KuraDevAttestation {
     precondition(!clientData.isEmpty, "Enrollment client data must not be empty")
     try requireSupportedService()
-    guard BuzzAppAttestKeyId.isValid(prepared.keyId),
+    guard KuraAppAttestKeyId.isValid(prepared.keyId),
       try keyIdStore.keyId() == prepared.keyId
     else {
-      throw BuzzDevPushEnrollmentError.invalidAppAttestKeyId
+      throw KuraDevPushEnrollmentError.invalidAppAttestKeyId
     }
     let object = try await service.attestKey(
       prepared.keyId,
       clientDataHash: Data(SHA256.hash(data: clientData))
     )
-    return BuzzDevAttestation(
+    return KuraDevAttestation(
       keyId: prepared.keyId,
       attestation: object.base64EncodedString()
     )
@@ -286,9 +286,9 @@ struct BuzzDCAppAttestProvider: BuzzDevAppAttesting {
     precondition(!clientData.isEmpty, "Delegation client data must not be empty")
     try requireSupportedService()
     guard let keyId = try keyIdStore.keyId(),
-      BuzzAppAttestKeyId.isValid(keyId)
+      KuraAppAttestKeyId.isValid(keyId)
     else {
-      throw BuzzDevPushEnrollmentError.invalidAppAttestKeyId
+      throw KuraDevPushEnrollmentError.invalidAppAttestKeyId
     }
     let object = try await service.generateAssertion(
       keyId,
@@ -299,20 +299,20 @@ struct BuzzDCAppAttestProvider: BuzzDevAppAttesting {
 
   private func requireSupportedService() throws {
     guard service.isSupported else {
-      throw BuzzDevPushEnrollmentError.appAttestUnsupported
+      throw KuraDevPushEnrollmentError.appAttestUnsupported
     }
   }
 }
 
 /// Enrollment and delegation driver for real App Attest and the gated debug bypass.
-public final class BuzzDevPushEnrollmentDriver {
+public final class KuraDevPushEnrollmentDriver {
   public static let appProfile = "buzz-ios-dogfood"
   public static let endpointEpoch: Int64 = 1
 
   private let gatewayBaseURL: URL
-  private let store: BuzzPushEndpointGrantStore
+  private let store: KuraPushEndpointGrantStore
   private let session: URLSession
-  private let appAttest: BuzzDevAppAttesting
+  private let appAttest: KuraDevAppAttesting
   private let now: () -> Date
   private let lifetimeSeconds: Int64
   private let installationIdBytes: () throws -> Data
@@ -321,7 +321,7 @@ public final class BuzzDevPushEnrollmentDriver {
   /// generated App Attest key identifier in the requested Keychain access group.
   public convenience init(
     gatewayBaseURL: URL,
-    store: BuzzPushEndpointGrantStore,
+    store: KuraPushEndpointGrantStore,
     appAttestKeychainAccessGroup: String?,
     session: URLSession = .shared
   ) throws {
@@ -329,30 +329,30 @@ public final class BuzzDevPushEnrollmentDriver {
       gatewayBaseURL: gatewayBaseURL,
       store: store,
       session: session,
-      appAttest: BuzzDCAppAttestProvider(
-        keyIdStore: BuzzAppAttestKeyIdKeychainStore(
+      appAttest: KuraDCAppAttestProvider(
+        keyIdStore: KuraAppAttestKeyIdKeychainStore(
           accessGroup: appAttestKeychainAccessGroup
         )
       ),
       now: Date.init,
       lifetimeSeconds: 2_592_000,
-      installationIdBytes: { try BuzzSecureRandom.bytes(count: 16) }
+      installationIdBytes: { try KuraSecureRandom.bytes(count: 16) }
     )
   }
 
   init(
     gatewayBaseURL: URL,
-    store: BuzzPushEndpointGrantStore,
+    store: KuraPushEndpointGrantStore,
     session: URLSession,
-    appAttest: BuzzDevAppAttesting,
+    appAttest: KuraDevAppAttesting,
     now: @escaping () -> Date,
     lifetimeSeconds: Int64,
     installationIdBytes: @escaping () throws -> Data = {
-      try BuzzSecureRandom.bytes(count: 16)
+      try KuraSecureRandom.bytes(count: 16)
     }
   ) throws {
     guard Self.isHTTPOrigin(gatewayBaseURL), lifetimeSeconds > 0 else {
-      throw BuzzDevPushEnrollmentError.invalidGatewayURL
+      throw KuraDevPushEnrollmentError.invalidGatewayURL
     }
     self.gatewayBaseURL = gatewayBaseURL
     self.store = store
@@ -363,7 +363,7 @@ public final class BuzzDevPushEnrollmentDriver {
     self.installationIdBytes = installationIdBytes
   }
 
-  public func endpointGrants() throws -> [BuzzPushEndpointGrantRecord] {
+  public func endpointGrants() throws -> [KuraPushEndpointGrantRecord] {
     try store.records()
   }
 
@@ -372,7 +372,7 @@ public final class BuzzDevPushEnrollmentDriver {
   public func enroll(
     deviceToken: Data,
     relayURL: URL
-  ) async throws -> BuzzPushEndpointGrantRecord {
+  ) async throws -> KuraPushEndpointGrantRecord {
     precondition(!deviceToken.isEmpty, "The APNs device token must not be empty")
     let relayOrigin = try Self.relayOrigin(relayURL)
     let relayKeys = try await fetchCurrentRelayKeys(from: relayOrigin.url)
@@ -412,7 +412,7 @@ public final class BuzzDevPushEnrollmentDriver {
         )
         return current
       }
-      let refreshed = BuzzPushEndpointGrantRecord(
+      let refreshed = KuraPushEndpointGrantRecord(
         relayOrigin: current.relayOrigin,
         relayPubkey: current.relayPubkey,
         relayMetadataPubkey: relayKeys.metadataPubkey,
@@ -434,7 +434,7 @@ public final class BuzzDevPushEnrollmentDriver {
     }
 
     // One gateway delegation is scoped to an installation and relay key, not
-    // to a Buzz community. A second origin served by the same relay therefore
+    // to a Kura community. A second origin served by the same relay therefore
     // gets a fresh unlinkable NIP-PL address while reusing the opaque grant.
     if storedForOrigin == nil,
       let sharedGrant = storedRecords.first(where: {
@@ -443,7 +443,7 @@ public final class BuzzDevPushEnrollmentDriver {
           && $0.expiresAt > nowSeconds + 300
       })
     {
-      let record = BuzzPushEndpointGrantRecord(
+      let record = KuraPushEndpointGrantRecord(
         relayOrigin: relayOrigin.text,
         relayPubkey: relayPubkey,
         relayMetadataPubkey: relayKeys.metadataPubkey,
@@ -481,10 +481,10 @@ public final class BuzzDevPushEnrollmentDriver {
 
     let (renewedExpiration, expiresOverflow) = nowSeconds.addingReportingOverflow(lifetimeSeconds)
     guard !expiresOverflow else {
-      throw BuzzDevPushEnrollmentError.invalidGatewayURL
+      throw KuraDevPushEnrollmentError.invalidGatewayURL
     }
 
-    var pending: BuzzPushPendingEnrollmentRecord
+    var pending: KuraPushPendingEnrollmentRecord
     if let existingPending = pendingEnrollment {
       pending = existingPending
     } else if let reusableInstallation,
@@ -495,7 +495,7 @@ public final class BuzzDevPushEnrollmentDriver {
         reusableInstallation.expiresAt > nowSeconds + 300
         ? reusableInstallation.expiresAt
         : renewedExpiration
-      pending = BuzzPushPendingEnrollmentRecord(
+      pending = KuraPushPendingEnrollmentRecord(
         relayOrigin: relayOrigin.text,
         relayPubkey: relayPubkey,
         endpointHash: endpointHash,
@@ -509,7 +509,7 @@ public final class BuzzDevPushEnrollmentDriver {
       let expiresAt = renewedExpiration
       let enrollmentChallenge = try await challenge()
       let preparedAttestation = try await appAttest.prepareAttestation()
-      let enrollmentClientData = try BuzzPushTranscript.enroll(
+      let enrollmentClientData = try KuraPushTranscript.enroll(
         challengeId: enrollmentChallenge.id,
         challenge: enrollmentChallenge.value,
         keyId: preparedAttestation.keyId,
@@ -523,9 +523,9 @@ public final class BuzzDevPushEnrollmentDriver {
         clientData: enrollmentClientData
       )
       guard attestation.keyId == preparedAttestation.keyId else {
-        throw BuzzDevPushEnrollmentError.invalidResponse(route: "development attestation")
+        throw KuraDevPushEnrollmentError.invalidResponse(route: "development attestation")
       }
-      pending = BuzzPushPendingEnrollmentRecord(
+      pending = KuraPushPendingEnrollmentRecord(
         relayOrigin: relayOrigin.text,
         relayPubkey: relayPubkey,
         endpointHash: endpointHash,
@@ -555,7 +555,7 @@ public final class BuzzDevPushEnrollmentDriver {
         let keyId = pending.keyId,
         let attestation = pending.attestation
       else {
-        throw BuzzDevPushEnrollmentError.invalidResponse(
+        throw KuraDevPushEnrollmentError.invalidResponse(
           route: "pending development enrollment"
         )
       }
@@ -564,9 +564,9 @@ public final class BuzzDevPushEnrollmentDriver {
           challenge: Challenge(id: challengeUUID, value: challengeValue),
           endpoint: endpoint,
           expiresAt: pending.expiresAt,
-          attestation: BuzzDevAttestation(keyId: keyId, attestation: attestation)
+          attestation: KuraDevAttestation(keyId: keyId, attestation: attestation)
         )
-      } catch BuzzDevPushEnrollmentError.unexpectedStatus(
+      } catch KuraDevPushEnrollmentError.unexpectedStatus(
         route: "v1/installations", _, actual: 404, _
       ) where pendingEnrollment != nil {
         // No installation was committed and the original challenge expired.
@@ -577,7 +577,7 @@ public final class BuzzDevPushEnrollmentDriver {
         )
         return try await enroll(deviceToken: deviceToken, relayURL: relayURL)
       }
-      pending = BuzzPushPendingEnrollmentRecord(
+      pending = KuraPushPendingEnrollmentRecord(
         relayOrigin: pending.relayOrigin,
         relayPubkey: pending.relayPubkey,
         endpointHash: pending.endpointHash,
@@ -608,13 +608,13 @@ public final class BuzzDevPushEnrollmentDriver {
     if generationBase > 0 {
       let (next, overflow) = generationBase.addingReportingOverflow(1)
       guard !overflow, next > 0 else {
-        throw BuzzDevPushEnrollmentError.generationExhausted
+        throw KuraDevPushEnrollmentError.generationExhausted
       }
       generation = next
     } else {
       generation = 1
     }
-    pending = BuzzPushPendingEnrollmentRecord(
+    pending = KuraPushPendingEnrollmentRecord(
       relayOrigin: pending.relayOrigin,
       relayPubkey: pending.relayPubkey,
       endpointHash: pending.endpointHash,
@@ -633,7 +633,7 @@ public final class BuzzDevPushEnrollmentDriver {
     try store.savePendingEnrollment(pending)
 
     let delegationChallenge = try await challenge()
-    let delegationClientData = try BuzzPushTranscript.delegate(
+    let delegationClientData = try KuraPushTranscript.delegate(
       challengeId: delegationChallenge.id,
       challenge: delegationChallenge.value,
       installationHandle: installation,
@@ -654,7 +654,7 @@ public final class BuzzDevPushEnrollmentDriver {
       assertion: assertion
     )
 
-    let record = BuzzPushEndpointGrantRecord(
+    let record = KuraPushEndpointGrantRecord(
       relayOrigin: relayOrigin.text,
       relayPubkey: relayPubkey,
       relayMetadataPubkey: relayKeys.metadataPubkey,
@@ -696,7 +696,7 @@ public final class BuzzDevPushEnrollmentDriver {
       Self.isBase64URLChallenge(response.challenge),
       response.expiresAt > Int64(now().timeIntervalSince1970)
     else {
-      throw BuzzDevPushEnrollmentError.invalidResponse(route: "v1/installations/challenges")
+      throw KuraDevPushEnrollmentError.invalidResponse(route: "v1/installations/challenges")
     }
     return Challenge(id: id, value: response.challenge)
   }
@@ -705,7 +705,7 @@ public final class BuzzDevPushEnrollmentDriver {
     challenge: Challenge,
     endpoint: String,
     expiresAt: Int64,
-    attestation: BuzzDevAttestation
+    attestation: KuraDevAttestation
   ) async throws -> UUID {
     let response: InstallationResponse = try await post(
       route: "v1/installations",
@@ -727,7 +727,7 @@ public final class BuzzDevPushEnrollmentDriver {
       response.endpointEpoch == Self.endpointEpoch,
       response.expiresAt == expiresAt
     else {
-      throw BuzzDevPushEnrollmentError.invalidResponse(route: "v1/installations")
+      throw KuraDevPushEnrollmentError.invalidResponse(route: "v1/installations")
     }
     return installation
   }
@@ -758,7 +758,7 @@ public final class BuzzDevPushEnrollmentDriver {
       )
     )
     guard !response.endpointGrant.isEmpty, response.endpointGrant.utf8.count <= 4_096 else {
-      throw BuzzDevPushEnrollmentError.invalidResponse(route: "v1/delegations")
+      throw KuraDevPushEnrollmentError.invalidResponse(route: "v1/delegations")
     }
     return response.endpointGrant
   }
@@ -773,13 +773,13 @@ public final class BuzzDevPushEnrollmentDriver {
     do {
       document = try JSONDecoder().decode(RelayInformation.self, from: data)
     } catch {
-      throw BuzzDevPushEnrollmentError.invalidRelayDescriptor
+      throw KuraDevPushEnrollmentError.invalidRelayDescriptor
     }
     let current = document.push.keys.filter(\.current)
     guard current.count == 1,
       Self.isLowercaseHexPubkey(current[0].pubkey)
     else {
-      throw BuzzDevPushEnrollmentError.invalidRelayDescriptor
+      throw KuraDevPushEnrollmentError.invalidRelayDescriptor
     }
     let metadataPubkey = document.relaySelf.flatMap {
       Self.isLowercaseHexPubkey($0) ? $0 : nil
@@ -807,7 +807,7 @@ public final class BuzzDevPushEnrollmentDriver {
     do {
       return try JSONDecoder().decode(Response.self, from: data)
     } catch {
-      throw BuzzDevPushEnrollmentError.invalidResponse(route: route)
+      throw KuraDevPushEnrollmentError.invalidResponse(route: route)
     }
   }
 
@@ -818,11 +818,11 @@ public final class BuzzDevPushEnrollmentDriver {
     expected: Int
   ) throws {
     guard let http = response as? HTTPURLResponse else {
-      throw BuzzDevPushEnrollmentError.invalidResponse(route: route)
+      throw KuraDevPushEnrollmentError.invalidResponse(route: route)
     }
     guard http.statusCode == expected else {
       let body = String(decoding: data.prefix(512), as: UTF8.self)
-      throw BuzzDevPushEnrollmentError.unexpectedStatus(
+      throw KuraDevPushEnrollmentError.unexpectedStatus(
         route: route, expected: expected, actual: http.statusCode, body: body
       )
     }
@@ -847,7 +847,7 @@ public final class BuzzDevPushEnrollmentDriver {
       url.query == nil,
       url.fragment == nil
     else {
-      throw BuzzDevPushEnrollmentError.invalidRelayURL
+      throw KuraDevPushEnrollmentError.invalidRelayURL
     }
     var components = URLComponents()
     components.scheme = url.scheme == "wss" ? "https" : "http"
@@ -855,13 +855,13 @@ public final class BuzzDevPushEnrollmentDriver {
     components.port = url.port
     components.path = "/"
     guard let httpURL = components.url else {
-      throw BuzzDevPushEnrollmentError.invalidRelayURL
+      throw KuraDevPushEnrollmentError.invalidRelayURL
     }
     var relayComponents = components
     relayComponents.scheme = url.scheme
     relayComponents.path = ""
     guard let relayText = relayComponents.string else {
-      throw BuzzDevPushEnrollmentError.invalidRelayURL
+      throw KuraDevPushEnrollmentError.invalidRelayURL
     }
     return (httpURL, relayText)
   }

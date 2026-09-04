@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import BuzzPushKit
+@testable import KuraPushKit
 
 final class APNsRegistrationBufferTests: XCTestCase {
     func testReplaysTokenAfterChannelAttachment() {

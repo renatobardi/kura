@@ -1,5 +1,5 @@
 import AVFoundation
-import BuzzPushKit
+import KuraPushKit
 import Flutter
 import UIKit
 import UserNotifications
@@ -10,19 +10,19 @@ import os.log
   private var mediaUploadChannel: FlutterMethodChannel?
   private var pushChannel: FlutterMethodChannel?
   private let apnsRegistrationBuffer = APNsRegistrationBuffer()
-  private let pushNavigationBuffer = BuzzPushNavigationBuffer()
+  private let pushNavigationBuffer = KuraPushNavigationBuffer()
   private var apnsDeviceToken: Data?
-  private lazy var endpointGrantStore = BuzzPushEndpointGrantKeychainStore(
-    accessGroup: Bundle.main.object(forInfoDictionaryKey: "BuzzKeychainAccessGroup") as? String
+  private lazy var endpointGrantStore = KuraPushEndpointGrantKeychainStore(
+    accessGroup: Bundle.main.object(forInfoDictionaryKey: "KuraKeychainAccessGroup") as? String
   )
   private var enrollmentTask: Task<Void, Never>?
   private var appGroupIdentifier: String? {
-    Bundle.main.object(forInfoDictionaryKey: "BuzzAppGroupIdentifier") as? String
+    Bundle.main.object(forInfoDictionaryKey: "KuraAppGroupIdentifier") as? String
   }
   private var pushKeychainAccessGroup: String? {
-    Bundle.main.object(forInfoDictionaryKey: "BuzzKeychainAccessGroup") as? String
+    Bundle.main.object(forInfoDictionaryKey: "KuraKeychainAccessGroup") as? String
   }
-  private lazy var pushSnapshotBridge = BuzzPushSnapshotBridge(
+  private lazy var pushSnapshotBridge = KuraPushSnapshotBridge(
     appGroupIdentifier: appGroupIdentifier,
     endpointGrantStore: endpointGrantStore,
     keychainAccessGroup: pushKeychainAccessGroup
@@ -89,7 +89,7 @@ import os.log
     }
 
     if let inlinePhotoPickerRegistrar = engineBridge.pluginRegistry.registrar(
-      forPlugin: "BuzzInlinePhotoPicker"
+      forPlugin: "KuraInlinePhotoPicker"
     ) {
       inlinePhotoPickerRegistrar.register(
         InlinePhotoPickerFactory(
@@ -101,7 +101,7 @@ import os.log
     }
 
     if let concentricSheetRegistrar = engineBridge.pluginRegistry.registrar(
-      forPlugin: "BuzzConcentricSheetSurface"
+      forPlugin: "KuraConcentricSheetSurface"
     ) {
       concentricSheetRegistrar.register(
         ConcentricSheetSurfaceFactory(messenger: messenger),
@@ -125,7 +125,7 @@ import os.log
     }
 
     if let jumpToLatestGlassRegistrar = engineBridge.pluginRegistry.registrar(
-      forPlugin: "BuzzJumpToLatestGlassButton"
+      forPlugin: "KuraJumpToLatestGlassButton"
     ) {
       jumpToLatestGlassRegistrar.register(
         JumpToLatestGlassButtonFactory(messenger: messenger),
@@ -134,7 +134,7 @@ import os.log
     }
 
     if let navigationGlassRegistrar = engineBridge.pluginRegistry.registrar(
-      forPlugin: "BuzzNavigationGlassButton"
+      forPlugin: "KuraNavigationGlassButton"
     ) {
       navigationGlassRegistrar.register(
         NavigationGlassButtonFactory(messenger: messenger),
@@ -143,7 +143,7 @@ import os.log
     }
 
     if let segmentedControlRegistrar = engineBridge.pluginRegistry.registrar(
-      forPlugin: "BuzzNativeSegmentedControl"
+      forPlugin: "KuraNativeSegmentedControl"
     ) {
       segmentedControlRegistrar.register(
         NativeSegmentedControlFactory(messenger: messenger),
@@ -152,7 +152,7 @@ import os.log
     }
 
     if let skinToneRegistrar = engineBridge.pluginRegistry.registrar(
-      forPlugin: "BuzzNativeSkinToneControl"
+      forPlugin: "KuraNativeSkinToneControl"
     ) {
       skinToneRegistrar.register(
         NativeSkinToneControlFactory(messenger: messenger),
@@ -161,7 +161,7 @@ import os.log
     }
 
     if let stickyDateGlassRegistrar = engineBridge.pluginRegistry.registrar(
-      forPlugin: "BuzzStickyDateGlassHeader"
+      forPlugin: "KuraStickyDateGlassHeader"
     ) {
       stickyDateGlassRegistrar.register(
         StickyDateGlassHeaderFactory(messenger: messenger),
@@ -170,7 +170,7 @@ import os.log
     }
 
     if let themePaginationGlassRegistrar = engineBridge.pluginRegistry.registrar(
-      forPlugin: "BuzzThemePaginationGlassControl"
+      forPlugin: "KuraThemePaginationGlassControl"
     ) {
       themePaginationGlassRegistrar.register(
         ThemePaginationGlassControlFactory(messenger: messenger),
@@ -179,7 +179,7 @@ import os.log
     }
 
     let nativeAttachmentRegistrar = engineBridge.pluginRegistry.registrar(
-      forPlugin: "BuzzNativeAttachmentPopover"
+      forPlugin: "KuraNativeAttachmentPopover"
     )
     nativeAttachmentPopoverCoordinator = NativeAttachmentPopoverCoordinator(
       messenger: messenger,
@@ -187,7 +187,7 @@ import os.log
     )
 
     let nativeEmojiPickerRegistrar = engineBridge.pluginRegistry.registrar(
-      forPlugin: "BuzzNativeEmojiPicker"
+      forPlugin: "KuraNativeEmojiPicker"
     )
     nativeEmojiPickerCoordinator = NativeEmojiPickerCoordinator(
       messenger: messenger,
@@ -195,7 +195,7 @@ import os.log
     )
 
     let nativeProfileTextEditorRegistrar = engineBridge.pluginRegistry.registrar(
-      forPlugin: "BuzzNativeProfileTextEditor"
+      forPlugin: "KuraNativeProfileTextEditor"
     )
     nativeProfileTextEditorCoordinator = NativeProfileTextEditorCoordinator(
       messenger: messenger,
@@ -203,7 +203,7 @@ import os.log
     )
     if #available(iOS 16.0, *),
       let nativeMessageActionsRegistrar = engineBridge.pluginRegistry.registrar(
-        forPlugin: "BuzzNativeMessageActionSurface"
+        forPlugin: "KuraNativeMessageActionSurface"
       )
     {
       nativeMessageActionsRegistrar.register(
@@ -296,7 +296,7 @@ import os.log
     didReceive response: UNNotificationResponse,
     withCompletionHandler completionHandler: @escaping () -> Void
   ) {
-    BuzzPushNotificationResponseCoordinator.handle(
+    KuraPushNotificationResponseCoordinator.handle(
       actionIdentifier: response.actionIdentifier,
       userInfo: response.notification.request.content.userInfo,
       onTarget: { target in
@@ -326,7 +326,7 @@ import os.log
     )
   }
 
-  private func deliverPushNavigationTarget(_ target: BuzzPushNavigationTarget) {
+  private func deliverPushNavigationTarget(_ target: KuraPushNavigationTarget) {
     pushChannel?.invokeMethod(
       "notificationOpened",
       arguments: target.flutterArguments
@@ -415,7 +415,7 @@ import os.log
       _, error in
       if let error {
         os_log(
-          "Buzz notification authorization request failed: %{public}@",
+          "Kura notification authorization request failed: %{public}@",
           type: .error,
           error.localizedDescription
         )
@@ -478,11 +478,11 @@ import os.log
     }
 
     do {
-      let driver = try BuzzDevPushEnrollmentDriver(
+      let driver = try KuraDevPushEnrollmentDriver(
         gatewayBaseURL: gatewayURL,
         store: endpointGrantStore,
         appAttestKeychainAccessGroup: Bundle.main.object(
-          forInfoDictionaryKey: "BuzzKeychainAccessGroup"
+          forInfoDictionaryKey: "KuraKeychainAccessGroup"
         ) as? String
       )
       enrollmentTask = Task { [weak self] in
@@ -737,7 +737,7 @@ import os.log
       let exportSession = AVAssetExportSession(
         asset: composition,
         // Passthrough preserves the source's HEVC codec and container
-        // metadata. Buzz accepts only canonical H.264/AAC MP4s with no
+        // metadata. Kura accepts only canonical H.264/AAC MP4s with no
         // metadata channels, so re-encode instead of copying the movie.
         presetName: AVAssetExportPresetMediumQuality
       )
@@ -770,7 +770,7 @@ import os.log
       case .completed:
         do {
           // AVFoundation writes a standard sample-dependency table (`sdtp`).
-          // Older Buzz relays mistook that playback-only box for metadata. Keep
+          // Older Kura relays mistook that playback-only box for metadata. Keep
           // its size and payload in a `free` box so chunk offsets stay valid and
           // uploads work before those relays receive the validator fix.
           try Self.neutralizeSampleDependencyBoxes(at: outputURL)
@@ -855,14 +855,14 @@ import os.log
         guard let posterImage else {
           throw lastError
             ?? NSError(
-              domain: "BuzzVideoPoster",
+              domain: "KuraVideoPoster",
               code: 1,
               userInfo: [NSLocalizedDescriptionKey: "Unable to decode a video frame."]
             )
         }
         guard let jpegData = try MediaSanitizer.encodeJpeg(UIImage(cgImage: posterImage)) else {
           throw NSError(
-            domain: "BuzzVideoPoster",
+            domain: "KuraVideoPoster",
             code: 2,
             userInfo: [NSLocalizedDescriptionKey: "Unable to encode video poster."]
           )
@@ -948,14 +948,14 @@ import os.log
 
   private static func invalidMp4BoxError() -> NSError {
     NSError(
-      domain: "BuzzVideoTranscode",
+      domain: "KuraVideoTranscode",
       code: 1,
       userInfo: [NSLocalizedDescriptionKey: "Invalid MP4 box structure."]
     )
   }
 }
 
-extension BuzzPushNavigationTarget {
+extension KuraPushNavigationTarget {
   fileprivate var flutterArguments: [String: String] {
     [
       "eventId": eventID,

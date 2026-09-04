@@ -1,7 +1,7 @@
 /// Crash-recovery journal written before installation or delegation requests.
 /// It contains no APNs endpoint, only its hash and the exact authenticated
 /// enrollment material needed to replay a committed request idempotently.
-public struct BuzzPushPendingEnrollmentRecord: Codable, Equatable, Sendable {
+public struct KuraPushPendingEnrollmentRecord: Codable, Equatable, Sendable {
   public let relayOrigin: String
   public let relayPubkey: String
   public let endpointHash: String

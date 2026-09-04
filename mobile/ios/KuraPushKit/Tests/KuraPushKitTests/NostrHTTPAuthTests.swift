@@ -2,7 +2,7 @@ import CryptoKit
 import Foundation
 import XCTest
 
-@testable import BuzzPushKit
+@testable import KuraPushKit
 
 final class NostrHTTPAuthTests: XCTestCase {
     private let privateKey = String(repeating: "0", count: 63) + "1"

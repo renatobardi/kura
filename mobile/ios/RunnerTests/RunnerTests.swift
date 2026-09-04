@@ -4,7 +4,7 @@ import UIKit
 import UserNotifications
 import XCTest
 
-@testable import Buzz
+@testable import Kura
 
 class RunnerTests: XCTestCase {
 

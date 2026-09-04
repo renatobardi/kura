@@ -2,14 +2,14 @@ import CryptoKit
 import Foundation
 import XCTest
 
-@testable import BuzzPushKit
+@testable import KuraPushKit
 
 /// Replays the gateway-generated known-answer vectors
 /// (`crates/buzz-push-gateway/tests/vectors/app_attest_transcripts.json`)
 /// against the Swift canonical encoder. Byte-for-byte transcript equality and
 /// SHA-256 equality are both asserted, so a drift on either side breaks a test
 /// instead of silently stranding iOS clients with `401 invalid_attestation`.
-final class BuzzPushTranscriptTests: XCTestCase {
+final class KuraPushTranscriptTests: XCTestCase {
     // MARK: Fixture
 
     struct Fixture: Decodable {
@@ -69,7 +69,7 @@ final class BuzzPushTranscriptTests: XCTestCase {
     // MARK: Known-answer vectors
 
     func testEnrollVector() throws {
-        try assertMatchesVector("enroll", BuzzPushTranscript.enroll(
+        try assertMatchesVector("enroll", KuraPushTranscript.enroll(
             challengeId: Self.challengeId,
             challenge: Self.challenge,
             keyId: Self.keyId,
@@ -81,7 +81,7 @@ final class BuzzPushTranscriptTests: XCTestCase {
     }
 
     func testDelegateVector() throws {
-        try assertMatchesVector("delegate", BuzzPushTranscript.delegate(
+        try assertMatchesVector("delegate", KuraPushTranscript.delegate(
             challengeId: Self.challengeId,
             challenge: Self.challenge,
             installationHandle: Self.installationHandle,
@@ -94,7 +94,7 @@ final class BuzzPushTranscriptTests: XCTestCase {
     }
 
     func testRotateEndpointVector() throws {
-        try assertMatchesVector("rotate_endpoint", BuzzPushTranscript.rotateEndpoint(
+        try assertMatchesVector("rotate_endpoint", KuraPushTranscript.rotateEndpoint(
             challengeId: Self.challengeId,
             challenge: Self.challenge,
             installationHandle: Self.installationHandle,
@@ -105,7 +105,7 @@ final class BuzzPushTranscriptTests: XCTestCase {
     }
 
     func testRevokeDelegationVector() throws {
-        try assertMatchesVector("revoke_delegation", BuzzPushTranscript.revokeDelegation(
+        try assertMatchesVector("revoke_delegation", KuraPushTranscript.revokeDelegation(
             challengeId: Self.challengeId,
             challenge: Self.challenge,
             installationHandle: Self.installationHandle,
@@ -115,7 +115,7 @@ final class BuzzPushTranscriptTests: XCTestCase {
     }
 
     func testRevokeInstallationVector() throws {
-        try assertMatchesVector("revoke_installation", BuzzPushTranscript.revokeInstallation(
+        try assertMatchesVector("revoke_installation", KuraPushTranscript.revokeInstallation(
             challengeId: Self.challengeId,
             challenge: Self.challenge,
             installationHandle: Self.installationHandle,
@@ -136,23 +136,23 @@ final class BuzzPushTranscriptTests: XCTestCase {
 
     func testSolidusIsNotEscaped() throws {
         // The whole reason this encoder exists: '/' must pass through raw.
-        XCTAssertEqual(try BuzzPushTranscript.CanonicalObject.escape("https://push.buzz.xyz/v1", field: "audience"),
+        XCTAssertEqual(try KuraPushTranscript.CanonicalObject.escape("https://push.buzz.xyz/v1", field: "audience"),
                        "https://push.buzz.xyz/v1")
     }
 
     func testMinimalEscaping() throws {
-        XCTAssertEqual(try BuzzPushTranscript.CanonicalObject.escape("a\"b\\c\u{08}\u{09}\u{0A}\u{0C}\u{0D}\u{01}", field: "x"),
+        XCTAssertEqual(try KuraPushTranscript.CanonicalObject.escape("a\"b\\c\u{08}\u{09}\u{0A}\u{0C}\u{0D}\u{01}", field: "x"),
                        "a\\\"b\\\\c\\b\\t\\n\\f\\r\\u0001")
     }
 
     func testNonASCIIRejected() {
-        XCTAssertThrowsError(try BuzzPushTranscript.CanonicalObject.escape("caf\u{00E9}", field: "app_profile")) {
-            XCTAssertEqual($0 as? BuzzPushTranscriptError, .nonASCIIInput(field: "app_profile"))
+        XCTAssertThrowsError(try KuraPushTranscript.CanonicalObject.escape("caf\u{00E9}", field: "app_profile")) {
+            XCTAssertEqual($0 as? KuraPushTranscriptError, .nonASCIIInput(field: "app_profile"))
         }
     }
 
     func testUUIDLowercased() throws {
-        var o = BuzzPushTranscript.CanonicalObject()
+        var o = KuraPushTranscript.CanonicalObject()
         o.uuid("k", UUID(uuidString: "ABCDEF12-3456-4789-8ABC-DEF123456789")!)
         XCTAssertEqual(o.encoded(), "{\"k\":\"abcdef12-3456-4789-8abc-def123456789\"}")
     }

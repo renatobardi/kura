@@ -1,7 +1,7 @@
 import Foundation
 
 /// Verified local values used to specialize an ordinary notification as communication.
-public struct BuzzCommunicationNotificationDescriptor: Equatable, Sendable {
+public struct KuraCommunicationNotificationDescriptor: Equatable, Sendable {
   public let senderDisplayName: String
   public let senderIdentifier: String
   public let senderAvatarPNG: Data?
@@ -29,7 +29,7 @@ public struct BuzzCommunicationNotificationDescriptor: Equatable, Sendable {
     self.recipientCount = recipientCount
   }
 
-  public init?(resolution: BuzzPushResolution) {
+  public init?(resolution: KuraPushResolution) {
     guard let target = resolution.navigationTarget,
       let senderPubkey = resolution.senderPubkey,
       !senderPubkey.isEmpty,
@@ -40,7 +40,7 @@ public struct BuzzCommunicationNotificationDescriptor: Equatable, Sendable {
     else { return nil }
     self.init(
       senderDisplayName: resolution.title,
-      senderIdentifier: BuzzPushPresentationIdentity.sender(
+      senderIdentifier: KuraPushPresentationIdentity.sender(
         communityID: target.communityID,
         pubkey: senderPubkey
       ),
@@ -58,7 +58,7 @@ public struct BuzzCommunicationNotificationDescriptor: Equatable, Sendable {
   import UserNotifications
 
   /// Donates and applies Apple's supported Communication Notifications intent.
-  public final class BuzzCommunicationNotificationPresenter {
+  public final class KuraCommunicationNotificationPresenter {
     public typealias Donation = (INInteraction, @escaping (Error?) -> Void) -> Void
     public typealias ContentUpdate = (
       UNMutableNotificationContent,
@@ -89,10 +89,10 @@ public struct BuzzCommunicationNotificationDescriptor: Equatable, Sendable {
 
     public func present(
       ordinaryContent: UNMutableNotificationContent,
-      resolution: BuzzPushResolution,
+      resolution: KuraPushResolution,
       completion: @escaping (UNNotificationContent) -> Void
     ) {
-      guard let descriptor = BuzzCommunicationNotificationDescriptor(resolution: resolution) else {
+      guard let descriptor = KuraCommunicationNotificationDescriptor(resolution: resolution) else {
         completion(ordinaryContent)
         return
       }
@@ -111,7 +111,7 @@ public struct BuzzCommunicationNotificationDescriptor: Equatable, Sendable {
     }
 
     public static func makeIntent(
-      _ descriptor: BuzzCommunicationNotificationDescriptor
+      _ descriptor: KuraCommunicationNotificationDescriptor
     ) -> INSendMessageIntent {
       let senderAvatar = descriptor.senderAvatarPNG.map(INImage.init(imageData:))
       let sender = INPerson(
@@ -132,7 +132,7 @@ public struct BuzzCommunicationNotificationDescriptor: Equatable, Sendable {
           INSpeakableString(spokenPhrase: $0)
         },
         conversationIdentifier: descriptor.conversationIdentifier,
-        serviceName: "Buzz",
+        serviceName: "Kura",
         sender: sender,
         attachments: nil
       )
@@ -143,7 +143,7 @@ public struct BuzzCommunicationNotificationDescriptor: Equatable, Sendable {
         if let senderAvatar {
           // Communication Notifications render a group conversation's image
           // from the speakable-group parameter rather than INPerson.image.
-          // Buzz channels do not have a separate avatar, so use the verified
+          // Kura channels do not have a separate avatar, so use the verified
           // sender thumbnail for the visible incoming-message avatar.
           intent.setImage(senderAvatar, forParameterNamed: \.speakableGroupName)
         }

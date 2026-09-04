@@ -1,4 +1,4 @@
-import BuzzPushKit
+import KuraPushKit
 import Foundation
 import Security
 import UserNotifications
@@ -6,17 +6,17 @@ import UserNotifications
 final class NotificationService: UNNotificationServiceExtension {
   private var contentHandler: ((UNNotificationContent) -> Void)?
   private var bestAttemptContent: UNMutableNotificationContent?
-  private let communicationPresenter = BuzzCommunicationNotificationPresenter()
-  private lazy var resolver: BuzzPushNotificationResolving = {
+  private let communicationPresenter = KuraCommunicationNotificationPresenter()
+  private lazy var resolver: KuraPushNotificationResolving = {
     let appGroupIdentifier =
       Bundle.main.object(
-        forInfoDictionaryKey: "BuzzAppGroupIdentifier"
+        forInfoDictionaryKey: "KuraAppGroupIdentifier"
       ) as? String
     let keychainAccessGroup =
       Bundle.main.object(
-        forInfoDictionaryKey: "BuzzKeychainAccessGroup"
+        forInfoDictionaryKey: "KuraKeychainAccessGroup"
       ) as? String
-    return BuzzPushNotificationResolver(
+    return KuraPushNotificationResolver(
       session: .shared,
       loadCommunitiesData: {
         Self.loadPushSnapshotData(appGroupIdentifier: appGroupIdentifier)
@@ -44,7 +44,7 @@ final class NotificationService: UNNotificationServiceExtension {
     }
     bestAttemptContent = content
     var cleanUserInfo = content.userInfo
-    cleanUserInfo.removeValue(forKey: BuzzPushNavigationTarget.userInfoKey)
+    cleanUserInfo.removeValue(forKey: KuraPushNavigationTarget.userInfoKey)
     content.userInfo = cleanUserInfo
 
     resolver.resolve { [weak self] resolution in
@@ -60,7 +60,7 @@ final class NotificationService: UNNotificationServiceExtension {
         }
         if let navigationTarget = resolution.navigationTarget {
           var userInfo = content.userInfo
-          userInfo[BuzzPushNavigationTarget.userInfoKey] = navigationTarget.userInfoValue
+          userInfo[KuraPushNavigationTarget.userInfoKey] = navigationTarget.userInfoValue
           content.userInfo = userInfo
         }
         self.bestAttemptContent = content
@@ -111,9 +111,9 @@ final class NotificationService: UNNotificationServiceExtension {
 
   private static func loadPushSnapshotData(appGroupIdentifier: String?) -> Data? {
     loadAppGroupData(
-      fileName: BuzzPushPresentationCacheStore.fileName,
+      fileName: KuraPushPresentationCacheStore.fileName,
       appGroupIdentifier: appGroupIdentifier,
-      maximumBytes: BuzzPushPresentationCacheStore.maximumSnapshotBytes
+      maximumBytes: KuraPushPresentationCacheStore.maximumSnapshotBytes
     )
   }
 

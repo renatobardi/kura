@@ -3,10 +3,10 @@ import Foundation
 import P256K
 import Testing
 
-@testable import BuzzPushKit
+@testable import KuraPushKit
 
 @Suite("Push presentation cache")
-struct BuzzPushPresentationCacheTests {
+struct KuraPushPresentationCacheTests {
   private let profileKey = String(repeating: "0", count: 63) + "1"
   private let relayKey = String(repeating: "0", count: 63) + "2"
   private let otherRelayKey = String(repeating: "0", count: 63) + "3"
@@ -15,7 +15,7 @@ struct BuzzPushPresentationCacheTests {
   func verifiedProfilePrecedenceAndAvatar() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = BuzzPushPresentationCacheStore(
+    let store = KuraPushPresentationCacheStore(
       containerURL: directory,
       now: { Date(timeIntervalSince1970: 1_700_000_100) }
     )
@@ -30,12 +30,12 @@ struct BuzzPushPresentationCacheTests {
     let needsAvatar = try store.updateProfiles(
       communityID: "community-a",
       relayOrigin: "wss://relay.example/",
-      updates: [BuzzPushProfileCacheUpdate(event: event)]
+      updates: [KuraPushProfileCacheUpdate(event: event)]
     )
     try store.updateProfiles(
       communityID: "community-b",
       relayOrigin: "wss://relay.example/",
-      updates: [BuzzPushProfileCacheUpdate(event: event)]
+      updates: [KuraPushProfileCacheUpdate(event: event)]
     )
 
     #expect(needsAvatar == Set([event.id]))
@@ -88,7 +88,7 @@ struct BuzzPushPresentationCacheTests {
   func verifiedInlineRasterProfileAndAvatar() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = BuzzPushPresentationCacheStore(containerURL: directory)
+    let store = KuraPushPresentationCacheStore(containerURL: directory)
     let picture = "data:image/png;base64," + String(repeating: "A", count: 170_000)
     let content = try #require(
       String(
@@ -104,7 +104,7 @@ struct BuzzPushPresentationCacheTests {
     let needsAvatar = try store.updateProfiles(
       communityID: "community-a",
       relayOrigin: "https://relay.example",
-      updates: [BuzzPushProfileCacheUpdate(event: event)]
+      updates: [KuraPushProfileCacheUpdate(event: event)]
     )
     #expect(needsAvatar == Set([event.id]))
     #expect(
@@ -137,7 +137,7 @@ struct BuzzPushPresentationCacheTests {
   func verifiedProfileNameFallback() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = BuzzPushPresentationCacheStore(containerURL: directory)
+    let store = KuraPushPresentationCacheStore(containerURL: directory)
     let event = try signedEvent(
       privateKey: profileKey,
       kind: 0,
@@ -147,7 +147,7 @@ struct BuzzPushPresentationCacheTests {
     try store.updateProfiles(
       communityID: "community-a",
       relayOrigin: "https://relay.example",
-      updates: [BuzzPushProfileCacheUpdate(event: event)]
+      updates: [KuraPushProfileCacheUpdate(event: event)]
     )
 
     let cached = try #require(
@@ -164,7 +164,7 @@ struct BuzzPushPresentationCacheTests {
   func malformedAndUnverifiedProfileFallback() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = BuzzPushPresentationCacheStore(containerURL: directory)
+    let store = KuraPushPresentationCacheStore(containerURL: directory)
     let named = try signedEvent(
       privateKey: profileKey,
       createdAt: 100,
@@ -174,7 +174,7 @@ struct BuzzPushPresentationCacheTests {
     try store.updateProfiles(
       communityID: "community-a",
       relayOrigin: "https://relay.example",
-      updates: [BuzzPushProfileCacheUpdate(event: named)]
+      updates: [KuraPushProfileCacheUpdate(event: named)]
     )
     let malformed = try signedEvent(
       privateKey: profileKey,
@@ -185,7 +185,7 @@ struct BuzzPushPresentationCacheTests {
     try store.updateProfiles(
       communityID: "community-a",
       relayOrigin: "https://relay.example",
-      updates: [BuzzPushProfileCacheUpdate(event: malformed)]
+      updates: [KuraPushProfileCacheUpdate(event: malformed)]
     )
     let tampered = VerifiedNostrEvent(
       id: malformed.id,
@@ -199,7 +199,7 @@ struct BuzzPushPresentationCacheTests {
     try store.updateProfiles(
       communityID: "community-a",
       relayOrigin: "https://relay.example",
-      updates: [BuzzPushProfileCacheUpdate(event: tampered)]
+      updates: [KuraPushProfileCacheUpdate(event: tampered)]
     )
 
     let cached = try #require(
@@ -217,7 +217,7 @@ struct BuzzPushPresentationCacheTests {
   func channelAuthorityAndOpaqueID() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = BuzzPushPresentationCacheStore(containerURL: directory)
+    let store = KuraPushPresentationCacheStore(containerURL: directory)
     let relayPubkey = try pubkey(for: relayKey)
     let opaqueChannelID = "channel/general:v5"
     let verified = try signedEvent(
@@ -258,7 +258,7 @@ struct BuzzPushPresentationCacheTests {
   func channelMembershipAuthorityAndOrdering() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = BuzzPushPresentationCacheStore(containerURL: directory)
+    let store = KuraPushPresentationCacheStore(containerURL: directory)
     let relayPubkey = try pubkey(for: relayKey)
     let firstMember = try pubkey(for: profileKey)
     let secondMember = try pubkey(for: otherRelayKey)
@@ -318,7 +318,7 @@ struct BuzzPushPresentationCacheTests {
     #expect(
       cached.memberDigests
         == [firstMember, secondMember].map {
-          BuzzPushPresentationIdentity.channelMember(
+          KuraPushPresentationIdentity.channelMember(
             communityID: "community-a",
             channelID: "opaque-channel",
             pubkey: $0
@@ -331,7 +331,7 @@ struct BuzzPushPresentationCacheTests {
   func channelAuthorityRotationClearsMembership() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = BuzzPushPresentationCacheStore(containerURL: directory)
+    let store = KuraPushPresentationCacheStore(containerURL: directory)
     let relayPubkey = try pubkey(for: relayKey)
     let rotatedRelayPubkey = try pubkey(for: otherRelayKey)
     let member = try pubkey(for: profileKey)
@@ -387,7 +387,7 @@ struct BuzzPushPresentationCacheTests {
   func oversizedChannelBatchIsIgnored() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = BuzzPushPresentationCacheStore(containerURL: directory)
+    let store = KuraPushPresentationCacheStore(containerURL: directory)
     let relayPubkey = try pubkey(for: relayKey)
     let initial = try signedEvent(
       privateKey: relayKey,
@@ -415,7 +415,7 @@ struct BuzzPushPresentationCacheTests {
       relayMetadataPubkey: relayPubkey,
       metadataEvents: Array(
         repeating: replacement,
-        count: BuzzPushPresentationCacheStore.maximumChannels + 1
+        count: KuraPushPresentationCacheStore.maximumChannels + 1
       ),
       membershipEvents: []
     )
@@ -433,13 +433,13 @@ struct BuzzPushPresentationCacheTests {
 
   @Test("Global member-digest bound drops oldest complete rosters first")
   func globalMembershipDigestBound() throws {
-    let membersPerChannel = BuzzPushPresentationCacheStore.maximumMembersPerChannel
+    let membersPerChannel = KuraPushPresentationCacheStore.maximumMembersPerChannel
     let channelCount =
-      BuzzPushPresentationCacheStore.maximumTotalMemberDigests / membersPerChannel + 1
+      KuraPushPresentationCacheStore.maximumTotalMemberDigests / membersPerChannel + 1
     let digests = (0..<membersPerChannel).map { String(format: "%064x", $0 + 1) }
-    let snapshot = BuzzPushPresentationCacheSnapshot(
+    let snapshot = KuraPushPresentationCacheSnapshot(
       channels: (0..<channelCount).map { index in
-        BuzzPushCachedChannel(
+        KuraPushCachedChannel(
           communityID: "community-a",
           relayOrigin: "https://relay.example",
           channelID: "channel-\(index)",
@@ -458,11 +458,11 @@ struct BuzzPushPresentationCacheTests {
       }
     )
 
-    let encoded = try BuzzPushPresentationCacheStore.encodedBoundedSnapshot(snapshot)
-    let decoded = try JSONDecoder().decode(BuzzPushPresentationCacheSnapshot.self, from: encoded)
+    let encoded = try KuraPushPresentationCacheStore.encodedBoundedSnapshot(snapshot)
+    let decoded = try JSONDecoder().decode(KuraPushPresentationCacheSnapshot.self, from: encoded)
     let totalDigests = decoded.channels.reduce(0) { $0 + ($1.memberDigests?.count ?? 0) }
 
-    #expect(totalDigests == BuzzPushPresentationCacheStore.maximumTotalMemberDigests)
+    #expect(totalDigests == KuraPushPresentationCacheStore.maximumTotalMemberDigests)
     #expect(decoded.channels.first { $0.channelID == "channel-0" }?.memberDigests == nil)
     #expect(
       decoded.channels.first { $0.channelID == "channel-\(channelCount - 1)" }?.memberDigests != nil
@@ -473,14 +473,14 @@ struct BuzzPushPresentationCacheTests {
   func oversizedMembershipFallback() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = BuzzPushPresentationCacheStore(containerURL: directory)
+    let store = KuraPushPresentationCacheStore(containerURL: directory)
     let relayPubkey = try pubkey(for: relayKey)
     let metadata = try signedEvent(
       privateKey: relayKey,
       kind: 39_000,
       tags: [["d", "large-channel"], ["name", "Large"], ["t", "stream"]]
     )
-    let memberCount = BuzzPushPresentationCacheStore.maximumMembersPerChannel + 25
+    let memberCount = KuraPushPresentationCacheStore.maximumMembersPerChannel + 25
     let membership = try signedEvent(
       privateKey: relayKey,
       kind: 39_002,
@@ -506,7 +506,7 @@ struct BuzzPushPresentationCacheTests {
       )
     )
     #expect(
-      cached.memberCount == BuzzPushPresentationCacheStore.maximumMembersPerChannel + 1
+      cached.memberCount == KuraPushPresentationCacheStore.maximumMembersPerChannel + 1
     )
     #expect(cached.memberDigests == nil)
     #expect(cached.membershipEventID == membership.id)
@@ -516,7 +516,7 @@ struct BuzzPushPresentationCacheTests {
   func malformedChannelMetadataFallback() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = BuzzPushPresentationCacheStore(containerURL: directory)
+    let store = KuraPushPresentationCacheStore(containerURL: directory)
     let relayPubkey = try pubkey(for: relayKey)
     let blankName = try signedEvent(
       privateKey: relayKey,
@@ -555,7 +555,7 @@ struct BuzzPushPresentationCacheTests {
   func communityPruning() throws {
     let directory = try temporaryDirectory()
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = BuzzPushPresentationCacheStore(containerURL: directory)
+    let store = KuraPushPresentationCacheStore(containerURL: directory)
     let profile = try signedEvent(privateKey: profileKey, kind: 0, content: #"{"name":"A"}"#)
     let channel = try signedEvent(
       privateKey: relayKey,
@@ -565,7 +565,7 @@ struct BuzzPushPresentationCacheTests {
     try store.updateProfiles(
       communityID: "removed",
       relayOrigin: "https://relay.example",
-      updates: [BuzzPushProfileCacheUpdate(event: profile)]
+      updates: [KuraPushProfileCacheUpdate(event: profile)]
     )
     try store.updateChannels(
       communityID: "removed",
@@ -593,9 +593,9 @@ struct BuzzPushPresentationCacheTests {
 
   @Test("Cache deterministically evicts entries beyond its global bounds")
   func boundedEviction() {
-    var snapshot = BuzzPushPresentationCacheSnapshot(
-      profiles: (0...BuzzPushPresentationCacheStore.maximumProfiles).map { index in
-        BuzzPushCachedProfile(
+    var snapshot = KuraPushPresentationCacheSnapshot(
+      profiles: (0...KuraPushPresentationCacheStore.maximumProfiles).map { index in
+        KuraPushCachedProfile(
           communityID: "community-a",
           relayOrigin: "https://relay.example",
           pubkey: String(format: "%064x", index),
@@ -607,8 +607,8 @@ struct BuzzPushPresentationCacheTests {
           cachedAt: index
         )
       },
-      channels: (0...BuzzPushPresentationCacheStore.maximumChannels).map { index in
-        BuzzPushCachedChannel(
+      channels: (0...KuraPushPresentationCacheStore.maximumChannels).map { index in
+        KuraPushCachedChannel(
           communityID: "community-a",
           relayOrigin: "https://relay.example",
           channelID: "channel-\(index)",
@@ -621,10 +621,10 @@ struct BuzzPushPresentationCacheTests {
       }
     )
 
-    BuzzPushPresentationCacheStore.enforceBounds(&snapshot)
+    KuraPushPresentationCacheStore.enforceBounds(&snapshot)
 
-    #expect(snapshot.profiles.count == BuzzPushPresentationCacheStore.maximumProfiles)
-    #expect(snapshot.channels.count == BuzzPushPresentationCacheStore.maximumChannels)
+    #expect(snapshot.profiles.count == KuraPushPresentationCacheStore.maximumProfiles)
+    #expect(snapshot.channels.count == KuraPushPresentationCacheStore.maximumChannels)
     #expect(snapshot.profiles.contains { $0.cachedAt == 0 } == false)
     #expect(snapshot.channels.contains { $0.cachedAt == 0 } == false)
   }
@@ -636,11 +636,11 @@ struct BuzzPushPresentationCacheTests {
       Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
       + Data(
         repeating: 0,
-        count: BuzzPushPresentationCacheStore.maximumAvatarBytes - 8
+        count: KuraPushPresentationCacheStore.maximumAvatarBytes - 8
       )
-    let snapshot = BuzzPushPresentationCacheSnapshot(
+    let snapshot = KuraPushPresentationCacheSnapshot(
       profiles: (0..<80).map { index in
-        BuzzPushCachedProfile(
+        KuraPushCachedProfile(
           communityID: controlText,
           relayOrigin: "https://relay.example",
           pubkey: String(format: "%064x", index),
@@ -652,8 +652,8 @@ struct BuzzPushPresentationCacheTests {
           cachedAt: index
         )
       },
-      channels: (0..<BuzzPushPresentationCacheStore.maximumChannels).map { index in
-        BuzzPushCachedChannel(
+      channels: (0..<KuraPushPresentationCacheStore.maximumChannels).map { index in
+        KuraPushCachedChannel(
           communityID: controlText,
           relayOrigin: "https://relay.example",
           channelID: "\(controlText)\(index)",
@@ -666,13 +666,13 @@ struct BuzzPushPresentationCacheTests {
       }
     )
 
-    let encoded = try BuzzPushPresentationCacheStore.encodedBoundedSnapshot(snapshot)
+    let encoded = try KuraPushPresentationCacheStore.encodedBoundedSnapshot(snapshot)
     let decoded = try JSONDecoder().decode(
-      BuzzPushPresentationCacheSnapshot.self,
+      KuraPushPresentationCacheSnapshot.self,
       from: encoded
     )
 
-    #expect(encoded.count <= BuzzPushPresentationCacheStore.maximumSnapshotBytes)
+    #expect(encoded.count <= KuraPushPresentationCacheStore.maximumSnapshotBytes)
     #expect(decoded.channels.first?.cachedAt == 1_511)
     #expect(decoded.profiles.count + decoded.channels.count < 592)
   }
@@ -689,7 +689,7 @@ struct BuzzPushPresentationCacheTests {
       ) ?? ""
     )
 
-    let metadata = BuzzPushPresentationCacheStore.profileMetadata(event)
+    let metadata = KuraPushPresentationCacheStore.profileMetadata(event)
 
     #expect(metadata.displayName == nil || metadata.displayName!.utf8.count <= 512)
   }
@@ -701,11 +701,11 @@ struct BuzzPushPresentationCacheTests {
     return url
   }
 
-  private func loadSnapshot(_ directory: URL) throws -> BuzzPushPresentationCacheSnapshot {
+  private func loadSnapshot(_ directory: URL) throws -> KuraPushPresentationCacheSnapshot {
     let data = try Data(
-      contentsOf: directory.appendingPathComponent(BuzzPushPresentationCacheStore.fileName)
+      contentsOf: directory.appendingPathComponent(KuraPushPresentationCacheStore.fileName)
     )
-    return try JSONDecoder().decode(BuzzPushPresentationCacheSnapshot.self, from: data)
+    return try JSONDecoder().decode(KuraPushPresentationCacheSnapshot.self, from: data)
   }
 
   private func pubkey(for privateKey: String) throws -> String {
