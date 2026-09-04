@@ -20,6 +20,7 @@ members = [
     "crates/kura-workflow",
     "crates/kura-media",
     "crates/kura-cli",
+    "crates/kurad",
     "crates/kura-pairing-cli",
     "crates/kura-sdk",
     "crates/kura-persona",
