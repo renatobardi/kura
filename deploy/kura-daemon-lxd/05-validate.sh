@@ -48,11 +48,17 @@ echo
 echo "== 4/5 kurad binário + status =="
 if lxc exec "$CONTAINER" -- test -x /usr/local/bin/kurad; then
   echo "-> binário presente"
-  STATUS_JSON=$(lxc exec "$CONTAINER" -- sudo -u kura kurad status --data-dir "$DATA_DIR" 2>&1) || {
+  # stdout e stderr são capturados separadamente: `kurad status` só imprime o
+  # JSON no stdout (main.rs) — logs de tracing (info/warn) vão pro stderr e,
+  # se misturados aqui (2>&1), invalidam o JSON mesmo com o comando saindo
+  # com sucesso.
+  STATUS_STDERR_FILE="$(mktemp)"
+  STATUS_JSON=$(lxc exec "$CONTAINER" -- sudo -u kura kurad status --data-dir "$DATA_DIR" 2>"$STATUS_STDERR_FILE") || {
     echo "-> FALHOU (kurad status saiu com erro)"
-    echo "$STATUS_JSON"
+    cat "$STATUS_STDERR_FILE"
     FAIL=1
   }
+  rm -f "$STATUS_STDERR_FILE"
   if [ -n "${STATUS_JSON:-}" ] && echo "$STATUS_JSON" | python3 -m json.tool >/dev/null 2>&1; then
     echo "-> JSON válido:"
     echo "$STATUS_JSON" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("   dataDir:", d.get("dataDir")); print("   instanceId:", d.get("instanceId")); print("   agents:", len(d.get("agents", [])))'
