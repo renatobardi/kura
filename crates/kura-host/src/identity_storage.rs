@@ -10,6 +10,10 @@ pub enum IdentityStorage {
     SystemKeyring = 1,
     LocalFile = 2,
     Environment = 3,
+    /// NIP-49 encrypted `identity.ncryptsec`, resolved through
+    /// `headless_identity::resolve_headless_identity`. Headless (`kurad`) only —
+    /// desktop never produces or reads this variant.
+    LockedLocalFile = 4,
 }
 
 impl IdentityStorage {
@@ -19,6 +23,7 @@ impl IdentityStorage {
             Self::SystemKeyring => "system-keyring",
             Self::LocalFile => "local-file",
             Self::Environment => "environment",
+            Self::LockedLocalFile => "locked-local-file",
         }
     }
 
@@ -27,6 +32,7 @@ impl IdentityStorage {
             1 => Self::SystemKeyring,
             2 => Self::LocalFile,
             3 => Self::Environment,
+            4 => Self::LockedLocalFile,
             _ => Self::Ephemeral,
         }
     }
