@@ -1,5 +1,6 @@
-import { listen } from "@tauri-apps/api/event";
 import * as React from "react";
+
+import { platform } from "@/platform";
 
 type TtsSpeakerActivity = { pubkey: string; level: number };
 
@@ -40,12 +41,14 @@ export function useHuddleSpeakerActivity() {
   React.useEffect(() => {
     let cancelled = false;
     let unlisten: (() => void) | null = null;
-    listen<Record<string, number>>("huddle-speaker-levels", (event) => {
-      if (!cancelled) setRemoteSpeakerLevels(event.payload);
-    }).then((cleanup) => {
-      if (cancelled) cleanup();
-      else unlisten = cleanup;
-    });
+    platform
+      .listen<Record<string, number>>("huddle-speaker-levels", (event) => {
+        if (!cancelled) setRemoteSpeakerLevels(event.payload);
+      })
+      .then((cleanup) => {
+        if (cancelled) cleanup();
+        else unlisten = cleanup;
+      });
     return () => {
       cancelled = true;
       unlisten?.();
@@ -55,19 +58,21 @@ export function useHuddleSpeakerActivity() {
   React.useEffect(() => {
     let cancelled = false;
     let unlisten: (() => void) | null = null;
-    listen<{ pubkey: string | null; level: number }>(
-      "huddle-tts-speaker-level",
-      (event) => {
-        if (cancelled) return;
-        const { pubkey, level } = event.payload;
-        setTtsSpeakerActivity(
-          pubkey ? { pubkey, level: Math.min(1, Math.max(0, level)) } : null,
-        );
-      },
-    ).then((cleanup) => {
-      if (cancelled) cleanup();
-      else unlisten = cleanup;
-    });
+    platform
+      .listen<{ pubkey: string | null; level: number }>(
+        "huddle-tts-speaker-level",
+        (event) => {
+          if (cancelled) return;
+          const { pubkey, level } = event.payload;
+          setTtsSpeakerActivity(
+            pubkey ? { pubkey, level: Math.min(1, Math.max(0, level)) } : null,
+          );
+        },
+      )
+      .then((cleanup) => {
+        if (cancelled) cleanup();
+        else unlisten = cleanup;
+      });
     return () => {
       cancelled = true;
       unlisten?.();
@@ -77,12 +82,14 @@ export function useHuddleSpeakerActivity() {
   React.useEffect(() => {
     let cancelled = false;
     let unlisten: (() => void) | null = null;
-    listen<string[]>("huddle-active-speakers", (event) => {
-      if (!cancelled) setRemoteActiveSpeakers(event.payload);
-    }).then((cleanup) => {
-      if (cancelled) cleanup();
-      else unlisten = cleanup;
-    });
+    platform
+      .listen<string[]>("huddle-active-speakers", (event) => {
+        if (!cancelled) setRemoteActiveSpeakers(event.payload);
+      })
+      .then((cleanup) => {
+        if (cancelled) cleanup();
+        else unlisten = cleanup;
+      });
     return () => {
       cancelled = true;
       unlisten?.();
