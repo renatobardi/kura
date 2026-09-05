@@ -84,7 +84,7 @@ Environment=KURA_RELAY_URL=$RELAY_URL
 # Passphrase para desbloquear a identidade NIP-49 sem interação (Rota B —
 # ver README.md "Secrets"). Descomente depois de criar
 # /etc/kurad/identity.env (root-only, chmod 600) com KURA_IDENTITY_PASSPHRASE=.
-# Se preferir a Rota A (`kurad identity unlock --remember`), deixe comentado.
+# Se preferir a Rota A (kurad identity unlock --remember), deixe comentado.
 # EnvironmentFile=-/etc/kurad/identity.env
 ExecStart=/usr/local/bin/kurad run --data-dir $DATA_DIR --relay $RELAY_URL
 Restart=on-failure
