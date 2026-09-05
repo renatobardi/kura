@@ -1,4 +1,6 @@
-import { Channel, invoke, isTauri } from "@tauri-apps/api/core";
+import { isTauri } from "@tauri-apps/api/core";
+
+import { platform } from "@/platform";
 
 import type { TerminalFrame } from "./terminalRenderer";
 
@@ -79,8 +81,9 @@ export class TerminalConnection {
           connection?.acknowledge(frame.sequence) ?? Promise.resolve(),
       });
     };
-    const channel = new Channel<TerminalMessage>(deliver);
-    const response = await invoke<AttachResponse>("terminal_attach", {
+    const channel = platform.channel<TerminalMessage>();
+    channel.onmessage = deliver;
+    const response = await platform.invoke<AttachResponse>("terminal_attach", {
       request,
       onFrame: channel,
     });
@@ -90,7 +93,10 @@ export class TerminalConnection {
   }
 
   input(data: string): Promise<void> {
-    return invoke("terminal_input", { sessionId: this.sessionId, data });
+    return platform.invoke("terminal_input", {
+      sessionId: this.sessionId,
+      data,
+    });
   }
 
   async resize(
@@ -99,7 +105,7 @@ export class TerminalConnection {
     pixelWidth: number,
     pixelHeight: number,
   ): Promise<TerminalViewport> {
-    return invoke("terminal_resize", {
+    return platform.invoke("terminal_resize", {
       sessionId: this.sessionId,
       columns,
       rows,
@@ -109,7 +115,7 @@ export class TerminalConnection {
   }
 
   viewportReady(viewport: TerminalViewport): Promise<void> {
-    return invoke("terminal_viewport_ready", {
+    return platform.invoke("terminal_viewport_ready", {
       sessionId: this.sessionId,
       subscriptionId: this.subscriptionId,
       viewport,
@@ -125,26 +131,32 @@ export class TerminalConnection {
    * which way history is.
    */
   scroll(lines: number): Promise<void> {
-    return invoke("terminal_scroll", { sessionId: this.sessionId, lines });
+    return platform.invoke("terminal_scroll", {
+      sessionId: this.sessionId,
+      lines,
+    });
   }
 
   focus(focused: boolean): Promise<void> {
-    return invoke("terminal_focus", { sessionId: this.sessionId, focused });
+    return platform.invoke("terminal_focus", {
+      sessionId: this.sessionId,
+      focused,
+    });
   }
 
   detach(): Promise<void> {
-    return invoke("terminal_detach", {
+    return platform.invoke("terminal_detach", {
       sessionId: this.sessionId,
       subscriptionId: this.subscriptionId,
     });
   }
 
   close(): Promise<void> {
-    return invoke("terminal_close", { sessionId: this.sessionId });
+    return platform.invoke("terminal_close", { sessionId: this.sessionId });
   }
 
   private acknowledge(sequence: number): Promise<void> {
-    return invoke("terminal_ack", {
+    return platform.invoke("terminal_ack", {
       sessionId: this.sessionId,
       subscriptionId: this.subscriptionId,
       sequence,
