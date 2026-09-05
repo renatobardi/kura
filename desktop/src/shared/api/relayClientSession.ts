@@ -1,4 +1,4 @@
-import { Channel, invoke } from "@tauri-apps/api/core";
+import { type PlatformChannel, platform } from "@/platform";
 import {
   createAuthEvent,
   getRelayWsUrl,
@@ -95,7 +95,7 @@ export class RelayClient {
   private reconnectListeners = new Set<() => void>();
   private hasConnectedOnce = false;
   private notifyReconnectListeners = false;
-  private onMessageChannel: Channel<unknown> | null = null;
+  private onMessageChannel: PlatformChannel<unknown> | null = null;
   private connectionGeneration = 0;
   private stabilityTimer: number | null = null;
   private visibleChannelId: string | null = null;
@@ -542,14 +542,13 @@ export class RelayClient {
           this.recoverFromSocketFailure(error, "Relay connection errored.");
       },
     );
-    this.onMessageChannel = new Channel<unknown>((delivery) =>
-      inbound.receive(delivery),
-    );
+    this.onMessageChannel = platform.channel<unknown>();
+    this.onMessageChannel.onmessage = (delivery) => inbound.receive(delivery);
     try {
       if (!this.relayUrl) {
         this.relayUrl = await getRelayWsUrl();
       }
-      const wsId = await invoke<number>("plugin:websocket|connect", {
+      const wsId = await platform.invoke<number>("plugin:websocket|connect", {
         url: this.relayUrl,
         onMessage: this.onMessageChannel,
         config: {},
@@ -654,7 +653,7 @@ export class RelayClient {
       throw new Error("Relay socket is not connected.");
     }
 
-    await invoke("plugin:websocket|send", {
+    await platform.invoke("plugin:websocket|send", {
       id: this.wsId,
       message: {
         type: "Text",

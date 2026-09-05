@@ -1,5 +1,4 @@
-import { Channel, invoke } from "@tauri-apps/api/core";
-
+import { type PlatformChannel, platform } from "@/platform";
 import { createAuthEvent } from "@/shared/api/tauri";
 import type { RelayEvent } from "@/shared/api/types";
 import {
@@ -36,7 +35,7 @@ type PendingPublish = {
  */
 export class ReadOnlyRelayClient {
   private wsId: number | null = null;
-  private onMessageChannel: Channel<unknown> | null = null;
+  private onMessageChannel: PlatformChannel<unknown> | null = null;
   private connectPromise: Promise<void> | null = null;
   private authRequest: {
     pendingEventId: string;
@@ -133,13 +132,14 @@ export class ReadOnlyRelayClient {
 
   private async openConnection(): Promise<void> {
     const generation = ++this.generation;
-    this.onMessageChannel = new Channel<unknown>((delivery) => {
+    this.onMessageChannel = platform.channel<unknown>();
+    this.onMessageChannel.onmessage = (delivery) => {
       for (const message of toRelayFrames(delivery)) {
         void this.handleWsMessage(message, generation);
       }
-    });
+    };
 
-    this.wsId = await invoke<number>("plugin:websocket|connect", {
+    this.wsId = await platform.invoke<number>("plugin:websocket|connect", {
       url: this.relayUrl,
       onMessage: this.onMessageChannel,
       config: {},
@@ -197,7 +197,7 @@ export class ReadOnlyRelayClient {
       throw new Error("Read-only relay socket is not connected.");
     }
 
-    await invoke("plugin:websocket|send", {
+    await platform.invoke("plugin:websocket|send", {
       id: this.wsId,
       message: {
         type: "Text",
