@@ -1,5 +1,4 @@
 import { isTauri } from "@tauri-apps/api/core";
-import { emit } from "@tauri-apps/api/event";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import {
@@ -11,6 +10,8 @@ import {
   useRef,
   useState,
 } from "react";
+
+import { platform } from "@/platform";
 
 import { router } from "@/app/router";
 import {
@@ -94,7 +95,7 @@ function useInitialRenderReady() {
       return;
     }
 
-    void emit(INITIAL_RENDER_READY_EVENT);
+    void platform.emit(INITIAL_RENDER_READY_EVENT);
   }, []);
 }
 

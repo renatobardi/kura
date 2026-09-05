@@ -1,6 +1,5 @@
 import * as React from "react";
-import { isTauri, invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
+import { isTauri } from "@tauri-apps/api/core";
 
 import {
   getActiveTurnsForAgent,
@@ -10,6 +9,7 @@ import {
   useManagedAgentsQuery,
   useRelayAgentsQuery,
 } from "@/features/agents/hooks";
+import { platform } from "@/platform";
 import { normalizePubkey, truncatePubkey } from "@/shared/lib/pubkey";
 import { useNow } from "@/shared/lib/useNow";
 import { formatElapsed } from "@/features/agents/ui/agentSessionUtils";
@@ -108,12 +108,14 @@ export function useTrayMenu({
 
   React.useEffect(() => {
     if (!isTauri()) return;
-    void invoke("update_tray_agent_activity", {
-      activities,
-      recentActivities,
-    }).catch((error) => {
-      console.error("Failed to update the macOS tray menu", error);
-    });
+    void platform
+      .invoke("update_tray_agent_activity", {
+        activities,
+        recentActivities,
+      })
+      .catch((error) => {
+        console.error("Failed to update the macOS tray menu", error);
+      });
   }, [activities, recentActivities]);
 
   React.useEffect(() => {
@@ -124,10 +126,10 @@ export function useTrayMenu({
 
     const handlePendingActions = async () => {
       if (disposed) return;
-      const actions = await invoke<TrayAction[]>("take_tray_actions");
+      const actions = await platform.invoke<TrayAction[]>("take_tray_actions");
       if (disposed) {
         if (actions.length > 0) {
-          await invoke("requeue_tray_actions", { actions });
+          await platform.invoke("requeue_tray_actions", { actions });
         }
         return;
       }
@@ -141,9 +143,12 @@ export function useTrayMenu({
     };
 
     void (async () => {
-      const nextUnlisten = await listen("tray-action-available", () => {
-        void handlePendingActions();
-      });
+      const nextUnlisten = await platform.listen(
+        "tray-action-available",
+        () => {
+          void handlePendingActions();
+        },
+      );
       if (disposed) {
         nextUnlisten();
         return;
