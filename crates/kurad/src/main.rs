@@ -24,6 +24,16 @@
 //! what is stale) instead of blindly spawning a second competing child. It also
 //! means `kurad` honours the store's `start_on_app_launch` flag, exactly like
 //! the desktop does.
+//!
+//! That restore only runs once, at boot. While `run` stays up, a background
+//! loop (`run_reconciliation_loop`) re-runs `reconcile_managed_agent_runtimes`
+//! every `--reconcile-interval-secs` (default 30, `0` disables it) against the
+//! single workspace relay `kurad` resolves through `relay_ws_url_with_override`
+//! — the same probe-then-fan-out the desktop drives per community, applied here
+//! to `kurad`'s one community. This is what lets an agent added to
+//! `managed-agents.json` (or flipped to `start_on_app_launch`) while `kurad` is
+//! already running get picked up without a restart, and it doubles as ongoing
+//! crash recovery between restarts, not just at one.
 
 mod host;
 
@@ -42,13 +52,15 @@ use kura_host::host::HostHandle;
 use kura_host::identity_lock::lock_keys_to_ncryptsec;
 use kura_host::identity_storage::IdentityStorage;
 use kura_host::managed_agents::runtime_commands::{
-    list_managed_agent_runtimes, stop_managed_agent_runtime,
+    list_managed_agent_runtimes, reconcile_managed_agent_runtimes, stop_managed_agent_runtime,
 };
 use kura_host::managed_agents::{
     backfill_persona_snapshots, load_managed_agents, process_is_running,
-    read_all_agent_runtime_receipts, restore_managed_agents_on_launch,
+    read_all_agent_runtime_receipts, restore_managed_agents_on_launch, ManagedAgentCommunityTarget,
     ManagedAgentRuntimeLifecycle, NoRestoreHooks,
 };
+use kura_host::relay::relay_ws_url_with_override;
+use std::collections::HashSet;
 use tracing_subscriber::EnvFilter;
 
 use crate::host::HeadlessHost;
@@ -149,6 +161,13 @@ struct RunArgs {
     /// (agents-everywhere), and `kurad` does not diverge from that.
     #[arg(long, env = "KURA_RELAY_URL")]
     relay: Option<String>,
+
+    /// Seconds between periodic managed-agent reconciliation ticks while
+    /// running (probes the workspace relay, restarts what should be up but
+    /// is not, per `reconcile_managed_agent_runtimes`). Set to `0` to disable
+    /// and fall back to the boot-only restore. See `run_reconciliation_loop`.
+    #[arg(long, env = "KURA_RECONCILE_INTERVAL_SECS", default_value_t = 30)]
+    reconcile_interval_secs: u64,
 }
 
 #[derive(Debug, Args)]
@@ -264,14 +283,95 @@ fn relay_override(value: Option<&str>) -> Option<String> {
 /// runtime this process still tracks as live. `Stopped` rows are the ones
 /// `list_managed_agent_runtimes` reports for a child it just reaped, so
 /// stopping them again would be pure noise.
-fn live_pairs(
-    runtimes: &[kura_host::managed_agents::ManagedAgentRuntimeStatus],
-) -> Vec<(String, String)> {
+/// A (pubkey, relay_url) pair identifying one managed-agent runtime — the
+/// same two fields `ManagedAgentRuntimeKey` is keyed by. Named so clippy's
+/// `type_complexity` lint does not flag `diff_live_pairs`'s return type.
+type AgentPairs = Vec<(String, String)>;
+
+fn live_pairs(runtimes: &[kura_host::managed_agents::ManagedAgentRuntimeStatus]) -> AgentPairs {
     runtimes
         .iter()
         .filter(|status| !matches!(status.lifecycle, ManagedAgentRuntimeLifecycle::Stopped))
         .map(|status| (status.pubkey.clone(), status.relay_url.clone()))
         .collect()
+}
+
+/// Pure diff between two `live_pairs` snapshots, so a reconcile tick logs
+/// only what actually changed instead of the full roster every time (a tick
+/// where nothing changed — the overwhelmingly common case — stays silent at
+/// info level). Extracted from the reconcile loop so it is unit-testable
+/// without a `Host`.
+fn diff_live_pairs(
+    previous: &HashSet<(String, String)>,
+    current: &[(String, String)],
+) -> (AgentPairs, AgentPairs) {
+    let current_set: HashSet<(String, String)> = current.iter().cloned().collect();
+    let started = current
+        .iter()
+        .filter(|pair| !previous.contains(*pair))
+        .cloned()
+        .collect();
+    let stopped = previous
+        .iter()
+        .filter(|pair| !current_set.contains(*pair))
+        .cloned()
+        .collect();
+    (started, stopped)
+}
+
+/// Runs `reconcile_managed_agent_runtimes` on a fixed interval until
+/// `host.state().shutdown_started` is set, closing the gap `restore_managed_agent_on_launch`
+/// leaves open: that call only runs once, at boot, so an agent added to
+/// `managed-agents.json` (or flipped to `start_on_app_launch`) after `kurad`
+/// is already up would otherwise sit there until the next restart. Every
+/// tick re-probes the single workspace relay `kurad` runs against — the same
+/// probe-then-fan-out `reconcile_managed_agent_runtimes` already does for the
+/// desktop app's multi-community loop — and (re)starts whatever should be
+/// running but is not (a newly added agent, or one that crashed and needs
+/// the crash-recovery path a reconcile also drives). A probe/start failure on
+/// one tick is logged and retried on the next tick; it never aborts the loop
+/// or the process, matching every other best-effort path in `kurad::run`.
+///
+/// `interval` of `Duration::ZERO` disables the loop entirely (checked by the
+/// caller) — this function is only ever invoked when reconciliation is on.
+async fn run_reconciliation_loop(host: HostHandle, interval: std::time::Duration) {
+    let mut ticker = tokio::time::interval(interval);
+    ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
+    // The first tick fires immediately; that work was just done by the
+    // boot-time restore, so skip it.
+    ticker.tick().await;
+
+    let mut previous: HashSet<(String, String)> = HashSet::new();
+    loop {
+        ticker.tick().await;
+        if host
+            .state()
+            .shutdown_started
+            .load(std::sync::atomic::Ordering::SeqCst)
+        {
+            return;
+        }
+
+        let target = ManagedAgentCommunityTarget {
+            relay_url: relay_ws_url_with_override(host.state()),
+        };
+        match reconcile_managed_agent_runtimes(vec![target], host.clone()).await {
+            Ok(statuses) => {
+                let current = live_pairs(&statuses);
+                let (started, stopped) = diff_live_pairs(&previous, &current);
+                for (pubkey, relay_url) in &started {
+                    tracing::info!(%pubkey, %relay_url, "reconcile started managed agent");
+                }
+                for (pubkey, relay_url) in &stopped {
+                    tracing::info!(%pubkey, %relay_url, "reconcile no longer tracks managed agent");
+                }
+                previous = current.into_iter().collect();
+            }
+            Err(error) => {
+                tracing::warn!(%error, "periodic managed-agent reconcile failed; retrying next tick");
+            }
+        }
+    }
 }
 
 async fn run(args: RunArgs) -> Result<()> {
@@ -331,6 +431,18 @@ async fn run(args: RunArgs) -> Result<()> {
         "kurad running ({} agent(s) live), Ctrl+C to stop",
         started.len()
     );
+
+    // Boot-time restore only ever runs once. Without a periodic reconcile,
+    // an agent added to the store (or flipped to `start_on_app_launch`)
+    // while `kurad` is already up would sit there until the next restart —
+    // see `run_reconciliation_loop`. `--reconcile-interval-secs 0` opts out
+    // and falls back to that boot-only behavior.
+    let reconcile_task = (args.reconcile_interval_secs > 0).then(|| {
+        let reconcile_host = host.clone();
+        let interval = std::time::Duration::from_secs(args.reconcile_interval_secs);
+        tokio::spawn(async move { run_reconciliation_loop(reconcile_host, interval).await })
+    });
+
     tokio::signal::ctrl_c()
         .await
         .context("failed to listen for Ctrl+C")?;
@@ -338,6 +450,24 @@ async fn run(args: RunArgs) -> Result<()> {
     host.state()
         .shutdown_started
         .store(true, std::sync::atomic::Ordering::SeqCst);
+
+    // Stop scheduling further reconcile ticks. A tick already in flight keeps
+    // running to completion in the background (aborting only cancels the
+    // outer task at its next await point, never the `spawn_blocking` start
+    // work inside it) — consistent with every other best-effort path here,
+    // and harmless: the recompute below reads whatever state that tick left.
+    if let Some(task) = reconcile_task {
+        task.abort();
+    }
+
+    // Recompute the live set fresh rather than reusing the boot-time
+    // `started`: a reconcile tick may have started (or reaped) agents since
+    // then, and every one of them still deserves a clean stop.
+    let started = live_pairs(
+        &list_managed_agent_runtimes(host.clone())
+            .await
+            .map_err(anyhow::Error::msg)?,
+    );
 
     // Best effort: a failed stop is logged, never fatal — the remaining agents
     // still deserve their turn at a clean teardown.
@@ -650,5 +780,73 @@ mod tests {
     fn explicit_data_dir_wins_over_the_platform_default() {
         let dir = PathBuf::from("/tmp/kurad-explicit");
         assert_eq!(resolve_data_dir(Some(dir.clone())).unwrap(), dir);
+    }
+
+    fn pair(pubkey: &str, relay: &str) -> (String, String) {
+        (pubkey.to_string(), relay.to_string())
+    }
+
+    #[test]
+    fn diff_live_pairs_reports_newly_started_agents() {
+        let previous = HashSet::new();
+        let current = vec![pair("aa", "wss://a.example")];
+        let (started, stopped) = diff_live_pairs(&previous, &current);
+        assert_eq!(started, vec![pair("aa", "wss://a.example")]);
+        assert!(stopped.is_empty());
+    }
+
+    #[test]
+    fn diff_live_pairs_reports_agents_no_longer_live() {
+        let previous = HashSet::from([pair("aa", "wss://a.example")]);
+        let current = vec![];
+        let (started, stopped) = diff_live_pairs(&previous, &current);
+        assert!(started.is_empty());
+        assert_eq!(stopped, vec![pair("aa", "wss://a.example")]);
+    }
+
+    #[test]
+    fn diff_live_pairs_is_silent_when_nothing_changed() {
+        let previous = HashSet::from([pair("aa", "wss://a.example")]);
+        let current = vec![pair("aa", "wss://a.example")];
+        let (started, stopped) = diff_live_pairs(&previous, &current);
+        assert!(started.is_empty());
+        assert!(stopped.is_empty());
+    }
+
+    #[test]
+    fn diff_live_pairs_treats_a_relay_change_for_the_same_pubkey_as_stop_plus_start() {
+        // A pubkey reconciled against a different relay is a distinct pair
+        // (matches `ManagedAgentRuntimeKey`, which is keyed by both), so it
+        // shows up as one stopped and one started row, not an update.
+        let previous = HashSet::from([pair("aa", "wss://old.example")]);
+        let current = vec![pair("aa", "wss://new.example")];
+        let (started, stopped) = diff_live_pairs(&previous, &current);
+        assert_eq!(started, vec![pair("aa", "wss://new.example")]);
+        assert_eq!(stopped, vec![pair("aa", "wss://old.example")]);
+    }
+
+    #[test]
+    fn run_args_default_reconcile_interval_is_30_seconds() {
+        let cli = Cli::parse_from(["kurad", "run", "--data-dir", "/tmp/kurad-defaults"]);
+        match cli.command {
+            Command::Run(args) => assert_eq!(args.reconcile_interval_secs, 30),
+            other => panic!("expected Run, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn run_args_reconcile_interval_is_configurable_and_zero_is_allowed() {
+        let cli = Cli::parse_from([
+            "kurad",
+            "run",
+            "--data-dir",
+            "/tmp/kurad-defaults",
+            "--reconcile-interval-secs",
+            "0",
+        ]);
+        match cli.command {
+            Command::Run(args) => assert_eq!(args.reconcile_interval_secs, 0),
+            other => panic!("expected Run, got {other:?}"),
+        }
     }
 }

@@ -40,9 +40,19 @@ lado do relay `dev.kura.oute.pro`.
 
 ## Estado atual do `kurad` (verificado em `crates/kurad/src/main.rs`)
 
-- CLI: só `kurad run --data-dir <path> [--relay <url>] [--dev]` e
-  `kurad status --data-dir <path>` (flags com equivalentes em env var:
-  `KURA_DATA_DIR`, `KURA_RELAY_URL`).
+- CLI: só `kurad run --data-dir <path> [--relay <url>] [--dev]
+  [--reconcile-interval-secs <n>]` e `kurad status --data-dir <path>` (flags
+  com equivalentes em env var: `KURA_DATA_DIR`, `KURA_RELAY_URL`,
+  `KURA_RECONCILE_INTERVAL_SECS`).
+- **Reconciliação periódica em runtime**: `run` não só restaura os agentes
+  configurados na subida — a cada `--reconcile-interval-secs` (default 30s)
+  ele reprova o relay do workspace e sobe o que deveria estar rodando e não
+  está (`reconcile_managed_agent_runtimes`, a mesma função que o desktop já
+  usava por comunidade). Isso fecha o gap que existia até aqui: adicionar um
+  agente em `managed-agents.json` (ou marcar `start_on_app_launch`) enquanto
+  o `kurad` já estava de pé exigia reiniciar o processo pra ele ser
+  percebido. `--reconcile-interval-secs 0` desliga e volta ao comportamento
+  antigo (só a restauração da subida).
 - **Sem `config.toml`**: os parâmetros são só flag/env, não há leitura de
   arquivo de configuração. `03-kurad.sh` por isso não escreve nenhum
   `config.toml` — os parâmetros vão direto na unit systemd. Suporte a
