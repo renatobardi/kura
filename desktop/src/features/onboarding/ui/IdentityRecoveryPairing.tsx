@@ -1,5 +1,4 @@
 import * as React from "react";
-import { listen } from "@tauri-apps/api/event";
 import {
   Check,
   Copy,
@@ -10,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 
+import { platform } from "@/platform";
 import { cancelPairing, confirmPairingSas } from "@/shared/api/tauri";
 import { startIdentityRecoveryPairing } from "@/shared/api/tauriPairing";
 import { writeTextToClipboard } from "@/shared/lib/clipboard";
@@ -77,33 +77,41 @@ export function IdentityRecoveryPairing({
     void start();
     const unlisteners: Array<() => void> = [];
     let disposed = false;
-    listen<{ sas: string }>("pairing-sas-received", ({ payload }) => {
-      if (!disposed && active.current) {
-        setSas(payload.sas);
-        setStep("sas");
-      }
-    }).then((unlisten) => (disposed ? unlisten() : unlisteners.push(unlisten)));
-    listen("pairing-complete", () => {
-      if (!disposed && active.current) {
-        active.current = false;
-        setStep("done");
-        void onRecovered();
-      }
-    }).then((unlisten) => (disposed ? unlisten() : unlisteners.push(unlisten)));
-    listen<{ message: string }>("pairing-error", ({ payload }) => {
-      if (!disposed && active.current) {
-        active.current = false;
-        setError(recoveryErrorMessage(payload.message));
-        setStep("error");
-      }
-    }).then((unlisten) => (disposed ? unlisten() : unlisteners.push(unlisten)));
-    listen<{ reason: string }>("pairing-aborted", ({ payload }) => {
-      if (!disposed && active.current) {
-        active.current = false;
-        setError(`Recovery stopped: ${payload.reason}`);
-        setStep("error");
-      }
-    }).then((unlisten) => (disposed ? unlisten() : unlisteners.push(unlisten)));
+    platform
+      .listen<{ sas: string }>("pairing-sas-received", ({ payload }) => {
+        if (!disposed && active.current) {
+          setSas(payload.sas);
+          setStep("sas");
+        }
+      })
+      .then((unlisten) => (disposed ? unlisten() : unlisteners.push(unlisten)));
+    platform
+      .listen("pairing-complete", () => {
+        if (!disposed && active.current) {
+          active.current = false;
+          setStep("done");
+          void onRecovered();
+        }
+      })
+      .then((unlisten) => (disposed ? unlisten() : unlisteners.push(unlisten)));
+    platform
+      .listen<{ message: string }>("pairing-error", ({ payload }) => {
+        if (!disposed && active.current) {
+          active.current = false;
+          setError(recoveryErrorMessage(payload.message));
+          setStep("error");
+        }
+      })
+      .then((unlisten) => (disposed ? unlisten() : unlisteners.push(unlisten)));
+    platform
+      .listen<{ reason: string }>("pairing-aborted", ({ payload }) => {
+        if (!disposed && active.current) {
+          active.current = false;
+          setError(`Recovery stopped: ${payload.reason}`);
+          setStep("error");
+        }
+      })
+      .then((unlisten) => (disposed ? unlisten() : unlisteners.push(unlisten)));
     return () => {
       disposed = true;
       active.current = false;
