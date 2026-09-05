@@ -1,5 +1,4 @@
 import * as React from "react";
-import { invoke } from "@tauri-apps/api/core";
 import {
   AlertCircle,
   Archive,
@@ -13,6 +12,7 @@ import {
   Unlink,
 } from "lucide-react";
 
+import { platform } from "@/platform";
 import { useIdentityQuery } from "@/shared/api/hooks";
 import {
   HOSTED_COMMUNITY_LIMIT as MAX_COMMUNITIES,
@@ -80,8 +80,8 @@ export function HostedCommunitiesSettingsCard() {
   const loadAccount = React.useCallback(async () => {
     setError(null);
     const [identityResponse, communitiesResponse] = await Promise.all([
-      invoke<IdentityResponse>("get_builderlab_nostr_identity"),
-      invoke<CommunitiesResponse>("list_builderlab_communities"),
+      platform.invoke<IdentityResponse>("get_builderlab_nostr_identity"),
+      platform.invoke<CommunitiesResponse>("list_builderlab_communities"),
     ]);
     if (
       identityResponse.error &&
@@ -114,7 +114,8 @@ export function HostedCommunitiesSettingsCard() {
 
   React.useEffect(() => {
     let active = true;
-    void invoke<BuilderlabAuth | null>("get_builderlab_auth")
+    void platform
+      .invoke<BuilderlabAuth | null>("get_builderlab_auth")
       .then(async (nextAuth) => {
         if (!active) return;
         setAuth(nextAuth);
@@ -149,14 +150,16 @@ export function HostedCommunitiesSettingsCard() {
 
   const signIn = () =>
     run("Signing in…", async () => {
-      const nextAuth = await invoke<BuilderlabAuth>("start_builderlab_login");
+      const nextAuth = await platform.invoke<BuilderlabAuth>(
+        "start_builderlab_login",
+      );
       setAuth(nextAuth);
       await loadAccount();
     });
 
   const signOut = () =>
     run("Signing out…", async () => {
-      await invoke("clear_builderlab_auth");
+      await platform.invoke("clear_builderlab_auth");
       setAuth(null);
       setIdentity(null);
       setCommunities([]);
@@ -166,7 +169,7 @@ export function HostedCommunitiesSettingsCard() {
 
   const connectIdentity = () =>
     run("Connecting Kura identity…", async () => {
-      const response = await invoke<IdentityResponse>(
+      const response = await platform.invoke<IdentityResponse>(
         "bind_builderlab_nostr_identity",
       );
       if (response.error) {
@@ -184,7 +187,7 @@ export function HostedCommunitiesSettingsCard() {
 
   const unpairIdentity = () =>
     run("Unpairing identity…", async () => {
-      const response = await invoke<IdentityResponse>(
+      const response = await platform.invoke<IdentityResponse>(
         "delete_builderlab_nostr_identity",
       );
       if (response.error) {
@@ -222,7 +225,7 @@ export function HostedCommunitiesSettingsCard() {
       // this device's key. If the local key is reserved by another Builderlab
       // account, the bind fails with pubkey_already_bound — surface that instead
       // of leaving the swap half-finished silently.
-      const released = await invoke<IdentityResponse>(
+      const released = await platform.invoke<IdentityResponse>(
         "delete_builderlab_nostr_identity",
       );
       if (released.error) {
@@ -234,7 +237,7 @@ export function HostedCommunitiesSettingsCard() {
           ),
         );
       }
-      const bound = await invoke<IdentityResponse>(
+      const bound = await platform.invoke<IdentityResponse>(
         "bind_builderlab_nostr_identity",
       );
       if (bound.error) {
@@ -258,7 +261,7 @@ export function HostedCommunitiesSettingsCard() {
   const archiveCommunity = (community: HostedCommunity) => {
     if (!community.id) return Promise.resolve(false);
     return run("Archiving community…", async () => {
-      const response = await invoke<CommunityMutationResponse>(
+      const response = await platform.invoke<CommunityMutationResponse>(
         "archive_builderlab_community",
         { communityId: community.id },
       );
@@ -280,7 +283,7 @@ export function HostedCommunitiesSettingsCard() {
   const unarchiveCommunity = (community: HostedCommunity) => {
     if (!community.id) return Promise.resolve(false);
     return run("Unarchiving community…", async () => {
-      const response = await invoke<CommunityMutationResponse>(
+      const response = await platform.invoke<CommunityMutationResponse>(
         "unarchive_builderlab_community",
         { communityId: community.id },
       );
@@ -299,7 +302,7 @@ export function HostedCommunitiesSettingsCard() {
 
   const transferCommunity = (community: HostedCommunity, npub: string) =>
     run("Transferring ownership…", async () => {
-      const response = await invoke<CommunityMutationResponse>(
+      const response = await platform.invoke<CommunityMutationResponse>(
         "transfer_builderlab_community",
         { communityId: community.id, transfereeNpub: npub },
       );
@@ -333,7 +336,7 @@ export function HostedCommunitiesSettingsCard() {
     const handle = window.setTimeout(() => {
       void (async () => {
         try {
-          const response = await invoke<AvailabilityResponse>(
+          const response = await platform.invoke<AvailabilityResponse>(
             "check_builderlab_community_name",
             { name: normalizedName },
           );
@@ -364,7 +367,7 @@ export function HostedCommunitiesSettingsCard() {
     )
       return;
     void run("Creating community…", async () => {
-      const availabilityResponse = await invoke<AvailabilityResponse>(
+      const availabilityResponse = await platform.invoke<AvailabilityResponse>(
         "check_builderlab_community_name",
         { name: normalizedName },
       );
@@ -378,7 +381,7 @@ export function HostedCommunitiesSettingsCard() {
           ),
         );
       }
-      const response = await invoke<CommunityMutationResponse>(
+      const response = await platform.invoke<CommunityMutationResponse>(
         "create_builderlab_community",
         { name: normalizedName },
       );
