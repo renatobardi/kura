@@ -24,7 +24,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
     "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20"
   fileprivate static let keyId = "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqo="
   fileprivate static let attestation = Data("test-attestation".utf8).base64EncodedString()
-  fileprivate static let assertion = Data("buzz-dev-app-assertion-v1".utf8).base64EncodedString()
+  fileprivate static let assertion = Data("kura-dev-app-assertion-v1".utf8).base64EncodedString()
 
   override func setUp() {
     super.setUp()
@@ -81,7 +81,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
         XCTAssertEqual(body["challenge"] as? String, Self.challenge)
         XCTAssertEqual(body["key_id"] as? String, Self.keyId)
         XCTAssertEqual(body["attestation"] as? String, Self.attestation)
-        XCTAssertEqual(body["app_profile"] as? String, "buzz-ios-dogfood")
+        XCTAssertEqual(body["app_profile"] as? String, "kura-ios-dogfood")
         return Self.response(
           request,
           status: 201,
@@ -149,7 +149,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
         installationId: Self.installationId,
         endpointGrant: "opaque-grant",
         endpointHash: Self.hex(SHA256.hash(data: Data((1...32).map(UInt8.init)))),
-        appProfile: "buzz-ios-dogfood",
+        appProfile: "kura-ios-dogfood",
         endpointEpoch: 1,
         generation: 1,
         expiresAt: Self.expiresAt
@@ -500,7 +500,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
   func testKeychainStoreReadsKeyIdAndIncludesAccessGroup() throws {
     var capturedQuery: [String: Any] = [:]
     let store = KuraAppAttestKeyIdKeychainStore(
-      accessGroup: "group.buzz",
+      accessGroup: "group.kura",
       copyMatching: { query, result in
         capturedQuery = query as! [String: Any]
         result?.pointee = Data(Self.keyId.utf8) as CFData
@@ -511,9 +511,9 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
     XCTAssertEqual(try store.keyId(), Self.keyId)
     XCTAssertEqual(
       capturedQuery[kSecClass as String] as? String, kSecClassGenericPassword as String)
-    XCTAssertEqual(capturedQuery[kSecAttrService as String] as? String, "buzz.push.app-attest")
+    XCTAssertEqual(capturedQuery[kSecAttrService as String] as? String, "kura.push.app-attest")
     XCTAssertEqual(capturedQuery[kSecAttrAccount as String] as? String, "key-id-v1")
-    XCTAssertEqual(capturedQuery[kSecAttrAccessGroup as String] as? String, "group.buzz")
+    XCTAssertEqual(capturedQuery[kSecAttrAccessGroup as String] as? String, "group.kura")
     XCTAssertEqual(capturedQuery[kSecReturnData as String] as? Bool, true)
     XCTAssertEqual(capturedQuery[kSecMatchLimit as String] as? String, kSecMatchLimitOne as String)
   }
@@ -563,7 +563,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
 
     try store.saveKeyId(Self.keyId)
 
-    XCTAssertEqual(updatedQuery[kSecAttrService as String] as? String, "buzz.push.app-attest")
+    XCTAssertEqual(updatedQuery[kSecAttrService as String] as? String, "kura.push.app-attest")
     XCTAssertEqual(updatedValues[kSecValueData as String] as? Data, Data(Self.keyId.utf8))
     XCTAssertEqual(addCallCount, 0)
   }
@@ -571,7 +571,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
   func testKeychainStoreAddsMissingKeyIdWithDeviceOnlyAccessibility() throws {
     var addedItem: [String: Any] = [:]
     let store = KuraAppAttestKeyIdKeychainStore(
-      accessGroup: "group.buzz",
+      accessGroup: "group.kura",
       update: { _, _ in errSecItemNotFound },
       add: { item, _ in
         addedItem = item as! [String: Any]
@@ -586,7 +586,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
       addedItem[kSecAttrAccessible as String] as? String,
       kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly as String
     )
-    XCTAssertEqual(addedItem[kSecAttrAccessGroup as String] as? String, "group.buzz")
+    XCTAssertEqual(addedItem[kSecAttrAccessGroup as String] as? String, "group.kura")
   }
 
   func testKeychainStoreSurfacesReadUpdateAndAddErrors() throws {
@@ -624,7 +624,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
       installationId: Self.installationId,
       endpointGrant: "existing-grant",
       endpointHash: Self.hex(SHA256.hash(data: Data((1...32).map(UInt8.init)))),
-      appProfile: "buzz-ios-dogfood",
+      appProfile: "kura-ios-dogfood",
       endpointEpoch: 1,
       generation: 1,
       expiresAt: Self.expiresAt
@@ -665,7 +665,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
       installationId: String(repeating: "f", count: 32),
       endpointGrant: "existing-grant",
       endpointHash: Self.hex(SHA256.hash(data: Data((1...32).map(UInt8.init)))),
-      appProfile: "buzz-ios-dogfood",
+      appProfile: "kura-ios-dogfood",
       endpointEpoch: 1,
       generation: 4,
       expiresAt: Self.expiresAt
@@ -710,7 +710,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
       installationId: String(repeating: "f", count: 32),
       endpointGrant: "first-relay-grant",
       endpointHash: Self.hex(SHA256.hash(data: Data((1...32).map(UInt8.init)))),
-      appProfile: "buzz-ios-dogfood",
+      appProfile: "kura-ios-dogfood",
       endpointEpoch: 1,
       generation: 7,
       expiresAt: Self.expiresAt
@@ -780,7 +780,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
       installationId: Self.installationId,
       endpointGrant: "existing-grant",
       endpointHash: Self.hex(SHA256.hash(data: Data((1...32).map(UInt8.init)))),
-      appProfile: "buzz-ios-dogfood",
+      appProfile: "kura-ios-dogfood",
       endpointEpoch: 1,
       generation: 7,
       expiresAt: Self.now + 300
@@ -884,7 +884,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
       installationId: Self.installationId,
       endpointGrant: "existing-grant",
       endpointHash: Self.hex(SHA256.hash(data: deviceToken)),
-      appProfile: "buzz-ios-dogfood",
+      appProfile: "kura-ios-dogfood",
       endpointEpoch: 1,
       generation: 1,
       expiresAt: Self.expiresAt
@@ -925,7 +925,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
       installationId: Self.installationId,
       endpointGrant: "existing-grant",
       endpointHash: Self.hex(SHA256.hash(data: deviceToken)),
-      appProfile: "buzz-ios-dogfood",
+      appProfile: "kura-ios-dogfood",
       endpointEpoch: 1,
       generation: 1,
       expiresAt: Self.expiresAt
@@ -962,7 +962,7 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
       installationId: Self.installationId,
       endpointGrant: "existing-grant",
       endpointHash: Self.hex(SHA256.hash(data: deviceToken)),
-      appProfile: "buzz-ios-dogfood",
+      appProfile: "kura-ios-dogfood",
       endpointEpoch: 1,
       generation: 1,
       expiresAt: Self.expiresAt
