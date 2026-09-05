@@ -1,7 +1,6 @@
-import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
 import * as React from "react";
 
+import { platform } from "@/platform";
 import {
   isDocumentVisible,
   subscribeDocumentVisibility,
@@ -65,7 +64,7 @@ export function useTtsSubscription(
             `[huddle] tts stage=invoke status=attempted route_id=${routeId}`,
           );
           try {
-            await invoke("speak_agent_message", {
+            await platform.invoke("speak_agent_message", {
               text,
               routeId,
               speakerPubkey,
@@ -191,7 +190,9 @@ export function useTtsSubscription(
 
     async function loadAgentPubkeys(initial = false) {
       try {
-        const pubkeys = await invoke<string[]>("get_huddle_agent_pubkeys");
+        const pubkeys = await platform.invoke<string[]>(
+          "get_huddle_agent_pubkeys",
+        );
         if (disposed) return;
         agentPubkeys.clear();
         for (const pk of pubkeys) agentPubkeys.add(pk);
@@ -248,9 +249,10 @@ export function useTtsSubscription(
         }
       },
     );
-    void listen<{ tts_enabled: boolean }>("huddle-state-changed", (event) => {
-      if (!disposed) ttsStateGate.applyEvent(event.payload);
-    })
+    void platform
+      .listen<{ tts_enabled: boolean }>("huddle-state-changed", (event) => {
+        if (!disposed) ttsStateGate.applyEvent(event.payload);
+      })
       .then((unlisten) => {
         if (disposed) {
           unlisten();
@@ -258,7 +260,8 @@ export function useTtsSubscription(
         }
         unlistenHuddleState = unlisten;
         const applyBootstrap = ttsStateGate.beginSnapshot();
-        void invoke<{ tts_enabled: boolean }>("get_huddle_state")
+        void platform
+          .invoke<{ tts_enabled: boolean }>("get_huddle_state")
           .then((state) => {
             if (!disposed) applyBootstrap(state);
           })

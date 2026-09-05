@@ -1,5 +1,6 @@
-import { invoke } from "@tauri-apps/api/core";
 import * as React from "react";
+
+import { platform } from "@/platform";
 
 const PIPELINE_HOTSTART_INTERVAL_MS = 15_000;
 
@@ -8,7 +9,7 @@ export function usePipelineHotstart(ephemeralChannelId: string | null) {
   React.useEffect(() => {
     if (!ephemeralChannelId) return;
     const checkPipelineHotstart = () => {
-      invoke("check_pipeline_hotstart").catch(() => {
+      platform.invoke("check_pipeline_hotstart").catch(() => {
         /* best-effort */
       });
     };

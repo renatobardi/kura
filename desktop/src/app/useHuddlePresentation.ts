@@ -1,7 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "@tanstack/react-router";
-import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
 import * as React from "react";
 import {
   loadHuddleBackingChannelIds,
@@ -10,6 +8,7 @@ import {
 import { useAppNavigation } from "@/app/navigation/useAppNavigation";
 import { channelsQueryKey } from "@/features/channels/hooks";
 import { huddleWindowChannelId } from "@/features/huddle/lib/huddleWindow";
+import { platform } from "@/platform";
 import {
   channelMessagesKey,
   channelWindowKey,
@@ -64,7 +63,8 @@ export function useHuddlePresentation() {
       if (!cancelled) setHuddleTranscriptRoute(state);
     };
 
-    void invoke<HuddleTranscriptRouteState>("get_huddle_state")
+    void platform
+      .invoke<HuddleTranscriptRouteState>("get_huddle_state")
       .then(syncRoute)
       .catch((error) => {
         console.error("Failed to resolve huddle transcript route:", error);
@@ -77,12 +77,14 @@ export function useHuddlePresentation() {
           });
         }
       });
-    void listen<HuddleTranscriptRouteState>("huddle-state-changed", (event) =>
-      syncRoute(event.payload),
-    ).then((cleanup) => {
-      if (cancelled) cleanup();
-      else unlisten = cleanup;
-    });
+    void platform
+      .listen<HuddleTranscriptRouteState>("huddle-state-changed", (event) =>
+        syncRoute(event.payload),
+      )
+      .then((cleanup) => {
+        if (cancelled) cleanup();
+        else unlisten = cleanup;
+      });
 
     return () => {
       cancelled = true;
@@ -231,7 +233,8 @@ export function useHuddlePresentation() {
       return;
     }
 
-    void invoke<HuddleTranscriptRouteState>("get_huddle_state")
+    void platform
+      .invoke<HuddleTranscriptRouteState>("get_huddle_state")
       .then(returnMainWindowToHuddleParent)
       .catch((error) => {
         console.error("Failed to restore the huddle parent channel:", error);
@@ -264,7 +267,7 @@ export function useHuddlePresentation() {
       }
 
       huddleCompanionChannelIdRef.current = ephemeralChannelId;
-      const openPromise = invoke<void>("open_huddle_window").catch((error) => {
+      const openPromise = platform.window.openHuddle().catch((error) => {
         if (huddleCompanionChannelIdRef.current === ephemeralChannelId) {
           huddleCompanionChannelIdRef.current = null;
           huddleCompanionOpenPromiseRef.current = null;
@@ -348,29 +351,32 @@ export function useHuddlePresentation() {
 
     let cancelled = false;
     let unlisten: (() => void) | null = null;
-    void listen("huddle-companion-returned", () => {
-      if (cancelled) return;
-      huddleCompanionDismissedChannelIdRef.current =
-        activeHuddleChannelIdRef.current;
-      huddleCompanionChannelIdRef.current = null;
-      huddleCompanionOpenPromiseRef.current = null;
-      setIsHuddleCompanionOpen(false);
-      setIsHuddleDrawerOpen(true);
-      void invoke<HuddleTranscriptRouteState>("get_huddle_state")
-        .then((state) => {
-          if (!state.ephemeral_channel_id) return;
-          if (state.parent_channel_id) {
-            activeHuddleParentChannelIdRef.current = state.parent_channel_id;
-          }
-          showHuddleInMainApp(state.ephemeral_channel_id);
-        })
-        .catch((error) => {
-          console.error("Failed to open huddle in the main app:", error);
-        });
-    }).then((cleanup) => {
-      if (cancelled) cleanup();
-      else unlisten = cleanup;
-    });
+    void platform
+      .listen("huddle-companion-returned", () => {
+        if (cancelled) return;
+        huddleCompanionDismissedChannelIdRef.current =
+          activeHuddleChannelIdRef.current;
+        huddleCompanionChannelIdRef.current = null;
+        huddleCompanionOpenPromiseRef.current = null;
+        setIsHuddleCompanionOpen(false);
+        setIsHuddleDrawerOpen(true);
+        void platform
+          .invoke<HuddleTranscriptRouteState>("get_huddle_state")
+          .then((state) => {
+            if (!state.ephemeral_channel_id) return;
+            if (state.parent_channel_id) {
+              activeHuddleParentChannelIdRef.current = state.parent_channel_id;
+            }
+            showHuddleInMainApp(state.ephemeral_channel_id);
+          })
+          .catch((error) => {
+            console.error("Failed to open huddle in the main app:", error);
+          });
+      })
+      .then((cleanup) => {
+        if (cancelled) cleanup();
+        else unlisten = cleanup;
+      });
     return () => {
       cancelled = true;
       unlisten?.();
@@ -380,7 +386,8 @@ export function useHuddlePresentation() {
   React.useEffect(() => {
     let cancelled = false;
     let unlisten: (() => void) | null = null;
-    void invoke<HuddleTranscriptRouteState>("get_huddle_state")
+    void platform
+      .invoke<HuddleTranscriptRouteState>("get_huddle_state")
       .then((state) => {
         if (cancelled || !state.ephemeral_channel_id) return;
         activeHuddleChannelIdRef.current = state.ephemeral_channel_id;
@@ -392,46 +399,48 @@ export function useHuddlePresentation() {
       .catch(() => {
         /* lifecycle events remain authoritative */
       });
-    listen<HuddleTranscriptRouteState>("huddle-state-changed", (event) => {
-      if (cancelled) return;
-      if (event.payload.ephemeral_channel_id) {
-        activeHuddleChannelIdRef.current = event.payload.ephemeral_channel_id;
-        trackHuddleBackingChannel(event.payload.ephemeral_channel_id);
-      }
-      if (event.payload.parent_channel_id) {
-        activeHuddleParentChannelIdRef.current =
-          event.payload.parent_channel_id;
-      }
-      if (
-        !isHuddleRoom &&
-        event.payload.phase === "creating" &&
-        event.payload.ephemeral_channel_id
-      ) {
-        void openHuddleCompanion(event.payload.ephemeral_channel_id).catch(
-          (error) => {
-            console.error("Failed to open starting huddle window:", error);
-          },
-        );
-      }
-      if (event.payload.phase === "idle") {
-        const endedChannelId = activeHuddleChannelIdRef.current;
-        const parentChannelId = activeHuddleParentChannelIdRef.current;
-        returnToHuddleParentAfterEnd(endedChannelId, parentChannelId);
-        hideHuddleChannel(endedChannelId);
-        activeHuddleChannelIdRef.current = null;
-        activeHuddleParentChannelIdRef.current = null;
-        huddleCompanionChannelIdRef.current = null;
-        huddleCompanionDismissedChannelIdRef.current = null;
-        huddleCompanionOpenPromiseRef.current = null;
-        setIsHuddleDrawerOpen(false);
-        setIsHuddleCompanionOpen(false);
-        setIsHuddleStartPending(false);
-        void queryClient.invalidateQueries({ queryKey: channelsQueryKey });
-      }
-    }).then((cleanup) => {
-      if (cancelled) cleanup();
-      else unlisten = cleanup;
-    });
+    platform
+      .listen<HuddleTranscriptRouteState>("huddle-state-changed", (event) => {
+        if (cancelled) return;
+        if (event.payload.ephemeral_channel_id) {
+          activeHuddleChannelIdRef.current = event.payload.ephemeral_channel_id;
+          trackHuddleBackingChannel(event.payload.ephemeral_channel_id);
+        }
+        if (event.payload.parent_channel_id) {
+          activeHuddleParentChannelIdRef.current =
+            event.payload.parent_channel_id;
+        }
+        if (
+          !isHuddleRoom &&
+          event.payload.phase === "creating" &&
+          event.payload.ephemeral_channel_id
+        ) {
+          void openHuddleCompanion(event.payload.ephemeral_channel_id).catch(
+            (error) => {
+              console.error("Failed to open starting huddle window:", error);
+            },
+          );
+        }
+        if (event.payload.phase === "idle") {
+          const endedChannelId = activeHuddleChannelIdRef.current;
+          const parentChannelId = activeHuddleParentChannelIdRef.current;
+          returnToHuddleParentAfterEnd(endedChannelId, parentChannelId);
+          hideHuddleChannel(endedChannelId);
+          activeHuddleChannelIdRef.current = null;
+          activeHuddleParentChannelIdRef.current = null;
+          huddleCompanionChannelIdRef.current = null;
+          huddleCompanionDismissedChannelIdRef.current = null;
+          huddleCompanionOpenPromiseRef.current = null;
+          setIsHuddleDrawerOpen(false);
+          setIsHuddleCompanionOpen(false);
+          setIsHuddleStartPending(false);
+          void queryClient.invalidateQueries({ queryKey: channelsQueryKey });
+        }
+      })
+      .then((cleanup) => {
+        if (cancelled) cleanup();
+        else unlisten = cleanup;
+      });
     return () => {
       cancelled = true;
       unlisten?.();

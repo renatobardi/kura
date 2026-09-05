@@ -1,8 +1,8 @@
-import { invoke } from "@tauri-apps/api/core";
 import { LoaderCircle } from "lucide-react";
 import * as React from "react";
 
 import { ProfileAvatar } from "@/features/profile/ui/ProfileAvatar";
+import { platform } from "@/platform";
 import { Dialog } from "@/shared/ui/dialog";
 import { ChooserDialogContent } from "@/shared/ui/chooser-dialog-content";
 import type { ManagedAgentBackend } from "@/shared/api/types";
@@ -49,7 +49,8 @@ export function AddAgentDialog({
     setError(null);
     setWarning(null);
 
-    invoke<ManagedAgentSummary[]>("list_managed_agents")
+    platform
+      .invoke<ManagedAgentSummary[]>("list_managed_agents")
       .then((nextAgents) => {
         if (!cancelled) setAgents(nextAgents);
       })
@@ -86,13 +87,15 @@ export function AddAgentDialog({
         ? agent.status !== "running"
         : agent.status !== "deployed";
       if (needsStart && isLocal) {
-        await invoke("start_managed_agent", { pubkey: agent.pubkey });
+        await platform.invoke("start_managed_agent", { pubkey: agent.pubkey });
         startedForAdd = true;
       }
       const result = await onAdd(agent.pubkey);
       if (needsStart && !isLocal) {
         try {
-          await invoke("start_managed_agent", { pubkey: agent.pubkey });
+          await platform.invoke("start_managed_agent", {
+            pubkey: agent.pubkey,
+          });
         } catch (startError: unknown) {
           const msg =
             startError instanceof Error
@@ -115,7 +118,7 @@ export function AddAgentDialog({
     } catch (e: unknown) {
       if (startedForAdd) {
         try {
-          await invoke("stop_managed_agent", { pubkey: agent.pubkey });
+          await platform.invoke("stop_managed_agent", { pubkey: agent.pubkey });
         } catch (rollbackError: unknown) {
           console.error(
             "Failed to stop agent after huddle add failed:",
