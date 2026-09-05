@@ -279,19 +279,29 @@ fn relay_override(value: Option<&str>) -> Option<String> {
     (!candidate.is_empty()).then(|| candidate.to_string())
 }
 
-/// Pairs `stop_managed_agent_runtime` should be called on at shutdown: every
-/// runtime this process still tracks as live. `Stopped` rows are the ones
-/// `list_managed_agent_runtimes` reports for a child it just reaped, so
-/// stopping them again would be pure noise.
 /// A (pubkey, relay_url) pair identifying one managed-agent runtime — the
 /// same two fields `ManagedAgentRuntimeKey` is keyed by. Named so clippy's
 /// `type_complexity` lint does not flag `diff_live_pairs`'s return type.
 type AgentPairs = Vec<(String, String)>;
 
+/// Pairs `stop_managed_agent_runtime` should be called on at shutdown, and
+/// the set the reconcile loop diffs tick-to-tick: every runtime this process
+/// still tracks as genuinely live. `Stopped` rows are the ones
+/// `list_managed_agent_runtimes` reports for a child it just reaped, so
+/// stopping them again would be pure noise. `Failed` rows never had a
+/// process to begin with (the probe or `start_pair` rejected the job before
+/// anything spawned) — counting them as live would log a misleading
+/// "reconcile started managed agent" for a job that never started, and would
+/// queue a pointless stop call for a pubkey/relay pair with nothing running.
 fn live_pairs(runtimes: &[kura_host::managed_agents::ManagedAgentRuntimeStatus]) -> AgentPairs {
     runtimes
         .iter()
-        .filter(|status| !matches!(status.lifecycle, ManagedAgentRuntimeLifecycle::Stopped))
+        .filter(|status| {
+            !matches!(
+                status.lifecycle,
+                ManagedAgentRuntimeLifecycle::Stopped | ManagedAgentRuntimeLifecycle::Failed
+            )
+        })
         .map(|status| (status.pubkey.clone(), status.relay_url.clone()))
         .collect()
 }
@@ -747,7 +757,7 @@ mod tests {
     }
 
     #[test]
-    fn shutdown_targets_every_runtime_that_is_not_stopped() {
+    fn shutdown_targets_every_runtime_that_is_genuinely_live() {
         let runtimes = vec![
             status("aa", "wss://a.example", ManagedAgentRuntimeLifecycle::Ready),
             status(
@@ -771,9 +781,22 @@ mod tests {
             vec![
                 ("aa".to_string(), "wss://a.example".to_string()),
                 ("bb".to_string(), "wss://b.example".to_string()),
-                ("dd".to_string(), "wss://d.example".to_string()),
             ]
         );
+    }
+
+    #[test]
+    fn live_pairs_excludes_failed_jobs_that_never_actually_started() {
+        // A record that fails validation/probe before anything spawns (e.g.
+        // an invalid pubkey) gets a `Failed` row, not a running process.
+        // Counting it as live would log a misleading "reconcile started
+        // managed agent" and queue a pointless stop call for it.
+        let runtimes = vec![status(
+            "zz",
+            "wss://dev.example",
+            ManagedAgentRuntimeLifecycle::Failed,
+        )];
+        assert!(live_pairs(&runtimes).is_empty());
     }
 
     #[test]
