@@ -15,7 +15,7 @@
  * (the Kura relay), resulting in 404s.
  */
 
-import { invoke } from "@tauri-apps/api/core";
+import { platform } from "@/platform";
 
 // Matches: https://anything.com/media/{64-hex}.{ext}
 // Also matches thumbnails: /media/{64-hex}.thumb.jpg
@@ -191,7 +191,7 @@ async function fetchProxyPort(): Promise<number | null> {
       const publishRelayOrigin = beginRelayOriginFetch();
       try {
         const url = await withDeadline(
-          invoke<string>("get_relay_http_url"),
+          platform.invoke<string>("get_relay_http_url"),
           deadline,
         );
         if (url !== null) publishRelayOrigin(canonicalOrigin(url));
@@ -203,7 +203,7 @@ async function fetchProxyPort(): Promise<number | null> {
     if (!cachedPort) {
       try {
         const port = await withDeadline(
-          invoke<number>("get_media_proxy_port"),
+          platform.invoke<number>("get_media_proxy_port"),
           deadline,
         );
         if (port !== null && port > 0 && generation === cacheGeneration) {
