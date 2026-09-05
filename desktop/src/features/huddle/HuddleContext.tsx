@@ -1,7 +1,6 @@
-import { invoke } from "@tauri-apps/api/core";
-import { emit, listen } from "@tauri-apps/api/event";
 import * as React from "react";
 
+import { platform } from "@/platform";
 import { setupAudioWorklet, type AudioWorkletHandle } from "./lib/audioWorklet";
 import { type AudioInputDevice, useAudioDevices } from "./lib/useAudioDevices";
 import { usePipelineHotstart } from "./lib/usePipelineHotstart";
@@ -56,7 +55,7 @@ function isRedundantHuddlePhaseError(message: string): boolean {
 }
 
 function interruptAgentSpeech(agentPubkey: string) {
-  return invoke<void>("interrupt_huddle_speech", { agentPubkey });
+  return platform.invoke<void>("interrupt_huddle_speech", { agentPubkey });
 }
 
 const HuddleContext = React.createContext<HuddleContextValue | null>(null);
@@ -152,7 +151,7 @@ export function HuddleProvider({
       setMirroredAudioState((previous) =>
         previous ? { ...previous, selectedDeviceId: deviceId } : previous,
       );
-      void emit(HUDDLE_AUDIO_COMMAND_EVENT, {
+      void platform.emit(HUDDLE_AUDIO_COMMAND_EVENT, {
         type: "set-input-device",
         deviceId,
       } satisfies HuddleAudioCommand);
@@ -169,7 +168,7 @@ export function HuddleProvider({
       setMirroredAudioState((previous) =>
         previous ? { ...previous, micGain: clamped } : previous,
       );
-      void emit(HUDDLE_AUDIO_COMMAND_EVENT, {
+      void platform.emit(HUDDLE_AUDIO_COMMAND_EVENT, {
         type: "set-mic-gain",
         gain: clamped,
       } satisfies HuddleAudioCommand);
@@ -184,7 +183,7 @@ export function HuddleProvider({
     React.useState("");
   const setSelectedOutputDevice = React.useCallback((name: string) => {
     setSelectedOutputDeviceState(name);
-    invoke("set_audio_output_device", { name }).catch(() => {
+    platform.invoke("set_audio_output_device", { name }).catch(() => {
       /* best-effort */
     });
   }, []);
@@ -192,16 +191,18 @@ export function HuddleProvider({
   // Fetch output devices on mount and when system devices change.
   React.useEffect(() => {
     function refreshOutputDevices() {
-      invoke<{ name: string; is_default: boolean }[]>(
-        "list_audio_output_devices",
-      )
+      platform
+        .invoke<{ name: string; is_default: boolean }[]>(
+          "list_audio_output_devices",
+        )
         .then(setOutputDevices)
         .catch(() => {
           /* best-effort */
         });
     }
     refreshOutputDevices();
-    invoke<string>("get_audio_output_device")
+    platform
+      .invoke<string>("get_audio_output_device")
       .then(setSelectedOutputDeviceState)
       .catch(() => {
         /* best-effort */
@@ -226,16 +227,18 @@ export function HuddleProvider({
   // Toggle voice input mode — persists to Rust backend and updates worklet gating.
   const setVoiceInputMode = React.useCallback(
     async (mode: VoiceInputMode) => {
-      await invoke("set_voice_input_mode", { mode });
+      await platform.invoke("set_voice_input_mode", { mode });
       setVoiceInputModeState(mode);
       // Re-sync the PTT-only STT gate with the visible mute state (best-effort).
-      void invoke("set_huddle_manual_mic_unmuted", {
-        enabled: !isMutedRef.current,
-      }).catch(() => {});
+      void platform
+        .invoke("set_huddle_manual_mic_unmuted", {
+          enabled: !isMutedRef.current,
+        })
+        .catch(() => {});
       if (ownsAudioSession) {
         workletRef.current?.setMode(mode);
       } else {
-        void emit(HUDDLE_AUDIO_COMMAND_EVENT, {
+        void platform.emit(HUDDLE_AUDIO_COMMAND_EVENT, {
           type: "set-voice-input-mode",
           mode,
         } satisfies HuddleAudioCommand);
@@ -272,7 +275,7 @@ export function HuddleProvider({
       // The companion never owns a MediaStream. Send the intended state, not
       // a toggle, so a delayed initial state response cannot invert the main
       // window's live microphone track.
-      void emit(HUDDLE_AUDIO_COMMAND_EVENT, {
+      void platform.emit(HUDDLE_AUDIO_COMMAND_EVENT, {
         type: "set-muted",
         isMuted: nextMuted,
       });
@@ -283,7 +286,7 @@ export function HuddleProvider({
     // hidden manual preference, which can differ while PTT is held.
     const requestedMuted = !locallyMuted;
     setIsMuted(requestedMuted);
-    void invoke("set_huddle_manual_mic_unmuted", {
+    void platform.invoke("set_huddle_manual_mic_unmuted", {
       enabled: !requestedMuted,
     });
   }, [
@@ -298,38 +301,40 @@ export function HuddleProvider({
     let unlisten: (() => void) | null = null;
     let requestRetry: number | null = null;
 
-    listen<HuddleAudioMirrorState>(HUDDLE_AUDIO_STATE_EVENT, (event) => {
-      if (!cancelled && !ownsAudioSession) {
-        if (requestRetry !== null) {
-          window.clearInterval(requestRetry);
-          requestRetry = null;
+    platform
+      .listen<HuddleAudioMirrorState>(HUDDLE_AUDIO_STATE_EVENT, (event) => {
+        if (!cancelled && !ownsAudioSession) {
+          if (requestRetry !== null) {
+            window.clearInterval(requestRetry);
+            requestRetry = null;
+          }
+          setMirroredAudioState(event.payload);
+          setVoiceInputModeState(event.payload.voiceInputMode);
         }
-        setMirroredAudioState(event.payload);
-        setVoiceInputModeState(event.payload.voiceInputMode);
-      }
-    }).then((fn) => {
-      if (cancelled) {
-        fn();
-        return;
-      }
-      unlisten = fn;
+      })
+      .then((fn) => {
+        if (cancelled) {
+          fn();
+          return;
+        }
+        unlisten = fn;
 
-      if (!ownsAudioSession) {
-        // Register the response listener before asking the main window for its
-        // browser-owned microphone state. The prior fire-and-forget request
-        // could be answered before this listener existed, leaving the room
-        // window permanently stuck in its "microphone unavailable" fallback.
-        const requestState = () => {
-          void emit(HUDDLE_AUDIO_COMMAND_EVENT, {
-            type: "request-state",
-          } satisfies HuddleAudioCommand);
-        };
-        requestState();
-        // A brief retry also covers the main window rebuilding its listener
-        // during a device-change render. It stops with the first response.
-        requestRetry = window.setInterval(requestState, 500);
-      }
-    });
+        if (!ownsAudioSession) {
+          // Register the response listener before asking the main window for its
+          // browser-owned microphone state. The prior fire-and-forget request
+          // could be answered before this listener existed, leaving the room
+          // window permanently stuck in its "microphone unavailable" fallback.
+          const requestState = () => {
+            void platform.emit(HUDDLE_AUDIO_COMMAND_EVENT, {
+              type: "request-state",
+            } satisfies HuddleAudioCommand);
+          };
+          requestState();
+          // A brief retry also covers the main window rebuilding its listener
+          // during a device-change render. It stops with the first response.
+          requestRetry = window.setInterval(requestState, 500);
+        }
+      });
 
     return () => {
       cancelled = true;
@@ -349,47 +354,49 @@ export function HuddleProvider({
       micGain: localMicGain,
       voiceInputMode,
     };
-    void emit(HUDDLE_AUDIO_STATE_EVENT, state);
+    void platform.emit(HUDDLE_AUDIO_STATE_EVENT, state);
 
     let cancelled = false;
     let unlisten: (() => void) | null = null;
-    listen<HuddleAudioCommand>(HUDDLE_AUDIO_COMMAND_EVENT, (event) => {
-      if (cancelled) return;
-      if (event.payload.type === "set-muted") {
-        const requestedMuted = event.payload.isMuted;
-        setIsMuted(() => {
-          void invoke("set_huddle_manual_mic_unmuted", {
-            enabled: !requestedMuted,
+    platform
+      .listen<HuddleAudioCommand>(HUDDLE_AUDIO_COMMAND_EVENT, (event) => {
+        if (cancelled) return;
+        if (event.payload.type === "set-muted") {
+          const requestedMuted = event.payload.isMuted;
+          setIsMuted(() => {
+            void platform.invoke("set_huddle_manual_mic_unmuted", {
+              enabled: !requestedMuted,
+            });
+            return requestedMuted;
           });
-          return requestedMuted;
-        });
-        return;
-      }
-      if (event.payload.type === "set-input-device") {
-        setLocalSelectedDeviceId(event.payload.deviceId);
-        return;
-      }
-      if (event.payload.type === "set-mic-gain") {
-        setLocalMicGain(event.payload.gain);
-        return;
-      }
-      if (event.payload.type === "set-voice-input-mode") {
-        setVoiceInputModeState(event.payload.mode);
-        workletRef.current?.setMode(event.payload.mode);
-        return;
-      }
-      void emit(HUDDLE_AUDIO_STATE_EVENT, {
-        isMuted: locallyMutedRef.current,
-        micConnected: micConnectedRef.current,
-        audioDevices: localAudioDevices,
-        selectedDeviceId: localSelectedDeviceId,
-        micGain: localMicGain,
-        voiceInputMode,
-      } satisfies HuddleAudioMirrorState);
-    }).then((fn) => {
-      if (cancelled) fn();
-      else unlisten = fn;
-    });
+          return;
+        }
+        if (event.payload.type === "set-input-device") {
+          setLocalSelectedDeviceId(event.payload.deviceId);
+          return;
+        }
+        if (event.payload.type === "set-mic-gain") {
+          setLocalMicGain(event.payload.gain);
+          return;
+        }
+        if (event.payload.type === "set-voice-input-mode") {
+          setVoiceInputModeState(event.payload.mode);
+          workletRef.current?.setMode(event.payload.mode);
+          return;
+        }
+        void platform.emit(HUDDLE_AUDIO_STATE_EVENT, {
+          isMuted: locallyMutedRef.current,
+          micConnected: micConnectedRef.current,
+          audioDevices: localAudioDevices,
+          selectedDeviceId: localSelectedDeviceId,
+          micGain: localMicGain,
+          voiceInputMode,
+        } satisfies HuddleAudioMirrorState);
+      })
+      .then((fn) => {
+        if (cancelled) fn();
+        else unlisten = fn;
+      });
 
     return () => {
       cancelled = true;
@@ -450,19 +457,22 @@ export function HuddleProvider({
 
     let cancelled = false;
     let unlisten: (() => void) | null = null;
-    void invoke<HuddleBackendState>("get_huddle_state")
+    void platform
+      .invoke<HuddleBackendState>("get_huddle_state")
       .then((state) => {
         if (!cancelled && state) applyBackendState(state);
       })
       .catch(() => {
         /* best-effort; lifecycle events remain authoritative */
       });
-    void listen<HuddleBackendState>("huddle-state-changed", (event) => {
-      if (!cancelled) applyBackendState(event.payload);
-    }).then((cleanup) => {
-      if (cancelled) cleanup();
-      else unlisten = cleanup;
-    });
+    void platform
+      .listen<HuddleBackendState>("huddle-state-changed", (event) => {
+        if (!cancelled) applyBackendState(event.payload);
+      })
+      .then((cleanup) => {
+        if (cancelled) cleanup();
+        else unlisten = cleanup;
+      });
     return () => {
       cancelled = true;
       unlisten?.();
@@ -474,7 +484,7 @@ export function HuddleProvider({
     try {
       // `leave_huddle` is idempotent in Rust. Always call it so a provider
       // remount cannot leave Rust's huddle state active while this ref is false.
-      await invoke("leave_huddle");
+      await platform.invoke("leave_huddle");
       rustActiveRef.current = false;
     } catch {
       return false; // Signal that backend cleanup failed
@@ -502,17 +512,17 @@ export function HuddleProvider({
       if (rustActiveRef.current) {
         if (isCreator) {
           try {
-            await invoke("end_huddle");
+            await platform.invoke("end_huddle");
             rustActiveRef.current = false;
           } catch {
             try {
-              await invoke("leave_huddle");
+              await platform.invoke("leave_huddle");
               rustActiveRef.current = false;
             } catch {}
           }
         } else {
           try {
-            await invoke("leave_huddle");
+            await platform.invoke("leave_huddle");
             rustActiveRef.current = false;
           } catch {}
         }
@@ -556,7 +566,9 @@ export function HuddleProvider({
       // Fetch self pubkey once for TTS filtering
       if (!selfPubkeyRef.current) {
         try {
-          const identity = await invoke<{ pubkey: string }>("get_identity");
+          const identity = await platform.invoke<{ pubkey: string }>(
+            "get_identity",
+          );
           selfPubkeyRef.current = identity.pubkey;
         } catch {
           /* best-effort */
@@ -606,7 +618,7 @@ export function HuddleProvider({
 
         workletRef.current = worklet;
         setEphemeralChannelId(joinInfo.ephemeral_channel_id);
-        await invoke("confirm_huddle_active");
+        await platform.invoke("confirm_huddle_active");
 
         return { worklet, stream };
       } catch (err) {
@@ -642,7 +654,7 @@ export function HuddleProvider({
       setIsStarting(true);
       onHuddleStartPendingChange?.(true);
       try {
-        const joinInfo = await invoke<HuddleJoinInfo>("start_huddle", {
+        const joinInfo = await platform.invoke<HuddleJoinInfo>("start_huddle", {
           parentChannelId,
           memberPubkeys,
           channelName,
@@ -719,7 +731,7 @@ export function HuddleProvider({
       setIsStarting(true);
 
       try {
-        const joinInfo = await invoke<HuddleJoinInfo>("join_huddle", {
+        const joinInfo = await platform.invoke<HuddleJoinInfo>("join_huddle", {
           parentChannelId,
           ephemeralChannelId,
           huddleThreadEventId,
@@ -784,7 +796,7 @@ export function HuddleProvider({
 
   React.useEffect(() => {
     if (ownsAudioSession) {
-      void emit(HUDDLE_AUDIO_LEVEL_EVENT, micLevel);
+      void platform.emit(HUDDLE_AUDIO_LEVEL_EVENT, micLevel);
     }
   }, [micLevel, ownsAudioSession]);
 
@@ -792,12 +804,14 @@ export function HuddleProvider({
     if (ownsAudioSession) return;
     let cancelled = false;
     let unlisten: (() => void) | null = null;
-    void listen<number>(HUDDLE_AUDIO_LEVEL_EVENT, (event) => {
-      if (!cancelled) setMirroredMicLevel(event.payload);
-    }).then((cleanup) => {
-      if (cancelled) cleanup();
-      else unlisten = cleanup;
-    });
+    void platform
+      .listen<number>(HUDDLE_AUDIO_LEVEL_EVENT, (event) => {
+        if (!cancelled) setMirroredMicLevel(event.payload);
+      })
+      .then((cleanup) => {
+        if (cancelled) cleanup();
+        else unlisten = cleanup;
+      });
     return () => {
       cancelled = true;
       unlisten?.();
@@ -824,46 +838,50 @@ export function HuddleProvider({
 
     let cancelled = false;
     let unlisten: (() => void) | null = null;
-    listen("huddle-audio-disconnected", () => {
-      if (cancelled || audioReconnectInFlightRef.current) return;
-      audioReconnectInFlightRef.current = true;
-      const reconnectToken = tokenRef.current;
+    platform
+      .listen("huddle-audio-disconnected", () => {
+        if (cancelled || audioReconnectInFlightRef.current) return;
+        audioReconnectInFlightRef.current = true;
+        const reconnectToken = tokenRef.current;
 
-      void (async () => {
-        // Keep a long enough tail for Kubernetes Service endpoint removal after
-        // a draining pod flips readiness. Early retries make remote-owner
-        // handoff fast; the two 2s attempts prevent a client connected to the
-        // draining pod itself from exhausting before kube-proxy converges.
-        const delaysMs = [0, 100, 250, 500, 1_000, 2_000, 2_000];
-        for (const delayMs of delaysMs) {
-          if (cancelled || tokenRef.current !== reconnectToken) return;
-          if (delayMs > 0) {
-            await new Promise((resolve) => window.setTimeout(resolve, delayMs));
+        void (async () => {
+          // Keep a long enough tail for Kubernetes Service endpoint removal after
+          // a draining pod flips readiness. Early retries make remote-owner
+          // handoff fast; the two 2s attempts prevent a client connected to the
+          // draining pod itself from exhausting before kube-proxy converges.
+          const delaysMs = [0, 100, 250, 500, 1_000, 2_000, 2_000];
+          for (const delayMs of delaysMs) {
+            if (cancelled || tokenRef.current !== reconnectToken) return;
+            if (delayMs > 0) {
+              await new Promise((resolve) =>
+                window.setTimeout(resolve, delayMs),
+              );
+            }
+            if (cancelled || tokenRef.current !== reconnectToken) return;
+            try {
+              await platform.invoke("reconnect_huddle_audio");
+              // Success installs a live replacement pipeline. If it later fails,
+              // its Tauri event arrives after this loop releases the in-flight
+              // guard and starts a fresh bounded recovery cycle. Repeating those
+              // cycles is intentional while the relay remains connectable.
+              return;
+            } catch {
+              // A draining pod may still receive the first retry before Service
+              // endpoints converge. Keep the bounded backoff client-local.
+            }
           }
-          if (cancelled || tokenRef.current !== reconnectToken) return;
-          try {
-            await invoke("reconnect_huddle_audio");
-            // Success installs a live replacement pipeline. If it later fails,
-            // its Tauri event arrives after this loop releases the in-flight
-            // guard and starts a fresh bounded recovery cycle. Repeating those
-            // cycles is intentional while the relay remains connectable.
-            return;
-          } catch {
-            // A draining pod may still receive the first retry before Service
-            // endpoints converge. Keep the bounded backoff client-local.
-          }
-        }
 
-        if (!cancelled && tokenRef.current === reconnectToken) {
-          await leaveHuddleRef.current();
-        }
-      })().finally(() => {
-        audioReconnectInFlightRef.current = false;
+          if (!cancelled && tokenRef.current === reconnectToken) {
+            await leaveHuddleRef.current();
+          }
+        })().finally(() => {
+          audioReconnectInFlightRef.current = false;
+        });
+      })
+      .then((fn) => {
+        if (cancelled) fn();
+        else unlisten = fn;
       });
-    }).then((fn) => {
-      if (cancelled) fn();
-      else unlisten = fn;
-    });
     return () => {
       cancelled = true;
       unlisten?.();

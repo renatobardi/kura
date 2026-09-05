@@ -1,8 +1,7 @@
-import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
 import * as React from "react";
 
 import { useProfileQuery, useSelfProfileCache } from "@/features/profile/hooks";
+import { platform } from "@/platform";
 import { useIdentityQuery } from "@/shared/api/hooks";
 import { useHuddle, useHuddleLevels } from "../HuddleContext";
 import { useHuddleParticipantRoster } from "../hooks/useHuddleParticipantRoster";
@@ -56,7 +55,7 @@ export function HuddleRoomHeader() {
   const handleRemoveAgent = React.useCallback(async (pubkey: string) => {
     if (!window.confirm("Remove this agent from the huddle?")) return;
     try {
-      await invoke("remove_agent_from_huddle", {
+      await platform.invoke("remove_agent_from_huddle", {
         agentPubkey: pubkey,
       });
       setState((current) =>
@@ -81,7 +80,8 @@ export function HuddleRoomHeader() {
     let disposed = false;
     let unlisten: (() => void) | null = null;
 
-    void invoke<HuddleRosterState>("get_huddle_state")
+    void platform
+      .invoke<HuddleRosterState>("get_huddle_state")
       .then((next) => {
         if (!disposed) setState(next);
       })
@@ -89,12 +89,14 @@ export function HuddleRoomHeader() {
         if (!disposed) setState(null);
       });
 
-    void listen<HuddleRosterState>("huddle-state-changed", (event) => {
-      if (!disposed) setState(event.payload);
-    }).then((cleanup) => {
-      if (disposed) cleanup();
-      else unlisten = cleanup;
-    });
+    void platform
+      .listen<HuddleRosterState>("huddle-state-changed", (event) => {
+        if (!disposed) setState(event.payload);
+      })
+      .then((cleanup) => {
+        if (disposed) cleanup();
+        else unlisten = cleanup;
+      });
 
     return () => {
       disposed = true;

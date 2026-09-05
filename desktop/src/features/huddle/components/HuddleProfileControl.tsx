@@ -1,8 +1,7 @@
-import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
 import { Headphones } from "lucide-react";
 import * as React from "react";
 
+import { platform } from "@/platform";
 import type { Channel } from "@/shared/api/types";
 import { Button } from "@/shared/ui/button";
 import { useHuddle, useHuddleLevels } from "../HuddleContext";
@@ -58,7 +57,8 @@ export function HuddleProfileControl({
     let disposed = false;
     let unlisten: (() => void) | null = null;
 
-    void invoke<HuddleProfileState>("get_huddle_state")
+    void platform
+      .invoke<HuddleProfileState>("get_huddle_state")
       .then((next) => {
         if (!disposed) setState(next);
       })
@@ -66,12 +66,14 @@ export function HuddleProfileControl({
         if (!disposed) setState(null);
       });
 
-    void listen<HuddleProfileState>("huddle-state-changed", (event) => {
-      if (!disposed) setState(event.payload);
-    }).then((cleanup) => {
-      if (disposed) cleanup();
-      else unlisten = cleanup;
-    });
+    void platform
+      .listen<HuddleProfileState>("huddle-state-changed", (event) => {
+        if (!disposed) setState(event.payload);
+      })
+      .then((cleanup) => {
+        if (disposed) cleanup();
+        else unlisten = cleanup;
+      });
 
     return () => {
       disposed = true;
@@ -109,7 +111,7 @@ export function HuddleProfileControl({
 
   async function handleOpenHuddleWindow() {
     try {
-      await invoke("open_huddle_window");
+      await platform.window.openHuddle();
     } catch (error) {
       console.error("Failed to open huddle window:", error);
     }

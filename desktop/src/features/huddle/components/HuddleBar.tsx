@@ -1,5 +1,3 @@
-import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import {
   Bot,
@@ -14,6 +12,7 @@ import * as React from "react";
 import { useCustomEmoji } from "@/features/custom-emoji/hooks";
 import { EmojiPicker } from "@/features/custom-emoji/ui/EmojiPicker";
 import { useProfileQuery, useSelfProfileCache } from "@/features/profile/hooks";
+import { platform } from "@/platform";
 import { reactionEmojiUrl } from "@/shared/api/customEmoji";
 import { useIdentityQuery } from "@/shared/api/hooks";
 import { relayClient } from "@/shared/api/relayClient";
@@ -223,7 +222,7 @@ export function HuddleBar({
     async function fetchState() {
       const generation = stateGenerationRef.current;
       try {
-        const s = await invoke<HuddleState>("get_huddle_state");
+        const s = await platform.invoke<HuddleState>("get_huddle_state");
         if (!cancelled && generation === stateGenerationRef.current) {
           applyIncomingState(s);
         }
@@ -242,15 +241,17 @@ export function HuddleBar({
     if (documentVisible) void fetchState();
 
     // Primary: listen for Rust-emitted state change events
-    listen<HuddleState>("huddle-state-changed", (event) => {
-      if (!cancelled) {
-        stateGenerationRef.current += 1;
-        applyIncomingState(event.payload);
-      }
-    }).then((fn) => {
-      if (cancelled) fn();
-      else unlisten = fn;
-    });
+    platform
+      .listen<HuddleState>("huddle-state-changed", (event) => {
+        if (!cancelled) {
+          stateGenerationRef.current += 1;
+          applyIncomingState(event.payload);
+        }
+      })
+      .then((fn) => {
+        if (cancelled) fn();
+        else unlisten = fn;
+      });
 
     // Fallback in case events are missed; keep it slow so normal huddle use is
     // event-driven and does not keep a sync IPC command warm on the main thread.
@@ -293,7 +294,7 @@ export function HuddleBar({
 
     async function pollModels() {
       try {
-        const status = await invoke<{
+        const status = await platform.invoke<{
           stt: unknown;
           tts: unknown;
         }>("get_model_status");
@@ -541,10 +542,10 @@ export function HuddleBar({
   async function handleToggleTranscript() {
     setTranscriptError(null);
     try {
-      await invoke("set_huddle_transcription_enabled", {
+      await platform.invoke("set_huddle_transcription_enabled", {
         enabled: !transcriptionEnabled,
       });
-      const s = await invoke<HuddleState>("get_huddle_state");
+      const s = await platform.invoke<HuddleState>("get_huddle_state");
       setState(s);
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
@@ -555,7 +556,7 @@ export function HuddleBar({
 
   async function handleOpenHuddleWindow() {
     try {
-      await invoke("open_huddle_window");
+      await platform.window.openHuddle();
       dismissHeadphonesHint();
       onOpenHuddleWindow?.();
     } catch (error) {
@@ -565,7 +566,7 @@ export function HuddleBar({
 
   async function handleReturnToDrawer() {
     try {
-      await invoke("close_huddle_companion");
+      await platform.invoke("close_huddle_companion");
     } catch (error) {
       console.error("Failed to return huddle to drawer:", error);
     }
@@ -641,12 +642,12 @@ export function HuddleBar({
           onAdd={async (pubkey: string): Promise<AgentAddResult> => {
             setAgentAddError(null);
             try {
-              const result = await invoke<AgentAddResult>(
+              const result = await platform.invoke<AgentAddResult>(
                 "add_agent_to_huddle",
                 { agentPubkey: pubkey },
               );
               // Refresh huddle state so the participant list updates immediately.
-              const s = await invoke<HuddleState>("get_huddle_state");
+              const s = await platform.invoke<HuddleState>("get_huddle_state");
               setState(s);
               return result;
             } catch (e: unknown) {
@@ -684,8 +685,11 @@ export function HuddleBar({
             onHeadphonesHintDismiss={dismissHeadphonesHint}
             onToggleTts={async () => {
               try {
-                await invoke("set_tts_enabled", { enabled: !ttsEnabled });
-                const s = await invoke<HuddleState>("get_huddle_state");
+                await platform.invoke("set_tts_enabled", {
+                  enabled: !ttsEnabled,
+                });
+                const s =
+                  await platform.invoke<HuddleState>("get_huddle_state");
                 setState(s);
               } catch (e) {
                 console.error("Failed to toggle TTS:", e);
@@ -720,7 +724,7 @@ export function HuddleBar({
                 );
                 if (!confirmed) return;
                 try {
-                  await invoke("remove_agent_from_huddle", {
+                  await platform.invoke("remove_agent_from_huddle", {
                     agentPubkey: pubkey,
                   });
                   setState((prev) => {
