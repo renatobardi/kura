@@ -1,5 +1,4 @@
-import { listen, type UnlistenFn } from "@tauri-apps/api/event";
-import { invoke } from "@tauri-apps/api/core";
+import { platform, type UnlistenFn } from "@/platform";
 import type { StartCommunityOnboardingInput } from "@/features/onboarding/communityOnboarding";
 
 export type AddCommunityDeepLinkPayload = {
@@ -92,7 +91,7 @@ function acceptPendingCommunityDeepLink(
           policyReceipt: pending.policyReceipt ?? undefined,
         });
   return accepted
-    ? invoke<boolean>("acknowledge_pending_community_deep_link", {
+    ? platform.invoke<boolean>("acknowledge_pending_community_deep_link", {
         id: pending.id,
       })
     : Promise.resolve(false);
@@ -100,7 +99,7 @@ function acceptPendingCommunityDeepLink(
 
 async function drainPendingCommunityDeepLinks(deps: DeepLinkDeps) {
   while (true) {
-    const pending = await invoke<PendingCommunityDeepLink | null>(
+    const pending = await platform.invoke<PendingCommunityDeepLink | null>(
       "take_pending_community_deep_link",
     );
     if (!pending) return;
@@ -149,9 +148,12 @@ export async function listenForDeepLinks(
     })();
   };
   const stopAvailabilityListener = deps.onAddCommunityAvailable(drain);
-  const connectPromise = listen<string>("deep-link-connect", drain);
-  const joinPromise = listen<JoinDeepLinkPayload>("deep-link-join", drain);
-  const addCommunityPromise = listen<AddCommunityDeepLinkPayload>(
+  const connectPromise = platform.listen<string>("deep-link-connect", drain);
+  const joinPromise = platform.listen<JoinDeepLinkPayload>(
+    "deep-link-join",
+    drain,
+  );
+  const addCommunityPromise = platform.listen<AddCommunityDeepLinkPayload>(
     "deep-link-add-community",
     drain,
   );
@@ -177,7 +179,7 @@ export async function resetNavigationDeepLinkDrain(): Promise<void> {
   // A rejected clear leaves that queue's identity unknown, so no later listener
   // may route it against a different community.
   navigationDrainEnabled = false;
-  await invoke("clear_pending_navigation_deep_links");
+  await platform.invoke("clear_pending_navigation_deep_links");
   if (generation === navigationDrainGeneration) {
     navigationDrainEnabled = true;
   }
@@ -202,7 +204,7 @@ async function drainPendingNavigationDeepLinks(
   const generation = navigationDrainGeneration;
   if (!navigationDrainEnabled) return;
   while (navigationDrainEnabled && generation === navigationDrainGeneration) {
-    const pending = await invoke<PendingNavigationDeepLink | null>(
+    const pending = await platform.invoke<PendingNavigationDeepLink | null>(
       "take_pending_navigation_deep_link",
     );
     if (
@@ -222,7 +224,7 @@ async function drainPendingNavigationDeepLinks(
           })
         : false);
     if (!accepted || generation !== navigationDrainGeneration) return;
-    const acknowledged = await invoke<boolean>(
+    const acknowledged = await platform.invoke<boolean>(
       "acknowledge_pending_navigation_deep_link",
       { id: pending.id },
     );
@@ -267,8 +269,8 @@ export async function listenForNavigationDeepLinks(
   };
 
   const unlistens = await Promise.all([
-    listen<ChannelDeepLinkPayload>("deep-link-channel", drain),
-    listen<MessageDeepLinkPayload>("deep-link-message", drain),
+    platform.listen<ChannelDeepLinkPayload>("deep-link-channel", drain),
+    platform.listen<MessageDeepLinkPayload>("deep-link-message", drain),
   ]);
   drain();
   return () => {
@@ -295,12 +297,12 @@ export function listenForEntityDeepLinks(
         while (drainRequested) {
           drainRequested = false;
           while (true) {
-            const pending = await invoke<PendingEntityDeepLink | null>(
+            const pending = await platform.invoke<PendingEntityDeepLink | null>(
               "take_pending_entity_deep_link",
             );
             if (!pending) break;
             if (!onOpen(pending.href)) return;
-            const acknowledged = await invoke<boolean>(
+            const acknowledged = await platform.invoke<boolean>(
               "acknowledge_pending_entity_deep_link",
               { id: pending.id },
             );
@@ -316,23 +318,28 @@ export function listenForEntityDeepLinks(
     })();
   };
 
-  return listen<PendingEntityDeepLink | string>("deep-link-entity", (event) => {
-    // String payloads are retained for older backends and E2E bridge calls.
-    if (typeof event.payload === "string") {
-      onOpen(event.payload);
-    } else {
+  return platform
+    .listen<PendingEntityDeepLink | string>("deep-link-entity", (event) => {
+      // String payloads are retained for older backends and E2E bridge calls.
+      if (typeof event.payload === "string") {
+        onOpen(event.payload);
+      } else {
+        drain();
+      }
+    })
+    .then((unlisten) => {
       drain();
-    }
-  }).then((unlisten) => {
-    drain();
-    return unlisten;
-  });
+      return unlisten;
+    });
 }
 
 export function listenForNostrBindDeepLinks(
   onOpen: (payload: NostrBindDeepLinkPayload) => void,
 ): Promise<UnlistenFn> {
-  return listen<NostrBindDeepLinkPayload>("deep-link-nostr-bind", (event) => {
-    onOpen(event.payload);
-  });
+  return platform.listen<NostrBindDeepLinkPayload>(
+    "deep-link-nostr-bind",
+    (event) => {
+      onOpen(event.payload);
+    },
+  );
 }
