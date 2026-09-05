@@ -12,9 +12,9 @@
 
 import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { invoke } from "@tauri-apps/api/core";
 import { toast } from "sonner";
 
+import { platform } from "@/platform";
 import { relayClient } from "@/shared/api/relayClient";
 import { isRelayDependentQuery } from "@/shared/api/relayQueryInvalidation";
 import { relayReconnectController } from "@/shared/api/relayReconnectController";
@@ -22,8 +22,9 @@ import { relayReconnectController } from "@/shared/api/relayReconnectController"
 function buildDeps(onSuccess: () => void, onBackstop: () => void) {
   return {
     preconnect: () => relayClient.preconnect(),
-    hookConfigured: () => invoke<boolean>("relay_reconnect_hook_configured"),
-    runHook: () => invoke<void>("relay_reconnect_hook"),
+    hookConfigured: () =>
+      platform.invoke<boolean>("relay_reconnect_hook_configured"),
+    runHook: () => platform.invoke<void>("relay_reconnect_hook"),
     subscribeToConnectionState: (listener: (state: string) => void) =>
       relayClient.subscribeToConnectionState(listener),
     onSuccess,

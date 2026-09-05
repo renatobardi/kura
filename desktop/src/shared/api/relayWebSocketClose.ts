@@ -1,4 +1,6 @@
-import { invoke } from "@tauri-apps/api/core";
+import { platform } from "@/platform";
+
+type InvokeFn = typeof platform.invoke;
 
 /**
  * Remove the connection from the native manager before waiting for its socket
@@ -8,7 +10,7 @@ import { invoke } from "@tauri-apps/api/core";
 export function closeWebSocket(
   id: number,
   reason: string,
-  invokeFn: typeof invoke = invoke,
+  invokeFn: InvokeFn = platform.invoke,
 ): Promise<void> {
   return invokeFn("plugin:websocket|disconnect", { id }).then(
     () => undefined,
@@ -19,7 +21,7 @@ export function closeWebSocket(
 }
 
 export function closeAllWebSockets(
-  invokeFn: typeof invoke = invoke,
+  invokeFn: InvokeFn = platform.invoke,
 ): Promise<void> {
   return invokeFn("plugin:websocket|disconnect_all").then(
     () => undefined,
