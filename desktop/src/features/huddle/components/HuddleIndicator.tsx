@@ -1,9 +1,9 @@
-import { listen } from "@tauri-apps/api/event";
 import { Headphones } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { platform } from "@/platform";
 import { relayClient } from "@/shared/api/relayClient";
 import type { RelayEvent } from "@/shared/api/types";
 import { cn } from "@/shared/lib/cn";
@@ -201,14 +201,16 @@ export function HuddleIndicator({
     let unlisten: (() => void) | null = null;
     let cancelled = false;
 
-    listen<{ phase: string }>("huddle-state-changed", (event) => {
-      if (!cancelled && event.payload.phase === "idle") {
-        setActiveHuddle(null);
-      }
-    }).then((fn) => {
-      if (cancelled) fn();
-      else unlisten = fn;
-    });
+    platform
+      .listen<{ phase: string }>("huddle-state-changed", (event) => {
+        if (!cancelled && event.payload.phase === "idle") {
+          setActiveHuddle(null);
+        }
+      })
+      .then((fn) => {
+        if (cancelled) fn();
+        else unlisten = fn;
+      });
 
     return () => {
       cancelled = true;
