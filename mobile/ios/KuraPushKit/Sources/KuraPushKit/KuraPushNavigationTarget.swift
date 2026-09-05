@@ -3,7 +3,7 @@ import Foundation
 /// A stable destination attached by the notification service extension after
 /// it resolves and verifies the event that produced a push wake.
 public struct KuraPushNavigationTarget: Codable, Equatable, Sendable {
-  public static let userInfoKey = "buzz_push_navigation"
+  public static let userInfoKey = "kura_push_navigation"
 
   public let eventID: String
   public let communityID: String

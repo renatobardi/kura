@@ -5,7 +5,7 @@ import XCTest
 @testable import KuraPushKit
 
 /// Replays the gateway-generated known-answer vectors
-/// (`crates/buzz-push-gateway/tests/vectors/app_attest_transcripts.json`)
+/// (`crates/kura-push-gateway/tests/vectors/app_attest_transcripts.json`)
 /// against the Swift canonical encoder. Byte-for-byte transcript equality and
 /// SHA-256 equality are both asserted, so a drift on either side breaks a test
 /// instead of silently stranding iOS clients with `401 invalid_attestation`.
@@ -45,7 +45,7 @@ final class KuraPushTranscriptTests: XCTestCase {
     static let installationHandle = UUID(uuidString: "22222222-2222-4222-8222-222222222222")!
     static let challenge = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8"
     static let keyId = "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqo="
-    static let appProfile = "buzz-ios-dogfood"
+    static let appProfile = "kura-ios-dogfood"
     static let endpoint = "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20"
     static let relayPubkey = String(repeating: "a", count: 64)
     static let notBefore: Int64 = 1_752_620_000
@@ -136,8 +136,8 @@ final class KuraPushTranscriptTests: XCTestCase {
 
     func testSolidusIsNotEscaped() throws {
         // The whole reason this encoder exists: '/' must pass through raw.
-        XCTAssertEqual(try KuraPushTranscript.CanonicalObject.escape("https://push.buzz.xyz/v1", field: "audience"),
-                       "https://push.buzz.xyz/v1")
+        XCTAssertEqual(try KuraPushTranscript.CanonicalObject.escape("https://push.kura.xyz/v1", field: "audience"),
+                       "https://push.kura.xyz/v1")
     }
 
     func testMinimalEscaping() throws {

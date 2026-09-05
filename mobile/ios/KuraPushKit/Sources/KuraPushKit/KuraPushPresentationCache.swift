@@ -783,6 +783,6 @@ public enum KuraPushPresentationIdentity {
 
   private static func scoped(namespace: String, values: [String]) -> String {
     let encoded = (try? JSONEncoder().encode([namespace] + values)) ?? Data()
-    return "buzz.\(namespace).\(VerifiedNostrEvent.hex(SHA256.hash(data: encoded)))"
+    return "kura.\(namespace).\(VerifiedNostrEvent.hex(SHA256.hash(data: encoded)))"
   }
 }
