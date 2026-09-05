@@ -1,11 +1,12 @@
-import { invoke, isTauri } from "@tauri-apps/api/core";
+import { isTauri } from "@tauri-apps/api/core";
+import { platform } from "@/platform";
 
 export function performDefaultHaptic() {
   if (!isTauri()) {
     return;
   }
 
-  void invoke("perform_sidebar_default_haptic").catch(() => {});
+  void platform.invoke("perform_sidebar_default_haptic").catch(() => {});
 }
 
 export function performSidebarDefaultHaptic() {

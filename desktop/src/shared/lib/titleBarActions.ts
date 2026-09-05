@@ -1,4 +1,5 @@
-import { invoke, isTauri } from "@tauri-apps/api/core";
+import { isTauri } from "@tauri-apps/api/core";
+import { platform } from "@/platform";
 
 /**
  * Runs the window action that matches the OS "double-click a window's title
@@ -15,7 +16,7 @@ export async function performTitleBarDoubleClickAction(): Promise<void> {
   }
 
   try {
-    await invoke("title_bar_double_click");
+    await platform.invoke("title_bar_double_click");
   } catch {
     // No-op on failure; a missed titlebar action is not worth surfacing.
   }

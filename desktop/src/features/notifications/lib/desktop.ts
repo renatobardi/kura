@@ -1,11 +1,11 @@
-import { invoke, isTauri } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
+import { isTauri } from "@tauri-apps/api/core";
 import { UserAttentionType, getCurrentWindow } from "@tauri-apps/api/window";
 import {
   isPermissionGranted,
   onAction,
   requestPermission,
 } from "@tauri-apps/plugin-notification";
+import { platform } from "@/platform";
 import { isLinuxPlatform, isMacPlatform } from "@/shared/lib/platform";
 
 // Backend event emitted when a native Linux notification is clicked or a
@@ -134,7 +134,7 @@ export async function getDesktopNotificationPermissionState(): Promise<DesktopNo
 
   if (isTauri() && isMacPlatform()) {
     try {
-      return await invoke<NotificationPermission>(
+      return await platform.invoke<NotificationPermission>(
         MACOS_NOTIFICATION_PERMISSION_STATE,
       );
     } catch (error) {
@@ -175,14 +175,14 @@ export async function requestDesktopNotificationAccess(): Promise<DesktopNotific
 
   const request =
     isTauri() && isMacPlatform()
-      ? invoke<NotificationPermission>(REQUEST_MACOS_NOTIFICATION_ACCESS).catch(
-          (error) => {
+      ? platform
+          .invoke<NotificationPermission>(REQUEST_MACOS_NOTIFICATION_ACCESS)
+          .catch((error) => {
             if (shouldUseMacDevelopmentFallback(error)) {
               return requestPermission();
             }
             throw error;
-          },
-        )
+          })
       : requestPermission();
   pendingPermissionRequest = request.finally(() => {
     pendingPermissionRequest = null;
@@ -236,7 +236,7 @@ export async function listenForDesktopNotificationActions(
     // Rust first so cold-start clicks survive until this listener is mounted.
     const dispatchNativeActivations = async (payload?: unknown) => {
       if (usesMacActivationQueue) {
-        const targets = await invoke<unknown[]>(
+        const targets = await platform.invoke<unknown[]>(
           TAKE_PENDING_MACOS_NOTIFICATION_ACTIVATIONS,
         );
         for (const pendingTarget of targets) {
@@ -255,7 +255,7 @@ export async function listenForDesktopNotificationActions(
     };
 
     try {
-      nativeUnlisten = await listen<unknown>(
+      nativeUnlisten = await platform.listen<unknown>(
         NATIVE_NOTIFICATION_ACTIVATED_EVENT,
         (event) => {
           void dispatchNativeActivations(event.payload).catch((error) => {
@@ -427,7 +427,7 @@ export async function sendDesktopNotification(
   // See src-tauri/src/commands/notifications.rs.
   if (isTauri() && (isLinuxPlatform() || isMacPlatform())) {
     try {
-      await invoke("show_native_notification", {
+      await platform.invoke("show_native_notification", {
         title: payload.title,
         body: payload.body,
         target: payload.target ?? null,
