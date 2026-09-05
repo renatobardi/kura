@@ -1,5 +1,6 @@
 import * as React from "react";
-import { listen } from "@tauri-apps/api/event";
+
+import { platform } from "@/platform";
 
 /** Mirror of the Rust `InstallOutputEvent` payload (install_report.rs). */
 export type InstallOutputEvent = {
@@ -69,7 +70,7 @@ export function useInstallOutputLine(
     let unlisten: (() => void) | null = null;
     (async () => {
       try {
-        const stop = await listen<InstallOutputEvent>(
+        const stop = await platform.listen<InstallOutputEvent>(
           "acp-install-output",
           (event) => {
             if (cancelled) return;

@@ -1,4 +1,3 @@
-import { listen } from "@tauri-apps/api/event";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
@@ -10,6 +9,7 @@ import {
 } from "@/features/agents/hooks";
 import { managedAgentRuntimesQueryKey } from "@/features/agents/managedAgentRuntimeHooks";
 import { teamAutoRetractedNotice } from "@/features/agents/ui/teamLibraryCopy";
+import { platform } from "@/platform";
 
 export const LOCAL_AGENT_DATA_QUERY_KEYS = [
   personasQueryKey,
@@ -30,14 +30,17 @@ export function useAgentsDataRefresh(): void {
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
 
-    const unlistenRuntime = listen("managed-agent-runtime-status", () => {
-      void queryClient.invalidateQueries({
-        queryKey: managedAgentRuntimesQueryKey,
-      });
-      void queryClient.invalidateQueries({ queryKey: managedAgentsQueryKey });
-    });
+    const unlistenRuntime = platform.listen(
+      "managed-agent-runtime-status",
+      () => {
+        void queryClient.invalidateQueries({
+          queryKey: managedAgentRuntimesQueryKey,
+        });
+        void queryClient.invalidateQueries({ queryKey: managedAgentsQueryKey });
+      },
+    );
 
-    const unlisten = listen("agents-data-changed", () => {
+    const unlisten = platform.listen("agents-data-changed", () => {
       if (timer !== undefined) clearTimeout(timer);
       timer = setTimeout(() => {
         for (const queryKey of LOCAL_AGENT_DATA_QUERY_KEYS) {
@@ -50,7 +53,7 @@ export function useAgentsDataRefresh(): void {
     // reconcile detected a shared team that can no longer be projected and
     // tombstoned it. Show a toast so the owner is not left wondering why
     // their share toggle changed.
-    const unlistenRetracted = listen<{
+    const unlistenRetracted = platform.listen<{
       teamName: string;
       reason: string;
     }>("team-catalog-auto-retracted", (event) => {
