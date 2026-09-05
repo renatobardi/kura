@@ -6,10 +6,10 @@ import {
   RefreshCw,
   TriangleAlert,
 } from "lucide-react";
-import { listen } from "@tauri-apps/api/event";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { toast } from "sonner";
 
+import { platform } from "@/platform";
 import {
   cancelPairing,
   confirmPairingSas,
@@ -302,55 +302,63 @@ export function MobilePairingCard({
     let cancelled = false;
     const unlisteners: (() => void)[] = [];
 
-    listen<{ sas: string }>("pairing-sas-received", (event) => {
-      if (!cancelled && pairingActiveRef.current) {
-        setSasCode(event.payload.sas);
-        setStep("sas");
-      }
-    }).then((fn) => {
-      if (cancelled) fn();
-      else unlisteners.push(fn);
-    });
-
-    listen("pairing-complete", () => {
-      if (!cancelled && pairingActiveRef.current) {
-        pairingActiveRef.current = false;
-        setStep("done");
-      }
-    }).then((fn) => {
-      if (cancelled) fn();
-      else unlisteners.push(fn);
-    });
-
-    listen<{ reason: string }>("pairing-aborted", (event) => {
-      if (!cancelled && pairingActiveRef.current) {
-        pairingActiveRef.current = false;
-        setError(`Pairing stopped: ${event.payload.reason}`);
-        setStep("error");
-      }
-    }).then((fn) => {
-      if (cancelled) fn();
-      else unlisteners.push(fn);
-    });
-
-    listen<{ message: string }>("pairing-error", (event) => {
-      if (!cancelled && pairingActiveRef.current) {
-        pairingActiveRef.current = false;
-        if (isPairingSessionTimeout(event.payload.message)) {
-          setQrUri(null);
-          setSasCode(null);
-          setError(null);
-          setStep("expired");
-          return;
+    platform
+      .listen<{ sas: string }>("pairing-sas-received", (event) => {
+        if (!cancelled && pairingActiveRef.current) {
+          setSasCode(event.payload.sas);
+          setStep("sas");
         }
+      })
+      .then((fn) => {
+        if (cancelled) fn();
+        else unlisteners.push(fn);
+      });
 
-        setError(pairingErrorMessage(event.payload.message));
-        setStep("error");
-      }
-    }).then((fn) => {
-      if (cancelled) fn();
-      else unlisteners.push(fn);
-    });
+    platform
+      .listen("pairing-complete", () => {
+        if (!cancelled && pairingActiveRef.current) {
+          pairingActiveRef.current = false;
+          setStep("done");
+        }
+      })
+      .then((fn) => {
+        if (cancelled) fn();
+        else unlisteners.push(fn);
+      });
+
+    platform
+      .listen<{ reason: string }>("pairing-aborted", (event) => {
+        if (!cancelled && pairingActiveRef.current) {
+          pairingActiveRef.current = false;
+          setError(`Pairing stopped: ${event.payload.reason}`);
+          setStep("error");
+        }
+      })
+      .then((fn) => {
+        if (cancelled) fn();
+        else unlisteners.push(fn);
+      });
+
+    platform
+      .listen<{ message: string }>("pairing-error", (event) => {
+        if (!cancelled && pairingActiveRef.current) {
+          pairingActiveRef.current = false;
+          if (isPairingSessionTimeout(event.payload.message)) {
+            setQrUri(null);
+            setSasCode(null);
+            setError(null);
+            setStep("expired");
+            return;
+          }
+
+          setError(pairingErrorMessage(event.payload.message));
+          setStep("error");
+        }
+      })
+      .then((fn) => {
+        if (cancelled) fn();
+        else unlisteners.push(fn);
+      });
 
     return () => {
       cancelled = true;
