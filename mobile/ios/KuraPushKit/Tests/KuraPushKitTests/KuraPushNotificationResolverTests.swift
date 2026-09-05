@@ -752,7 +752,7 @@ final class KuraPushNotificationResolverTests: XCTestCase {
   }
 
   private static let fixtureEvent = #"""
-    {"kind":9,"created_at":1785551670,"tags":[["h","123e4567-e89b-42d3-a456-426614174000"]],"content":"  Hello   [Kura](https://buzz.block.xyz)  ","pubkey":"c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5","id":"233ccf24ec7c94808f9ef08b0c986b6df1bc3843ff72a9f8d016e2a77c77429b","sig":"d39dcd413839b872ed75a979b2c1542247fde636709966905c9e424e227a43897dc67b71ec84178a3faad0634f9bcdf0b48a56ebac84a2ac6e58124b8b6476e6"}
+    {"kind":9,"created_at":1785551670,"tags":[["h","123e4567-e89b-42d3-a456-426614174000"]],"content":"  Hello   [Kura](https://buzz.block.xyz)  ","pubkey":"c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5","id":"5389bc05a7b67a12f9461a7580f7f8593f4a75c81fce80f186a3134918c7d67e","sig":"12e2267b20eaeea9ab4d3cdda7671e8aa4d1398e814ee62df94a61c0c5808db89143c5760af4795b0dfe0efc8bfeb47fc71292d03c453620bd5bb209b4beca49"}
     """#
 
   static func response(

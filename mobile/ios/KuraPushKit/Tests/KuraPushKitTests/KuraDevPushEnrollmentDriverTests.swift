@@ -125,13 +125,13 @@ final class KuraDevPushEnrollmentDriverTests: XCTestCase {
     try assertMatchesVector(
       "enroll",
       actual: appAttest.clientData[0],
-      expectedSHA256: "58274bd9e9a86489fe5bae36aecbe89618824433189405ff4de8b18b58384270",
+      expectedSHA256: "2d5a6faefad0a7241fc67b76be9eb12e7f146bfbffacdb32b2853755ef698fae",
       fixture: makeFixtureTranscript(name: "enroll", replacements: [])
     )
     try assertMatchesVector(
       "delegate",
       actual: appAttest.clientData[1],
-      expectedSHA256: "f186db11cb53e4e80f09489c11dd18afc9b641683c3d72a67113c57d32fca323",
+      expectedSHA256: "8872d99d3ac4961242333dbaf7bf7e2293f25f37ff3bf0179a130c7b2a73919d",
       fixture: makeFixtureTranscript(
         name: "delegate",
         replacements: [
