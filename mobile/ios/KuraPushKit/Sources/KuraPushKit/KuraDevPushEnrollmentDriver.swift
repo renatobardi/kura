@@ -143,7 +143,7 @@ protocol KuraAppAttestKeyIdStoring {
 }
 
 struct KuraAppAttestKeyIdKeychainStore: KuraAppAttestKeyIdStoring {
-  private static let service = "buzz.push.app-attest"
+  private static let service = "kura.push.app-attest"
   private static let account = "key-id-v1"
 
   private let accessGroup: String?
@@ -306,7 +306,7 @@ struct KuraDCAppAttestProvider: KuraDevAppAttesting {
 
 /// Enrollment and delegation driver for real App Attest and the gated debug bypass.
 public final class KuraDevPushEnrollmentDriver {
-  public static let appProfile = "buzz-ios-dogfood"
+  public static let appProfile = "kura-ios-dogfood"
   public static let endpointEpoch: Int64 = 1
 
   private let gatewayBaseURL: URL

@@ -23,38 +23,38 @@ public enum KuraPushTranscriptError: Error, Equatable {
 /// hand-rolled for that reason: `JSONSerialization` escapes `/` as `\/` and
 /// does not guarantee member order, so it must never be used for transcripts.
 ///
-/// Ground truth: `crates/buzz-push-gateway/tests/vectors/app_attest_transcripts.json`,
+/// Ground truth: `crates/kura-push-gateway/tests/vectors/app_attest_transcripts.json`,
 /// generated and asserted by the gateway's own encoder. The tests in this
 /// package replay those vectors byte-for-byte.
 ///
 /// The `audience` member of each transcript is a **fixed protocol constant**
-/// defined by NIP-PL (`https://push.buzz.xyz/v1/...`). It is a cross-route
+/// defined by NIP-PL (`https://push.kura.xyz/v1/...`). It is a cross-route
 /// domain-separation string, not a deployment URL: the gateway hardcodes it
 /// regardless of where it is hosted, so clients must never derive it from a
 /// discovered gateway base URL or relay host.
 public enum KuraPushTranscript {
     // MARK: Domains
 
-    public static let enrollDomain = "buzz.push.enroll.v1"
-    public static let delegateDomain = "buzz.push.delegate.v1"
-    public static let rotateEndpointDomain = "buzz.push.rotate-endpoint.v1"
-    public static let revokeDelegationDomain = "buzz.push.revoke-delegation.v1"
-    public static let revokeInstallationDomain = "buzz.push.revoke-installation.v1"
+    public static let enrollDomain = "kura.push.enroll.v1"
+    public static let delegateDomain = "kura.push.delegate.v1"
+    public static let rotateEndpointDomain = "kura.push.rotate-endpoint.v1"
+    public static let revokeDelegationDomain = "kura.push.revoke-delegation.v1"
+    public static let revokeInstallationDomain = "kura.push.revoke-installation.v1"
 
     // MARK: Fixed audiences (protocol constants, see type docs)
 
-    public static let enrollAudience = "https://push.buzz.xyz/v1/installations"
-    public static let delegateAudience = "https://push.buzz.xyz/v1/delegations"
-    public static let rotateEndpointAudience = "https://push.buzz.xyz/v1/installations/endpoint"
-    public static let revokeDelegationAudience = "https://push.buzz.xyz/v1/delegations/revoke"
-    public static let revokeInstallationAudience = "https://push.buzz.xyz/v1/installations/revoke"
+    public static let enrollAudience = "https://push.kura.xyz/v1/installations"
+    public static let delegateAudience = "https://push.kura.xyz/v1/delegations"
+    public static let rotateEndpointAudience = "https://push.kura.xyz/v1/installations/endpoint"
+    public static let revokeDelegationAudience = "https://push.kura.xyz/v1/delegations/revoke"
+    public static let revokeInstallationAudience = "https://push.kura.xyz/v1/installations/revoke"
 
     /// Wire version pinned by NIP-PL. Every transcript carries `"v":1`.
     public static let wireVersion: Int64 = 1
 
     // MARK: Transcripts
 
-    /// `buzz.push.enroll.v1` — these exact bytes are the App Attest
+    /// `kura.push.enroll.v1` — these exact bytes are the App Attest
     /// `clientData` supplied to attestation verification.
     public static func enroll(
         challengeId: UUID,
@@ -78,7 +78,7 @@ public enum KuraPushTranscript {
         return encode(domain: enrollDomain, object: o)
     }
 
-    /// `buzz.push.delegate.v1` — `SHA-256(bytes)` is the assertion
+    /// `kura.push.delegate.v1` — `SHA-256(bytes)` is the assertion
     /// `clientDataHash`.
     public static func delegate(
         challengeId: UUID,
@@ -104,7 +104,7 @@ public enum KuraPushTranscript {
         return encode(domain: delegateDomain, object: o)
     }
 
-    /// `buzz.push.rotate-endpoint.v1` — `SHA-256(bytes)` is the assertion
+    /// `kura.push.rotate-endpoint.v1` — `SHA-256(bytes)` is the assertion
     /// `clientDataHash`.
     public static func rotateEndpoint(
         challengeId: UUID,
@@ -126,7 +126,7 @@ public enum KuraPushTranscript {
         return encode(domain: rotateEndpointDomain, object: o)
     }
 
-    /// `buzz.push.revoke-delegation.v1` — `SHA-256(bytes)` is the assertion
+    /// `kura.push.revoke-delegation.v1` — `SHA-256(bytes)` is the assertion
     /// `clientDataHash`.
     public static func revokeDelegation(
         challengeId: UUID,
@@ -146,7 +146,7 @@ public enum KuraPushTranscript {
         return encode(domain: revokeDelegationDomain, object: o)
     }
 
-    /// `buzz.push.revoke-installation.v1` — `SHA-256(bytes)` is the assertion
+    /// `kura.push.revoke-installation.v1` — `SHA-256(bytes)` is the assertion
     /// `clientDataHash`.
     public static func revokeInstallation(
         challengeId: UUID,

@@ -696,7 +696,7 @@ struct KuraPushPresentationCacheTests {
 
   private func temporaryDirectory() throws -> URL {
     let url = FileManager.default.temporaryDirectory
-      .appendingPathComponent("buzz-push-cache-\(UUID().uuidString)", isDirectory: true)
+      .appendingPathComponent("kura-push-cache-\(UUID().uuidString)", isDirectory: true)
     try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
     return url
   }
