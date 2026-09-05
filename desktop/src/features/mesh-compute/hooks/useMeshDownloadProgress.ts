@@ -1,5 +1,6 @@
 import * as React from "react";
-import { listen } from "@tauri-apps/api/event";
+
+import { platform } from "@/platform";
 
 /** Mirror of the Rust MeshDownloadProgress payload (mesh_llm/progress.rs). */
 export type MeshDownloadProgress = {
@@ -31,7 +32,7 @@ export function useMeshDownloadProgress(): {
     let unlisten: (() => void) | null = null;
     (async () => {
       try {
-        const stop = await listen<MeshDownloadProgress>(
+        const stop = await platform.listen<MeshDownloadProgress>(
           "mesh-download-progress",
           (event) => {
             if (cancelled) return;

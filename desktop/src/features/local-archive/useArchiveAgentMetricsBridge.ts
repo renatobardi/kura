@@ -1,6 +1,6 @@
 import * as React from "react";
-import { listen } from "@tauri-apps/api/event";
 
+import { platform } from "@/platform";
 import { notifyAgentMetricsChanged } from "@/shared/api/tauriArchive";
 
 /**
@@ -14,7 +14,7 @@ import { notifyAgentMetricsChanged } from "@/shared/api/tauriArchive";
  */
 export function useArchiveAgentMetricsBridge(): void {
   React.useEffect(() => {
-    const unlisten = listen("archive-agent-metrics-changed", () => {
+    const unlisten = platform.listen("archive-agent-metrics-changed", () => {
       notifyAgentMetricsChanged();
     });
     return () => {

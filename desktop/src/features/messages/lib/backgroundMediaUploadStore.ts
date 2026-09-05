@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { platform } from "@/platform";
 import type { BlobDescriptor } from "@/shared/api/tauri";
 import {
   cancelMediaUpload,
@@ -106,9 +107,8 @@ async function ensureUploadListeners(): Promise<void> {
   uploadListenersPromise = (async () => {
     const disposers: (() => void)[] = [];
     try {
-      const { listen } = await import("@tauri-apps/api/event");
       disposers.push(
-        await listen<{
+        await platform.listen<{
           id: string;
           sent: number;
           total: number;
@@ -134,7 +134,7 @@ async function ensureUploadListeners(): Promise<void> {
         }),
       );
       disposers.push(
-        await listen<{ id: string; phase: unknown }>(
+        await platform.listen<{ id: string; phase: unknown }>(
           "media-upload-phase",
           (event) => {
             const match = /^background-media-upload-(\d+)-(\d+)$/.exec(
