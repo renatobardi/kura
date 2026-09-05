@@ -28,14 +28,38 @@ import type {
   UnlistenFn,
 } from "../types";
 
+// `desktop/src` ships as a single bundle used both inside the real Tauri
+// shell and standalone (browser dev preview, Desktop Smoke E2E under
+// Playwright/Chromium) — `platform/web` (Fase 3) does not exist yet, so
+// `platform/index.ts` always resolves to `tauriPlatform`. That means these
+// flags cannot be build-time constants: whether native capabilities exist
+// depends on the runtime the same bundle happens to be executing in today,
+// exactly like the `isTauri()` checks this replaces. Getters re-evaluate
+// `tauriIsTauri()` on every access instead of caching a stale answer from
+// module init (before `window.__TAURI_INTERNALS__` might be set) or a
+// hardcoded `true` that would report a Tauri shell inside the e2e browser.
 const capabilities: PlatformCapabilities = {
-  isTauri: true,
-  tray: true,
-  vibrancy: true,
-  nativeNotifications: true,
-  globalShortcuts: true,
-  multiWindow: true,
-  nativeFileDialogs: true,
+  get isTauri() {
+    return tauriIsTauri();
+  },
+  get tray() {
+    return tauriIsTauri();
+  },
+  get vibrancy() {
+    return tauriIsTauri();
+  },
+  get nativeNotifications() {
+    return tauriIsTauri();
+  },
+  get globalShortcuts() {
+    return tauriIsTauri();
+  },
+  get multiWindow() {
+    return tauriIsTauri();
+  },
+  get nativeFileDialogs() {
+    return tauriIsTauri();
+  },
 };
 
 async function readClipboardText(): Promise<string> {

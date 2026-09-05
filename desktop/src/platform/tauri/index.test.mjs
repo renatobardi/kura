@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { test } from "node:test";
+import { after, test } from "node:test";
 
 import { isRunningInTauri, tauriPlatform } from "./index.ts";
 
@@ -7,10 +7,33 @@ import { isRunningInTauri, tauriPlatform } from "./index.ts";
 // existing tests on `invokeTauri`/etc. — this module is a thin delegation
 // layer, see ../types.ts for why).
 
-test("tauriPlatform.capabilities reports a Tauri shell", () => {
+// `desktop/src` ships as one bundle used both inside the real Tauri shell
+// and standalone (browser dev preview, Desktop Smoke E2E under
+// Playwright/Chromium — `platform/web` does not exist yet, see the comment
+// on `capabilities` in ./index.ts), so these flags must track the runtime
+// `isTauri()` reports, not a build-time constant. `@tauri-apps/api/core`'s
+// `isTauri()` reads `globalThis.isTauri`; toggling it here reproduces both
+// runtimes without mocking `window.__TAURI_INTERNALS__`.
+after(() => {
+  delete globalThis.isTauri;
+});
+
+test("tauriPlatform.capabilities reports a Tauri shell when isTauri() is true", () => {
+  globalThis.isTauri = true;
   assert.equal(tauriPlatform.capabilities.isTauri, true);
   assert.equal(tauriPlatform.capabilities.tray, true);
   assert.equal(tauriPlatform.capabilities.multiWindow, true);
+});
+
+test("tauriPlatform.capabilities reports no native shell when isTauri() is false (e2e/browser)", () => {
+  delete globalThis.isTauri;
+  assert.equal(tauriPlatform.capabilities.isTauri, false);
+  assert.equal(tauriPlatform.capabilities.tray, false);
+  assert.equal(tauriPlatform.capabilities.vibrancy, false);
+  assert.equal(tauriPlatform.capabilities.nativeNotifications, false);
+  assert.equal(tauriPlatform.capabilities.globalShortcuts, false);
+  assert.equal(tauriPlatform.capabilities.multiWindow, false);
+  assert.equal(tauriPlatform.capabilities.nativeFileDialogs, false);
 });
 
 test("isRunningInTauri is re-exported from @tauri-apps/api/core", () => {
