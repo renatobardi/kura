@@ -5,10 +5,10 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { isTauri } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
 
 import { matchBackForwardChord } from "@/app/navigation/backForwardChords";
 import { traverseHistory } from "@/app/navigation/navigationGuard";
+import { platform } from "@/platform";
 import { isMacPlatform } from "@/shared/lib/platform";
 import { trimMapToSize } from "@/shared/lib/trimMapToSize";
 
@@ -119,7 +119,7 @@ export function useBackForwardControls() {
       return;
     }
 
-    const unlistenPromise = listen<string>("mouse-nav", (event) => {
+    const unlistenPromise = platform.listen<string>("mouse-nav", (event) => {
       handleMouseNav(event.payload);
     });
 
