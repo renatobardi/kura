@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core";
+import { platform } from "@/platform";
 
 export const HOSTED_COMMUNITY_SUFFIX = "communities.kura.oute.pro";
 export const HOSTED_COMMUNITY_LIMIT = 5;
@@ -91,25 +91,25 @@ export function hostedCommunityRelayUrl(community: HostedCommunity) {
 }
 
 export function getBuilderlabAuth() {
-  return invoke<BuilderlabAuth | null>("get_builderlab_auth");
+  return platform.invoke<BuilderlabAuth | null>("get_builderlab_auth");
 }
 
 export function cancelBuilderlabLogin() {
-  return invoke<void>("cancel_builderlab_login");
+  return platform.invoke<void>("cancel_builderlab_login");
 }
 
 export function clearBuilderlabAuth() {
-  return invoke<void>("clear_builderlab_auth");
+  return platform.invoke<void>("clear_builderlab_auth");
 }
 
 export function startBuilderlabLogin() {
-  return invoke<BuilderlabAuth>("start_builderlab_login");
+  return platform.invoke<BuilderlabAuth>("start_builderlab_login");
 }
 
 export async function loadHostedCommunityAccount(): Promise<HostedCommunityAccount> {
   const [identityResponse, communitiesResponse] = await Promise.all([
-    invoke<HostedIdentityResponse>("get_builderlab_nostr_identity"),
-    invoke<HostedCommunitiesResponse>("list_builderlab_communities"),
+    platform.invoke<HostedIdentityResponse>("get_builderlab_nostr_identity"),
+    platform.invoke<HostedCommunitiesResponse>("list_builderlab_communities"),
   ]);
   if (
     identityResponse.error &&
@@ -140,22 +140,26 @@ export async function loadHostedCommunityAccount(): Promise<HostedCommunityAccou
 }
 
 export function bindBuilderlabIdentity() {
-  return invoke<HostedIdentityResponse>("bind_builderlab_nostr_identity");
+  return platform.invoke<HostedIdentityResponse>(
+    "bind_builderlab_nostr_identity",
+  );
 }
 
 export function deleteBuilderlabIdentity() {
-  return invoke<HostedIdentityResponse>("delete_builderlab_nostr_identity");
+  return platform.invoke<HostedIdentityResponse>(
+    "delete_builderlab_nostr_identity",
+  );
 }
 
 export function checkHostedCommunityName(name: string) {
-  return invoke<HostedCommunityAvailabilityResponse>(
+  return platform.invoke<HostedCommunityAvailabilityResponse>(
     "check_builderlab_community_name",
     { name },
   );
 }
 
 export function createHostedCommunity(name: string) {
-  return invoke<HostedCommunityMutationResponse>(
+  return platform.invoke<HostedCommunityMutationResponse>(
     "create_builderlab_community",
     {
       name,
